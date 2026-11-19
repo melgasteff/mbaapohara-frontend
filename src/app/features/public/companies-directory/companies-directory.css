@@ -1,0 +1,21 @@
+.filters { display: grid; gap: var(--space-4); }
+.filters__search { display: flex; gap: var(--space-2); align-items: center; }
+.filters__search .mb-search { flex: 1; max-width: none; }
+/* .mb-field trae 320px fijos para la vista previa del manual (ver ADAPTACIONES.md). */
+.filters .mb-field { width: 100%; }
+
+/* Desde tablet: buscador en una fila y los dos filtros de ubicación lado a lado debajo. */
+@media (min-width: 768px) {
+  .filters { grid-template-columns: 1fr 1fr; }
+  .filters__search { grid-column: 1 / -1; }
+}
+
+
+.grid {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+}
+.grid.is-reloading { opacity: 0.6; }
+
+.pager { display: flex; align-items: center; justify-content: center; gap: var(--space-4); padding-top: var(--space-2); }

@@ -1,0 +1,97 @@
+<section class="page" aria-labelledby="titulo">
+  <h1 id="titulo" class="h1">Empresas</h1>
+  <p class="body">Buscá una empresa y mirá qué cuentan quienes trabajan ahí.</p>
+
+  <div class="filters">
+    <form class="filters__search" role="search" (submit)="search($event, term.value)">
+      <label class="mb-search">
+        <svg lucideSearch [size]="20"></svg>
+        <span class="visually-hidden">Nombre de la empresa</span>
+        <input #term type="search" name="q" [value]="q() ?? ''" placeholder="Buscá por nombre" autocomplete="off" />
+      </label>
+      <button type="submit" class="mb-btn mb-btn-primary">Buscar</button>
+    </form>
+
+    <div class="mb-field">
+      <label for="departamento">Departamento</label>
+      <select id="departamento" class="mb-input" (change)="selectDepartment(dep.value)" #dep>
+        <option value="" [selected]="!departamento()">Todos</option>
+        @for (item of departments.hasValue() ? departments.value().data : []; track item.id) {
+          <option [value]="item.id" [selected]="item.id === departamento()">{{ item.nombre }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="mb-field">
+      <label for="ciudad">Ciudad</label>
+      <select
+        id="ciudad"
+        class="mb-input"
+        [disabled]="!departamento()"
+        aria-describedby="ciudad-ayuda"
+        (change)="selectCity(city.value)"
+        #city
+      >
+        <option value="" [selected]="!ciudad()">Todas</option>
+        @for (item of cities.hasValue() ? cities.value().data : []; track item.id) {
+          <option [value]="item.id" [selected]="item.id === ciudad()">{{ item.nombre }}</option>
+        }
+      </select>
+      <span class="mb-help" id="ciudad-ayuda">
+        @if (departamento()) { Empresas con al menos un local en la ciudad. } @else { Elegí primero el departamento. }
+      </span>
+    </div>
+  </div>
+
+  @if (companies.error()) {
+    <app-page-state kind="error" title="No pudimos cargar las empresas." (retry)="companies.reload()" />
+  } @else if (companies.hasValue()) {
+    @let result = companies.value();
+    @if (result.total === 0) {
+      <app-page-state
+        kind="empty"
+        title="No encontramos empresas con esa búsqueda."
+        message="Probá con otro nombre o quitá el filtro de ciudad."
+      >
+        @if (hasFilters()) {
+          <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm" (click)="clearFilters()">Quitar filtros</button>
+        }
+      </app-page-state>
+    } @else {
+      <p class="body-sm results-count" aria-live="polite">
+        {{ result.total | number }} {{ result.total === 1 ? 'empresa' : 'empresas' }}
+      </p>
+      <ul class="grid" [class.is-reloading]="companies.isLoading()">
+        @for (company of result.data; track company.id; let i = $index) {
+          <li><app-company-card [company]="company" [index]="i" /></li>
+        }
+      </ul>
+
+      @if (totalPages() > 1) {
+        <nav class="pager" aria-label="Páginas">
+          <button
+            type="button"
+            class="mb-btn mb-btn-secondary mb-btn-sm"
+            [disabled]="page() <= 1"
+            (click)="goToPage(page() - 1)"
+          >
+            <svg lucideChevronLeft [size]="16" aria-hidden="true"></svg>
+            Anterior
+          </button>
+          <span class="body-sm">Página {{ page() }} de {{ totalPages() }}</span>
+          <button
+            type="button"
+            class="mb-btn mb-btn-secondary mb-btn-sm"
+            [disabled]="page() >= totalPages()"
+            (click)="goToPage(page() + 1)"
+          >
+            Siguiente
+            <svg lucideChevronRight [size]="16" aria-hidden="true"></svg>
+          </button>
+        </nav>
+      }
+    }
+  } @else {
+    <app-page-state kind="loading" message="Cargando empresas…" />
+  }
+</section>

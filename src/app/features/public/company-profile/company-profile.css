@@ -1,0 +1,14 @@
+.back { display: inline-flex; align-items: center; gap: var(--space-1); }
+.profile-head { display: flex; flex-direction: column; gap: var(--space-2); }
+section[aria-labelledby] > * + * { margin-top: var(--space-3); }
+.h2 { margin: var(--space-6) 0 0; }
+.city { margin-bottom: 0; }
+.offices { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+.office {
+  display: flex; gap: var(--space-3); align-items: flex-start;
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-md);
+}
+.office svg { flex: none; color: var(--yerba-text); }
+.office div { display: flex; flex-direction: column; }
+.office__ref { color: var(--ink-muted); }

@@ -1,0 +1,62 @@
+<section class="page" aria-labelledby="titulo">
+  <a class="mb-link back" routerLink="/empresas">
+    <svg lucideArrowLeft [size]="16" aria-hidden="true"></svg>
+    Volver a empresas
+  </a>
+
+  @if (notFound()) {
+    <h1 id="titulo" class="h1">No encontramos esta empresa</h1>
+    <app-page-state
+      kind="empty"
+      title="Puede que el enlace esté mal o que la empresa todavía esté en revisión."
+      message="Buscala en el directorio."
+    >
+      <a class="mb-btn mb-btn-secondary mb-btn-sm" routerLink="/empresas">Ir a empresas</a>
+    </app-page-state>
+  } @else if (company.error()) {
+    <h1 id="titulo" class="h1">Perfil de la empresa</h1>
+    <app-page-state kind="error" title="No pudimos cargar esta empresa." (retry)="company.reload()" />
+  } @else if (company.hasValue()) {
+    @let data = company.value();
+    <header class="profile-head">
+      <h1 id="titulo" class="h1">{{ data.nombre }}</h1>
+      @if (data.rubro.nombre; as rubro) {
+        <div class="mb-meta"><span>{{ rubro }}</span></div>
+      }
+    </header>
+
+    <section aria-labelledby="locales">
+      <h2 id="locales" class="h2">Locales</h2>
+      @if (data.locales.length === 0) {
+        <p class="body">Esta empresa todavía no tiene locales cargados.</p>
+      } @else {
+        @for (group of cityGroups(); track group.ciudad) {
+          <h3 class="h3 city">{{ group.ciudad }}</h3>
+          <ul class="offices">
+            @for (office of group.locales; track office.id) {
+              <li class="office">
+                <svg lucideMapPin [size]="20" aria-hidden="true"></svg>
+                <div>
+                  <span class="body">{{ office.nombre }}</span>
+                  @if (office.direccionReferencia) {
+                    <span class="body-sm office__ref">{{ office.direccionReferencia }}</span>
+                  }
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      }
+    </section>
+
+    <section aria-labelledby="resenas">
+      <h2 id="resenas" class="h2">Reseñas</h2>
+      <app-page-state kind="empty" icon="reviews" title="Todavía no hay reseñas. Sé la primera persona en contar.">
+        <a class="mb-btn mb-btn-primary" routerLink="/publicar">Escribí tu reseña</a>
+      </app-page-state>
+    </section>
+  } @else {
+    <h1 id="titulo" class="h1 visually-hidden">Perfil de la empresa</h1>
+    <app-page-state kind="loading" message="Cargando la empresa…" />
+  }
+</section>
