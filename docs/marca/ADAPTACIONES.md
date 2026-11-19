@@ -42,4 +42,8 @@ Si algo de este archivo choca con el manual, gana este archivo.
 - Rechazada: `.mb-tag-danger`, visible solo para quien la escribió, junto con el motivo.
 
 ## Datos de ejemplo
-- Siempre empresas ficticias. Los nombres del manual («Supermercado Central», «Distribuidora Ñandutí») son ficticios y se pueden usar.
+- Las empresas y locales de la demo son reales: vienen de la semilla del backend (decisión del 19/11).
+  Las reseñas, personas y textos de ejemplo siempre son ficticios: nunca se le atribuye una opinión inventada
+  a una empresa real. Por eso el perfil muestra el estado vacío y no reseñas simuladas.
+- Los nombres del manual («Supermercado Central», «Distribuidora Ñandutí») son ficticios y se pueden usar
+  en vistas previas y en la documentación.
