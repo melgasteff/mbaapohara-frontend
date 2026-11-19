@@ -1,0 +1,26 @@
+<!-- @dsCard group="Formularios" height=330 subtitle="Normal, con ayuda y con error" -->
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><title>Campo de texto — vista previa</title></head>
+<body>
+<div class="mb-stage">
+  <div class="mb-col">
+    <div class="mb-field">
+      <label for="cargo">Tu cargo en la empresa</label>
+      <input class="mb-input" id="cargo" placeholder="Ej.: cajera, chofer, analista">
+      <span class="mb-help"><svg class="mb-icon mb-icon-sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Tu nombre nunca se muestra.</span>
+    </div>
+    <div class="mb-field mb-field-error">
+      <label for="titulo">Título de tu reseña</label>
+      <input class="mb-input" id="titulo" value="Bien" aria-invalid="true" aria-describedby="e1">
+      <span class="mb-help" id="e1"><svg class="mb-icon mb-icon-sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5"/><path d="M12 16.5h.01"/></svg>Escribí al menos 10 caracteres.</span>
+    </div>
+  </div>
+  <div class="mb-field">
+    <label for="bueno">Lo bueno</label>
+    <textarea class="mb-input" id="bueno" placeholder="¿Qué valorás de trabajar ahí?"></textarea>
+    <span class="mb-help">Mínimo 50 caracteres · 0/1000</span>
+  </div>
+</div>
+</body>
+</html>
