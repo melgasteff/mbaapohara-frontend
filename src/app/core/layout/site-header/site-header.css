@@ -66,3 +66,12 @@
   }
   .site-header__nav .mb-btn { height: 36px; margin-top: 0; }
 }
+
+/* «Salir» es una acción (botón), pero se ve como los enlaces de la navegación. */
+.site-header__logout {
+  font: inherit; font-weight: 600; color: var(--ink); background: none; border: 0; padding: 0;
+  cursor: pointer; text-align: left; min-height: 44px;
+}
+.site-header__logout:hover { color: var(--yerba-text); }
+.site-header__logout:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+@media (min-width: 768px) { .site-header__logout { min-height: 0; } }

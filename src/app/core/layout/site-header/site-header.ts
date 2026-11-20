@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal, ViewEncapsulation }
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { LucideMenu, LucideSearch, LucideX } from '@lucide/angular';
 import { Logo } from '../../../shared/brand/logo/logo';
+import { SessionService } from '../../auth/session.service';
 
 /**
  * Encabezado del manual de marca (docs/marca/components/Encabezado).
@@ -19,6 +20,7 @@ import { Logo } from '../../../shared/brand/logo/logo';
 })
 export class SiteHeader {
   private readonly router = inject(Router);
+  protected readonly session = inject(SessionService);
   protected readonly menuOpen = signal(false);
 
   protected toggleMenu(): void {
@@ -27,6 +29,12 @@ export class SiteHeader {
 
   protected closeMenu(): void {
     this.menuOpen.set(false);
+  }
+
+  protected signOut(): void {
+    this.closeMenu();
+    this.session.end();
+    this.router.navigate(['/']);
   }
 
   protected search(event: Event, term: string): void {

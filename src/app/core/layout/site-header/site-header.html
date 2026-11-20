@@ -28,7 +28,14 @@
 
   <nav id="menu-principal" class="mb-nav site-header__nav" [class.is-open]="menuOpen()" aria-label="Principal">
     <a routerLink="/empresas" routerLinkActive ariaCurrentWhenActive="page" (click)="closeMenu()">Empresas</a>
-    <a routerLink="/ingresar" routerLinkActive ariaCurrentWhenActive="page" (click)="closeMenu()">Ingresar</a>
+    @if (session.isAdmin()) {
+      <a routerLink="/admin" routerLinkActive ariaCurrentWhenActive="page" (click)="closeMenu()">Administración</a>
+    }
+    @if (session.isAuthenticated()) {
+      <button type="button" class="site-header__logout" (click)="signOut()">Salir</button>
+    } @else {
+      <a routerLink="/ingresar" routerLinkActive ariaCurrentWhenActive="page" (click)="closeMenu()">Ingresar</a>
+    }
     <a class="mb-btn mb-btn-primary mb-btn-sm" routerLink="/publicar" (click)="closeMenu()">Escribí tu reseña</a>
   </nav>
 </header>

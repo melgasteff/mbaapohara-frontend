@@ -21,11 +21,11 @@ export const PUBLIC_ROUTES: Routes = [
   {
     path: 'ingresar',
     title: 'Ingresar · Mbaapohara',
-    loadComponent: () => import('./sign-in/sign-in').then((m) => m.SignIn),
+    loadComponent: () => import('./auth/sign-in/sign-in').then((m) => m.SignIn),
   },
   {
     path: 'registro',
     title: 'Crear cuenta · Mbaapohara',
-    loadComponent: () => import('./sign-up/sign-up').then((m) => m.SignUp),
+    loadComponent: () => import('./auth/sign-up/sign-up').then((m) => m.SignUp),
   },
 ];
