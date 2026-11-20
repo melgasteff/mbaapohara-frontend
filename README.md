@@ -53,6 +53,7 @@ Para comprobar que se hablan: `http://localhost:4200/empresas` debe listar las e
 | Directorio de empresas | `/empresas` | **Reales:** búsqueda por nombre, filtro por departamento y ciudad, paginación |
 | Perfil de empresa | `/empresas/:id` | **Reales:** empresa, rubro y locales. Reseñas: estado vacío hasta la Fase 3 |
 | Escribí tu reseña | `/publicar` | Exige sesión. **Reales:** empresas, locales, cargos, tipos de contrato y modalidades. Criterios del JSON provisional. **Prototipo:** el envío no guarda nada |
+| Cómo moderamos, privacidad, términos | `/como-moderamos`, `/privacidad`, `/terminos` | Borradores (tarea 1.9), con enlaces en el pie, el registro y el asistente |
 | Ingresar, crear cuenta | `/ingresar`, `/registro` | **Reales:** JWT de la API; la sesión se guarda en `sessionStorage` y vence con el token |
 | Administración | `/admin/…` | Solo administradores. **Reales:** empresas por estado (aprobar, rechazar, eliminar), alta de empresa con su primer local, gestión de una empresa aprobada y sus locales, cola de locales pendientes y cargos |
 
