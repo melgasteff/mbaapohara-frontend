@@ -3,8 +3,8 @@
   <p class="mb-help anon"><svg lucideLock [size]="16" aria-hidden="true"></svg>Tu nombre nunca se muestra.</p>
 
   @if (published(); as done) {
-    <h2 class="h2 step-title" tabindex="-1" #stepHeading>Listo</h2>
-    <app-publish-result [draft]="done.draft" [result]="done.result" (restart)="restart()" />
+    <h2 class="h2 step-title" tabindex="-1" #stepHeading>{{ done.result.estado === 'rechazada' ? 'Falta un ajuste' : 'Listo' }}</h2>
+    <app-publish-result [draft]="done.draft" [result]="done.result" (restart)="restart()" (edit)="editRejected()" />
   } @else if (loadError()) {
     <app-page-state kind="error" title="No pudimos preparar el formulario." (retry)="reloadAll()" />
   } @else if (ready()) {

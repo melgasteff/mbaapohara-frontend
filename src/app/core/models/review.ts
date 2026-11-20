@@ -79,10 +79,16 @@ export interface ReviewDraft {
   aMejorar: string;
 }
 
-export type ReviewStatus = 'publicada' | 'en_revision';
+/** Estados de una reseña después de la moderación (política de moderación, sección 7). */
+export type ReviewStatus = 'publicada' | 'en_revision' | 'rechazada';
+
+/** Categorías de moderación (política de moderación, sección 4). */
+export type ModerationCategory = 'DP' | 'TER' | 'ACU' | 'INS' | 'SPAM' | 'TEMA';
 
 export interface PublishResult {
   estado: ReviewStatus;
-  /** Motivo de la revisión, para mostrárselo a quien escribió. */
+  /** Categoría que motivó el rechazo o la revisión. */
+  categoria?: ModerationCategory;
+  /** Motivo para quien escribió: qué corregir o por qué se revisa. */
   motivo?: string;
 }

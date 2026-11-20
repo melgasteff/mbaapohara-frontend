@@ -123,6 +123,12 @@ export class PublishReview {
     this.goTo(1);
   }
 
+  /** Vuelve al último paso con todo lo escrito, para corregir una reseña rechazada. */
+  protected editRejected(): void {
+    this.published.set(null);
+    this.goTo(STEPS.length);
+  }
+
   protected reloadAll(): void {
     for (const resource of [this.config, this.jobs, this.contractTypes, this.workModes]) {
       if (resource.error()) resource.reload();

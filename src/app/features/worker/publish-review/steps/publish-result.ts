@@ -1,15 +1,18 @@
 import { formatDate } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input, LOCALE_ID, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { LucideCircleCheck, LucideClock, LucideFlaskConical } from '@lucide/angular';
+import { LucideCircleCheck, LucideCircleX, LucideClock, LucideFlaskConical } from '@lucide/angular';
 import { PublishResult as Result, ReviewDraft } from '../../../../core/models/review';
 import { ReviewCard } from '../../../../shared/ui/review-card/review-card';
 import { draftMeta } from '../review-form';
 
-/** Resultado del envío: publicada o en revisión. PROTOTIPO hasta la tarea 3.3. */
+/**
+ * Resultado del envío según la política de moderación (sección 7): publicada, en revisión o rechazada con lo que
+ * hay que corregir. PROTOTIPO hasta la tarea 3.3.
+ */
 @Component({
   selector: 'app-publish-result',
-  imports: [RouterLink, ReviewCard, LucideCircleCheck, LucideClock, LucideFlaskConical],
+  imports: [RouterLink, ReviewCard, LucideCircleCheck, LucideCircleX, LucideClock, LucideFlaskConical],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (result().estado === 'publicada') {
@@ -17,16 +20,23 @@ import { draftMeta } from '../review-form';
         <span class="mb-tag mb-tag-success"><svg lucideCircleCheck aria-hidden="true"></svg>Publicada</span>
         <span class="body">Gracias por contar. Así se va a ver tu reseña en el perfil de {{ draft().empresa.nombre }}.</span>
       </p>
-    } @else {
+    } @else if (result().estado === 'en_revision') {
       <p class="status">
         <span class="mb-tag mb-tag-warning"><svg lucideClock aria-hidden="true"></svg>En revisión</span>
         <span class="body">Tu reseña está en revisión. Te avisamos en 48 horas.</span>
       </p>
       @if (result().motivo) {
-        <p class="body-sm reason">{{ result().motivo }} Una persona del equipo la va a revisar antes de publicarla.</p>
+        <p class="body-sm reason">{{ result().motivo }}</p>
       }
+    } @else {
+      <p class="status">
+        <span class="mb-tag mb-tag-danger"><svg lucideCircleX aria-hidden="true"></svg>Rechazada</span>
+        <span class="body">{{ result().motivo }}</span>
+      </p>
+      <p class="body-sm reason">Solo vos ves esta reseña. Corregila y volvé a enviarla: lo que escribiste no se perdió.</p>
     }
 
+    @if (result().estado !== 'rechazada') {
     <app-review-card
       [rating]="draft().calificacion"
       [meta]="meta()"
@@ -36,13 +46,18 @@ import { draftMeta } from '../review-form';
     >
       <span tag class="mb-tag"><svg lucideFlaskConical aria-hidden="true"></svg>Prototipo</span>
     </app-review-card>
+    }
 
     <p class="body-sm prototype">
       Prototipo: esta reseña no se guardó. La publicación y la moderación reales llegan en las próximas tareas.
     </p>
 
     <div class="actions">
-      <a class="mb-btn mb-btn-primary" [routerLink]="['/empresas', draft().empresa.id]">Ver {{ draft().empresa.nombre }}</a>
+      @if (result().estado === 'rechazada') {
+        <button type="button" class="mb-btn mb-btn-primary" (click)="edit.emit()">Editar y volver a enviar</button>
+      } @else {
+        <a class="mb-btn mb-btn-primary" [routerLink]="['/empresas', draft().empresa.id]">Ver {{ draft().empresa.nombre }}</a>
+      }
       <button type="button" class="mb-btn mb-btn-secondary" (click)="restart.emit()">Escribir otra reseña</button>
     </div>
   `,
@@ -57,6 +72,8 @@ export class PublishResult {
   readonly draft = input.required<ReviewDraft>();
   readonly result = input.required<Result>();
   readonly restart = output<void>();
+  /** Volver al paso 4 con lo escrito, para corregir una reseña rechazada. */
+  readonly edit = output<void>();
 
   private readonly locale = inject(LOCALE_ID);
   protected readonly meta = computed(() => draftMeta(this.draft()));
