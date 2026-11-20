@@ -1,0 +1,87 @@
+<section class="page" aria-labelledby="titulo">
+  <h1 id="titulo" class="h1">Escribí tu reseña</h1>
+  <p class="mb-help anon"><svg lucideLock [size]="16" aria-hidden="true"></svg>Tu nombre nunca se muestra.</p>
+
+  @if (published(); as done) {
+    <h2 class="h2 step-title" tabindex="-1" #stepHeading>Listo</h2>
+    <app-publish-result [draft]="done.draft" [result]="done.result" (restart)="restart()" />
+  } @else if (loadError()) {
+    <app-page-state kind="error" title="No pudimos preparar el formulario." (retry)="reloadAll()" />
+  } @else if (ready()) {
+    <ol class="stepper" aria-label="Pasos">
+      @for (name of steps; track name; let i = $index) {
+        <li [class.is-current]="step() === i + 1" [class.is-done]="step() > i + 1" [attr.aria-current]="step() === i + 1 ? 'step' : null">
+          <span class="stepper__num" aria-hidden="true">{{ i + 1 }}</span>
+          <span class="stepper__name">{{ name }}</span>
+        </li>
+      }
+    </ol>
+
+    <h2 class="h2 step-title" tabindex="-1" #stepHeading>
+      <span class="caption step-count">Paso {{ step() }} de {{ steps.length }}</span>
+      {{ steps[step() - 1] }}
+    </h2>
+
+    @switch (step()) {
+      @case (1) {
+        <app-step-place [group]="form.controls.lugar" [showErrors]="showErrors(1)" />
+      }
+      @case (2) {
+        <app-step-relation
+          [group]="form.controls.relacion"
+          [showErrors]="showErrors(2)"
+          [jobs]="jobs.value()!.data"
+          [contractTypes]="contractTypes.value()!.data"
+          [workModes]="workModes.value()!.data"
+          [situations]="config.value()!.situaciones"
+        />
+      }
+      @case (3) {
+        <app-step-criteria
+          [group]="form.controls.criterios"
+          [showErrors]="showErrors(3)"
+          [categories]="config.value()!.categorias"
+          [options]="config.value()!.opcionesRespuesta"
+        />
+      }
+      @case (4) {
+        <app-step-rating
+          [group]="form.controls.texto"
+          [showErrors]="showErrors(4)"
+          [rating]="config.value()!.calificacionGeneral"
+          [texts]="config.value()!.textos"
+        />
+      }
+    }
+
+    @if (showErrors(step()) && currentGroup().invalid) {
+      <p class="mb-help summary" role="alert">
+        <svg lucideCircleAlert [size]="16" aria-hidden="true"></svg>Revisá los campos marcados para seguir.
+      </p>
+    }
+    @if (sendError()) {
+      <p class="mb-help summary" role="alert">
+        <svg lucideCircleAlert [size]="16" aria-hidden="true"></svg>No pudimos enviar tu reseña. Intentá de nuevo.
+      </p>
+    }
+
+    <div class="actions">
+      @if (step() > 1) {
+        <button type="button" class="mb-btn mb-btn-secondary" (click)="back()" [disabled]="sending()">
+          <svg lucideArrowLeft [size]="16" aria-hidden="true"></svg>Anterior
+        </button>
+      }
+      <button type="button" class="mb-btn mb-btn-primary" (click)="next()" [disabled]="sending()">
+        @if (step() < steps.length) {
+          Siguiente<svg lucideArrowRight [size]="16" aria-hidden="true"></svg>
+        } @else if (sending()) {
+          Publicando…
+        } @else {
+          Publicar reseña
+        }
+      </button>
+    </div>
+  } @else {
+    <app-page-state kind="loading" message="Preparando el formulario…" />
+  }
+</section>

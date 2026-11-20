@@ -1,0 +1,115 @@
+import { DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { Company, Office } from '../../../core/models/company';
+import { CatalogItem, CriteriaConfig, Job, ReviewDraft, WorkSituation } from '../../../core/models/review';
+
+export const CURRENT_YEAR = new Date().getFullYear();
+/** Valor del select de cargo para «Mi cargo no está en la lista». */
+export const OTHER_JOB = 'otro';
+
+/** Largo mínimo sin contar los espacios de los extremos. */
+function minTrimmed(min: number): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const length = String(control.value ?? '').trim().length;
+    return length > 0 && length < min ? { minlength: { requiredLength: min, actualLength: length } } : null;
+  };
+}
+
+/** Formulario del asistente: un grupo por paso, para validar cada paso por separado. */
+export function createReviewForm() {
+  return new FormGroup({
+    lugar: new FormGroup({
+      empresa: new FormControl<Company | null>(null, Validators.required),
+      local: new FormControl<Office | null>(null, Validators.required),
+    }),
+    relacion: new FormGroup({
+      cargo: new FormControl<number | typeof OTHER_JOB | null>(null, Validators.required),
+      cargoNuevo: new FormControl('', { nonNullable: true }),
+      situacion: new FormControl<WorkSituation | null>(null, Validators.required),
+      ultimoAnio: new FormControl<number | null>(null),
+      tipoContrato: new FormControl<number | null>(null, Validators.required),
+      modalidad: new FormControl<number | null>(null, Validators.required),
+    }),
+    // Un control por criterio; se agregan al llegar el JSON (applyCriteriaConfig).
+    criterios: new FormGroup<Record<string, FormControl<string | null>>>({}),
+    texto: new FormGroup({
+      calificacion: new FormControl<number | null>(null, Validators.required),
+      loBueno: new FormControl('', { nonNullable: true, validators: Validators.required }),
+      aMejorar: new FormControl('', { nonNullable: true, validators: Validators.required }),
+    }),
+  });
+}
+
+export type ReviewForm = ReturnType<typeof createReviewForm>;
+
+/** Agrega los criterios del JSON como controles obligatorios y aplica los límites de los textos. */
+export function applyCriteriaConfig(form: ReviewForm, config: CriteriaConfig): void {
+  for (const category of config.categorias) {
+    for (const item of category.items) {
+      if (!form.controls.criterios.contains(item.codigo)) {
+        form.controls.criterios.addControl(item.codigo, new FormControl<string | null>(null, Validators.required));
+      }
+    }
+  }
+  for (const field of config.textos) {
+    const control = field.codigo === 'LO_BUENO' ? form.controls.texto.controls.loBueno : form.controls.texto.controls.aMejorar;
+    control.setValidators([Validators.required, minTrimmed(field.minimo), Validators.maxLength(field.maximo)]);
+    control.updateValueAndValidity();
+  }
+}
+
+/** Campos que dependen de otros: el cargo propuesto y el último año (solo si ya no trabaja ahí). */
+export function linkConditionalFields(form: ReviewForm, destroyRef: DestroyRef): void {
+  const { cargo, cargoNuevo, situacion, ultimoAnio } = form.controls.relacion.controls;
+  const { empresa, local } = form.controls.lugar.controls;
+
+  cargo.valueChanges.pipe(takeUntilDestroyed(destroyRef)).subscribe((value) => {
+    cargoNuevo.setValidators(value === OTHER_JOB ? [Validators.required, minTrimmed(2), Validators.maxLength(80)] : null);
+    cargoNuevo.updateValueAndValidity();
+  });
+  situacion.valueChanges.pipe(takeUntilDestroyed(destroyRef)).subscribe((value) => {
+    ultimoAnio.setValidators(value === 'ANTERIOR' ? Validators.required : null);
+    ultimoAnio.updateValueAndValidity();
+  });
+  // Otro local pertenece a otra empresa: al cambiar de empresa se vuelve a elegir.
+  empresa.valueChanges.pipe(takeUntilDestroyed(destroyRef)).subscribe((value) => {
+    if (local.value && local.value.idEmpresa !== value?.id) local.reset();
+  });
+}
+
+/** Listas de la API que hacen falta para nombrar los ids en la vista previa. */
+export interface DraftLookups {
+  jobs: Job[];
+  contractTypes: CatalogItem[];
+  workModes: CatalogItem[];
+}
+
+/** Arma la reseña a partir de un formulario válido. */
+export function toDraft(form: ReviewForm, lookups: DraftLookups): ReviewDraft {
+  const { lugar, relacion, criterios, texto } = form.getRawValue();
+  const job = lookups.jobs.find((item) => item.id === relacion.cargo);
+  return {
+    empresa: { id: lugar.empresa!.id, nombre: lugar.empresa!.nombre },
+    local: { id: lugar.local!.id, nombre: lugar.local!.nombre, ciudad: lugar.local!.ciudad.nombre },
+    cargo: job ? { id: job.id, nombre: job.descripcion } : { id: null, nombre: relacion.cargoNuevo.trim() },
+    situacion: relacion.situacion!,
+    ultimoAnio: relacion.situacion === 'ACTUAL' ? CURRENT_YEAR : relacion.ultimoAnio!,
+    tipoContrato: lookups.contractTypes.find((item) => item.id === relacion.tipoContrato)!,
+    modalidad: lookups.workModes.find((item) => item.id === relacion.modalidad)!,
+    respuestas: criterios as Record<string, string>,
+    calificacion: texto.calificacion!,
+    loBueno: texto.loBueno.trim(),
+    aMejorar: texto.aMejorar.trim(),
+  };
+}
+
+/** Metadatos sin género para la tarjeta: «Trabajó aquí · Cajera · Asunción · hasta 2025». */
+export function draftMeta(draft: ReviewDraft): string[] {
+  return [
+    draft.situacion === 'ACTUAL' ? 'Trabaja aquí' : 'Trabajó aquí',
+    draft.cargo.nombre,
+    ...(draft.local.ciudad ? [draft.local.ciudad] : []),
+    ...(draft.situacion === 'ANTERIOR' ? [`hasta ${draft.ultimoAnio}`] : []),
+  ];
+}

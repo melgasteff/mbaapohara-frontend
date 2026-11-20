@@ -1,0 +1,17 @@
+.anon { display: flex; align-items: center; gap: var(--space-1); }
+
+.stepper { list-style: none; margin: var(--space-6) 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-2); }
+.stepper li { display: flex; flex-direction: column; gap: var(--space-1); padding-top: var(--space-2); border-top: 4px solid var(--line); color: var(--ink-muted); }
+.stepper li.is-done { border-top-color: var(--yerba-soft); }
+.stepper li.is-current { border-top-color: var(--yerba); color: var(--ink); }
+.stepper__num { font-weight: 700; }
+.stepper__name { font-size: 14px; line-height: 20px; }
+/* En móvil solo se ven las barras; el nombre del paso está en el título. */
+@media (max-width: 599px) { .stepper__name { display: none; } }
+
+.step-title { margin: var(--space-5) 0 0; display: flex; flex-direction: column; gap: var(--space-1); }
+.step-title:focus { outline: none; }
+.step-count { color: var(--ink-muted); }
+
+.summary { color: var(--danger); display: flex; align-items: center; gap: var(--space-1); }
+.actions { display: flex; gap: var(--space-3); flex-wrap: wrap; padding-top: var(--space-2); }
