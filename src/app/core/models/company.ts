@@ -31,6 +31,8 @@ export interface Office {
   ciudad: OfficeCity;
   direccionReferencia: string | null;
   estado: ProposalStatus;
+  /** Empresa del local; solo en los listados de administración (GET /offices/admin). */
+  empresa?: { id: number; nombre: string };
 }
 
 /** Empresa con sus locales aprobados (GET /companies/:id). */
@@ -43,6 +45,48 @@ export interface CompaniesQuery {
   q?: string;
   ciudad?: number;
   rubro?: number;
+  page?: number;
+  pageSize?: number;
+}
+
+/** Rubro completo del catálogo (GET /sectors). */
+export interface SectorItem {
+  id: number;
+  codigoCiiu: string;
+  nombre: string;
+  descripcion: string;
+}
+
+/** Datos de un local para proponerlo o editarlo. */
+export interface SaveOffice {
+  nombre: string;
+  idCiudad: number;
+  direccionReferencia?: string;
+}
+
+/** Datos de una empresa para editarla. */
+export interface SaveCompany {
+  nombre: string;
+  idRubro: number;
+}
+
+/** Empresa nueva con su primer local (POST /companies). */
+export interface ProposeCompany extends SaveCompany {
+  local: SaveOffice;
+}
+
+/** Filtros de GET /companies/admin. */
+export interface AdminCompaniesQuery {
+  q?: string;
+  estado?: ProposalStatus;
+  page?: number;
+  pageSize?: number;
+}
+
+/** Filtros de GET /offices/admin. */
+export interface AdminOfficesQuery {
+  estado?: ProposalStatus;
+  empresa?: number;
   page?: number;
   pageSize?: number;
 }

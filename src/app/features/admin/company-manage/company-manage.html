@@ -1,0 +1,116 @@
+<a class="mb-link back" routerLink="/admin/empresas" [queryParams]="{ estado: 'aprobada' }">
+  <svg lucideArrowLeft [size]="16" aria-hidden="true"></svg>Empresas aprobadas
+</a>
+
+@if (notFound()) {
+  <h1 class="h1">No encontramos esta empresa</h1>
+  <app-page-state
+    kind="empty"
+    title="Solo se gestionan empresas aprobadas."
+    message="Las pendientes se aprueban o rechazan desde el listado."
+  />
+} @else if (company.error()) {
+  <app-page-state kind="error" title="No pudimos cargar la empresa." (retry)="company.reload()" />
+} @else if (company.hasValue()) {
+  <h1 class="h1">{{ company.value().nombre }}</h1>
+
+  <div role="status">
+    @if (notice(); as n) {
+      <p class="notice body-sm" [class.notice--ok]="n.kind === 'ok'" [class.notice--error]="n.kind === 'error'">
+        @if (n.kind === 'ok') { <svg lucideCircleCheck [size]="16" aria-hidden="true"></svg> } @else { <svg lucideCircleAlert [size]="16" aria-hidden="true"></svg> }
+        {{ n.text }}
+      </p>
+    }
+  </div>
+
+  <form class="form" [formGroup]="companyForm" (ngSubmit)="saveCompany()" novalidate aria-labelledby="datos">
+    <h2 id="datos" class="h2">Datos</h2>
+    <div class="mb-field" [class.mb-field-error]="companyForm.controls.nombre.invalid && companyForm.controls.nombre.touched">
+      <label for="nombre">Nombre comercial</label>
+      <input id="nombre" class="mb-input" formControlName="nombre" maxlength="120" />
+    </div>
+    <div class="mb-field">
+      <label for="rubro">Rubro</label>
+      <select id="rubro" class="mb-input" formControlName="idRubro">
+        @for (sector of sectors.hasValue() ? sectors.value().data : []; track sector.id) {
+          <option [ngValue]="sector.id">{{ sector.nombre }}</option>
+        }
+      </select>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="mb-btn mb-btn-primary" [disabled]="busy() || companyForm.pristine">Guardar datos</button>
+    </div>
+  </form>
+
+  <h2 class="h2">Locales</h2>
+  @if (offices.error()) {
+    <app-page-state kind="error" title="No pudimos cargar los locales." (retry)="offices.reload()" />
+  } @else if (offices.hasValue()) {
+    @if (offices.value().total === 0) {
+      <p class="body">Esta empresa todavía no tiene locales.</p>
+    } @else {
+      <ul class="rows">
+        @for (office of offices.value().data; track office.id) {
+          <li class="row">
+            <div class="row__main">
+              <span class="row__title">{{ office.nombre }}</span>
+              <span class="mb-meta">
+                @if (office.ciudad.nombre) { <span>{{ office.ciudad.nombre }}</span> }
+                @if (office.direccionReferencia) { <span>{{ office.direccionReferencia }}</span> }
+              </span>
+            </div>
+            <span [class]="status[office.estado].tag">{{ status[office.estado].label }}</span>
+            <div class="row__actions">
+              @if (office.estado === 'pendiente') {
+                <button type="button" class="mb-btn mb-btn-primary mb-btn-sm" [disabled]="busy()" (click)="approveOffice(office)">Aprobar</button>
+                <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm" [disabled]="busy()" (click)="rejectOffice(office)">Rechazar</button>
+              }
+              <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm" [disabled]="busy()" (click)="startEdit(office)">Editar</button>
+              <button type="button" class="mb-btn mb-btn-ghost mb-btn-sm" [disabled]="busy()" (click)="removeOffice(office)">Eliminar</button>
+            </div>
+            @if (editingId() === office.id) {
+              <form class="form office-edit" [formGroup]="editOffice" (ngSubmit)="saveOffice(office)" novalidate [attr.aria-label]="'Editar ' + office.nombre">
+                <div class="mb-field">
+                  <label [for]="'edit-nombre-' + office.id">Nombre del local</label>
+                  <input class="mb-input" [id]="'edit-nombre-' + office.id" formControlName="nombre" maxlength="120" />
+                </div>
+                <app-city-picker formControlName="idCiudad" />
+                <div class="mb-field">
+                  <label [for]="'edit-ref-' + office.id">Referencia (opcional)</label>
+                  <input class="mb-input" [id]="'edit-ref-' + office.id" formControlName="direccionReferencia" maxlength="200" />
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="mb-btn mb-btn-primary mb-btn-sm" [disabled]="busy()">Guardar local</button>
+                  <button type="button" class="mb-btn mb-btn-ghost mb-btn-sm" (click)="editingId.set(null)">Cancelar</button>
+                </div>
+              </form>
+            }
+          </li>
+        }
+      </ul>
+    }
+  } @else {
+    <app-page-state kind="loading" message="Cargando locales…" />
+  }
+
+  <form class="form" [formGroup]="newOffice" (ngSubmit)="addOffice()" novalidate aria-labelledby="nuevo-local">
+    <h2 id="nuevo-local" class="h2">Agregar un local</h2>
+    <div class="mb-field" [class.mb-field-error]="showNew('nombre')">
+      <label for="nuevo-nombre">Nombre del local</label>
+      <input id="nuevo-nombre" class="mb-input" formControlName="nombre" maxlength="120" placeholder="Ej.: Shopping del Sol" />
+      @if (showNew('nombre')) {
+        <span class="mb-help"><svg lucideCircleAlert [size]="16" aria-hidden="true"></svg>Escribí el nombre del local.</span>
+      }
+    </div>
+    <app-city-picker formControlName="idCiudad" [invalid]="showNew('idCiudad')" />
+    <div class="mb-field">
+      <label for="nuevo-ref">Referencia (opcional)</label>
+      <input id="nuevo-ref" class="mb-input" formControlName="direccionReferencia" maxlength="200" />
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="mb-btn mb-btn-primary" [disabled]="busy()">Agregar local</button>
+    </div>
+  </form>
+} @else {
+  <app-page-state kind="loading" message="Cargando la empresa…" />
+}

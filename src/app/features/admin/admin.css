@@ -1,0 +1,27 @@
+/* Estilos comunes de las pantallas de administración. */
+.toolbar { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+.toolbar form { display: flex; gap: var(--space-2); flex: 1; min-width: 240px; }
+.toolbar .mb-search { flex: 1; max-width: none; }
+.tabs { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.tabs a { text-decoration: none; }
+.tabs a.mb-chip[aria-current='page'] { background: var(--yerba-soft); border-color: var(--yerba); color: var(--yerba-text); }
+.rows { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
+.row {
+  display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; justify-content: space-between;
+  padding: var(--space-4); background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-md);
+}
+.row__main { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
+.row__title { font-weight: 600; }
+.row__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.notice { display: flex; align-items: center; gap: var(--space-2); margin: 0; padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); }
+.notice--ok { background: var(--success-soft); color: var(--success); }
+.notice--error { background: var(--danger-soft); color: var(--danger); }
+.form { display: flex; flex-direction: column; gap: var(--space-4); max-width: 640px; }
+.form .mb-field { width: 100%; }
+.form fieldset { border: 1px solid var(--line); border-radius: var(--radius-md); padding: var(--space-4); margin: 0; display: grid; gap: var(--space-4); }
+.form legend { font-weight: 600; padding: 0 var(--space-1); }
+.form-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+.pager { display: flex; align-items: center; justify-content: center; gap: var(--space-4); }
+:host.admin-screen { display: flex; flex-direction: column; gap: var(--space-4); }
+:host.admin-screen h1, :host.admin-screen > p { margin: 0; }
+.back { display: inline-flex; align-items: center; gap: var(--space-1); align-self: flex-start; }
