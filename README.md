@@ -52,9 +52,9 @@ Para comprobar que se hablan: `http://localhost:4200/empresas` debe listar las e
 | Inicio | `/` | Buscador y accesos. «Conocé tus derechos» figura como «Próximamente» (tarea 3.7) |
 | Directorio de empresas | `/empresas` | **Reales:** búsqueda por nombre, filtro por departamento y ciudad, paginación |
 | Perfil de empresa | `/empresas/:id` | **Reales:** empresa, rubro y locales. Reseñas: estado vacío hasta la Fase 3 |
-| Escribí tu reseña | `/publicar` | **Reales:** empresas, locales, cargos, tipos de contrato y modalidades. Criterios del JSON provisional. **Prototipo:** el envío no guarda nada |
-| Ingresar, crear cuenta | `/ingresar`, `/registro` | Pendiente (paso 6 de la demo) |
-| Administración | `/admin/empresas` | Pendiente (paso 5 de la demo) |
+| Escribí tu reseña | `/publicar` | Exige sesión. **Reales:** empresas, locales, cargos, tipos de contrato y modalidades. Criterios del JSON provisional. **Prototipo:** el envío no guarda nada |
+| Ingresar, crear cuenta | `/ingresar`, `/registro` | **Reales:** JWT de la API; la sesión se guarda en `sessionStorage` y vence con el token |
+| Administración | `/admin/empresas` | Solo administradores (pantalla pendiente: paso 5 de la demo) |
 
 - **Criterios provisionales:** [public/criterios-provisionales.json](public/criterios-provisionales.json), tomados
   de las preguntas 5 a 8 del cuestionario. Se reemplazan con los resultados de la encuesta cambiando solo ese
@@ -64,11 +64,22 @@ Para comprobar que se hablan: `http://localhost:4200/empresas` debe listar las e
   tarea 2.3.
 - Las empresas y locales de la semilla son reales; las reseñas y textos de ejemplo siempre son ficticios.
 
+### Cuenta de administrador
+
+La base empieza sin usuarios. Para entrar a la administración, en `mbaapohara-backend/`:
+
+```bash
+npm run admin:create -- correo@ejemplo.com   # pide la contraseña sin mostrarla
+```
+
+Una cuenta común se crea desde `/registro`.
+
 ## Guion de la demo (5 minutos)
 
 1. **Inicio → buscar «banco»** → directorio con resultados reales. Filtrar por Asunción → Asunción.
 2. **Abrir una empresa** → perfil con sus locales agrupados por ciudad y el estado vacío de reseñas.
-3. **«Escribí tu reseña»** → recorrer los 4 pasos:
+3. **«Escribí tu reseña»** → pide ingresar; crear una cuenta en `/registro` (se ven las reglas de la
+   contraseña) y vuelve solo al asistente. Recorrer los 4 pasos:
    1. empresa y local (probar «Siguiente» vacío para mostrar la validación);
    2. relación laboral (mostrar «Mi cargo no está en la lista» y que solo se pide el año);
    3. los 23 criterios con Sí / En parte / No / No sé o no aplica;
