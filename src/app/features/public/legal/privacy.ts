@@ -8,6 +8,7 @@ const CONTACT = 'melgasteff@gmail.com';
  * Política de privacidad (tarea 1.9). Describe lo que el sistema hace hoy: datos mínimos (Ley 7593/2025),
  * borrado de la cuenta con sus reseñas (D9) y envío de solo el texto al modelo de lenguaje (D4).
  * BORRADOR: revisar con el tutor; los marcadores [entre corchetes] se completan en las tareas indicadas.
+ * El proveedor del modelo se completó en la 2.3; el alojamiento y las copias de seguridad, en la 4.4.
  */
 @Component({
   selector: 'app-privacy',
@@ -63,7 +64,7 @@ const CONTACT = 'melgasteff@gmail.com';
         <li><strong>Moderación automática:</strong> el texto de la reseña («Lo bueno» y «A mejorar») se envía a un servicio de
           modelo de lenguaje para revisarlo (ver <a class="mb-link" routerLink="/como-moderamos">cómo moderamos</a>).
           <strong>Solo se envía el texto</strong>: nunca tu correo, tu cuenta, la empresa ni el local.
-          Proveedor: [se completa en la tarea 2.3].</li>
+          Proveedor: Anthropic (modelo Claude), a través de su API.</li>
         <li><strong>Alojamiento:</strong> los datos se guardan en servidores de [se completa en la tarea 4.4].</li>
         <li>No vendemos ni cedemos tus datos a nadie, tampoco a las empresas reseñadas.</li>
       </ul>
