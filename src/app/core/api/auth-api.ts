@@ -1,7 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext, httpResource } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, switchMap, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { KEEP_SESSION_ON_401 } from '../auth/auth.interceptor';
 import { SessionService } from '../auth/session.service';
 import { Account, Credentials, RegisterRequest, TokenResponse } from '../models/account';
 
@@ -21,6 +22,24 @@ export class AuthApi {
           .pipe(tap((account) => this.session.start(accessToken, account))),
       ),
     );
+  }
+
+  /** La cuenta con sesión iniciada (el interceptor agrega el token). */
+  meResource() {
+    return httpResource<Account>(() => `${this.url}/users/me`);
+  }
+
+  /** Todos los datos de la cuenta, para descargarlos. */
+  exportData(): Observable<unknown> {
+    return this.http.get<unknown>(`${this.url}/users/me/export`);
+  }
+
+  /** Elimina la cuenta y sus reseñas (D9); pide la contraseña para confirmar. Cierra la sesión. */
+  deleteAccount(password: string): Observable<void> {
+    return this.http
+      // Una contraseña incorrecta responde 401: no es una sesión vencida.
+      .delete<void>(`${this.url}/users/me`, { body: { password }, context: new HttpContext().set(KEEP_SESSION_ON_401, true) })
+      .pipe(tap(() => this.session.end()));
   }
 
   /** Crea la cuenta e inicia la sesión. */

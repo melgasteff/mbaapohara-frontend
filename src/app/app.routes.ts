@@ -9,6 +9,12 @@ export const routes: Routes = [
     loadChildren: () => import('./features/worker/worker.routes').then((m) => m.WORKER_ROUTES),
   },
   {
+    path: 'mi-cuenta',
+    canMatch: [authGuard],
+    title: 'Mi cuenta · Mbaapohara',
+    loadComponent: () => import('./features/worker/my-account/my-account').then((m) => m.MyAccount),
+  },
+  {
     path: 'admin',
     canMatch: [adminGuard],
     loadChildren: () => import('./features/admin/admin.routes').then((m) => m.ADMIN_ROUTES),

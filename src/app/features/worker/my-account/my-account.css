@@ -1,0 +1,24 @@
+.account { max-width: 640px; }
+.card {
+  display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-5);
+  background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-lg);
+}
+.card h2, .card p { margin: 0; }
+dl { display: grid; gap: var(--space-1); margin: 0; }
+dt { color: var(--ink-muted); }
+dt:not(:first-child) { margin-top: var(--space-2); }
+@media (min-width: 480px) {
+  dl { grid-template-columns: auto 1fr; gap: var(--space-2) var(--space-4); }
+  dt:not(:first-child) { margin-top: 0; }
+}
+dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.anon { display: flex; align-items: center; gap: var(--space-1); }
+.card .mb-btn { align-self: flex-start; }
+.card form { display: flex; flex-direction: column; gap: var(--space-3); }
+.card .mb-field { width: 100%; max-width: 360px; }
+.danger-zone { border-color: var(--danger); }
+.delete { color: var(--danger); border-color: var(--danger); }
+.alert {
+  display: flex; gap: var(--space-2); align-items: flex-start; margin: 0;
+  padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--danger-soft); color: var(--danger);
+}

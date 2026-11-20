@@ -1,9 +1,15 @@
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { HttpContextToken, HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { SessionService } from './session.service';
+
+/**
+ * Marca una petición cuyo 401 NO significa «sesión vencida» (por ejemplo, confirmar con una contraseña
+ * incorrecta al eliminar la cuenta): el interceptor no cierra la sesión y deja que la pantalla muestre el error.
+ */
+export const KEEP_SESSION_ON_401 = new HttpContextToken<boolean>(() => false);
 
 /** ¿La petición va a nuestra API? El token nunca se envía a otros orígenes ni a los archivos estáticos. */
 export function isApiRequest(url: string): boolean {
@@ -22,7 +28,7 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
 
   return next(send ? request.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : request).pipe(
     catchError((error: unknown) => {
-      if (send && error instanceof HttpErrorResponse && error.status === 401) {
+      if (send && error instanceof HttpErrorResponse && error.status === 401 && !request.context.get(KEEP_SESSION_ON_401)) {
         session.end();
         router.navigate(['/ingresar'], { queryParams: { volver: router.url } });
       }

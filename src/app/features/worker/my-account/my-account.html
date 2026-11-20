@@ -1,0 +1,84 @@
+<section class="page account" aria-labelledby="titulo">
+  <h1 id="titulo" class="h1">Mi cuenta</h1>
+
+  @if (account.error()) {
+    <app-page-state kind="error" title="No pudimos cargar tu cuenta." (retry)="account.reload()" />
+  } @else if (account.hasValue()) {
+    @let data = { account: account.value() };
+    <section class="card" aria-labelledby="datos">
+      <h2 id="datos" class="h3">Tus datos</h2>
+      <dl>
+        <dt>Correo</dt>
+        <dd>{{ data.account.email }}</dd>
+        <dt>Tipo de cuenta</dt>
+        <dd>{{ data.account.rol === 'administrador' ? 'Administración' : 'Común' }}</dd>
+        <dt>Creada el</dt>
+        <dd>{{ data.account.fechaCreacion | date: 'longDate' }}</dd>
+        @if (data.account.fechaConsentimiento) {
+          <dt>Aceptaste los términos el</dt>
+          <dd>{{ data.account.fechaConsentimiento | date: 'longDate' }}</dd>
+        }
+      </dl>
+      <p class="mb-help anon">
+        <svg lucideLock [size]="16" aria-hidden="true"></svg>
+        Es todo lo que guardamos sobre vos, además de tus reseñas. Tu correo nunca se muestra.
+      </p>
+    </section>
+
+    <section class="card" aria-labelledby="descargar">
+      <h2 id="descargar" class="h3">Descargar tus datos</h2>
+      <p class="body">Un archivo con tu cuenta y todo lo que escribiste en Mbaapohara.</p>
+      @if (exportError()) {
+        <p class="alert body-sm" role="alert">
+          <svg lucideCircleAlert [size]="16" aria-hidden="true"></svg>No pudimos preparar el
+          archivo. Intentá de nuevo.
+        </p>
+      }
+      <button
+        type="button"
+        class="mb-btn mb-btn-secondary"
+        [disabled]="exporting()"
+        (click)="download()"
+      >
+        <svg lucideDownload [size]="16" aria-hidden="true"></svg
+        >{{ exporting() ? 'Preparando…' : 'Descargar mis datos' }}
+      </button>
+    </section>
+
+    <section class="card danger-zone" aria-labelledby="eliminar">
+      <h2 id="eliminar" class="h3">Eliminar tu cuenta</h2>
+      <p class="body">
+        Se borran tu cuenta, tus datos y <strong>todas tus reseñas</strong>, de forma definitiva. No
+        se puede deshacer.
+      </p>
+      <form (submit)="remove($event)" novalidate>
+        @if (deleteError(); as message) {
+          <p class="alert body-sm" role="alert">
+            <svg lucideCircleAlert [size]="16" aria-hidden="true"></svg>{{ message }}
+          </p>
+        }
+        <div class="mb-field" [class.mb-field-error]="password.invalid && password.touched">
+          <label for="password">Escribí tu contraseña para confirmar</label>
+          <input
+            id="password"
+            class="mb-input"
+            type="password"
+            autocomplete="current-password"
+            [formControl]="password"
+          />
+        </div>
+        <button type="submit" class="mb-btn mb-btn-secondary delete" [disabled]="deleting()">
+          <svg lucideTrash2 [size]="16" aria-hidden="true"></svg
+          >{{ deleting() ? 'Eliminando…' : 'Eliminar mi cuenta' }}
+        </button>
+      </form>
+    </section>
+
+    <p class="body-sm">
+      Más sobre tus derechos en la
+      <a class="mb-link" routerLink="/privacidad">política de privacidad</a>.
+    </p>
+  } @else {
+    <app-page-state kind="loading" message="Cargando tu cuenta…" />
+  }
+</section>
