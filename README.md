@@ -54,7 +54,7 @@ Para comprobar que se hablan: `http://localhost:4200/empresas` debe listar las e
 | Perfil de empresa | `/empresas/:id` | **Reales:** empresa, rubro y locales. Reseñas: estado vacío hasta la Fase 3 |
 | Escribí tu reseña | `/publicar` | Exige sesión. **Reales:** empresas, locales, cargos, tipos de contrato y modalidades. Criterios del JSON provisional. **Prototipo:** el envío no guarda nada |
 | Ingresar, crear cuenta | `/ingresar`, `/registro` | **Reales:** JWT de la API; la sesión se guarda en `sessionStorage` y vence con el token |
-| Administración | `/admin/empresas` | Solo administradores (pantalla pendiente: paso 5 de la demo) |
+| Administración | `/admin/…` | Solo administradores. **Reales:** empresas por estado (aprobar, rechazar, eliminar), alta de empresa con su primer local, gestión de una empresa aprobada y sus locales, cola de locales pendientes y cargos |
 
 - **Criterios provisionales:** [public/criterios-provisionales.json](public/criterios-provisionales.json), tomados
   de las preguntas 5 a 8 del cuestionario. Se reemplazan con los resultados de la encuesta cambiando solo ese
@@ -88,7 +88,9 @@ Una cuenta común se crea desde `/registro`.
 5. **«Escribir otra reseña»** y poner un teléfono en «Lo bueno» (por ejemplo «llamá al 0981 123 456») →
    «En revisión», con el motivo. Explicar que la moderación real combina reglas, un modelo de lenguaje y
    revisión humana (Fase 2).
-6. Cerrar con qué es real, qué es prototipo y qué falta.
+6. **Ingresar como administrador** → «Administración»: crear una empresa ficticia con su local, agregar un
+   cargo común (por ejemplo «Cajera») y mostrar la cola de locales pendientes.
+7. Cerrar con qué es real, qué es prototipo y qué falta.
 
 ## Comandos
 
