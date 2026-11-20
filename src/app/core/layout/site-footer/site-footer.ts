@@ -21,7 +21,8 @@ import { RouterLink } from '@angular/router';
     }
     p { margin: 0; }
     .muted { color: var(--ink-muted); }
-    .mb-link { margin-left: auto; display: inline-flex; align-items: center; min-height: 44px; }
+    .links { margin-left: auto; display: flex; flex-wrap: wrap; gap: 0 var(--space-4); }
+    .mb-link { display: inline-flex; align-items: center; min-height: 44px; }
     @media (min-width: 1024px) {
       .inner { padding-left: var(--space-6); padding-right: var(--space-6); }
     }
@@ -31,8 +32,11 @@ import { RouterLink } from '@angular/router';
       <div class="inner">
         <p class="label">Mbaapohara · Tu experiencia vale</p>
         <p class="body-sm muted">Proyecto Final de Grado · Ingeniería en Informática · FCyT-UNCA</p>
-        <!-- Acceso visible solo para la demo: todavía no hay roles (fuera de alcance). -->
-        <a class="mb-link" routerLink="/admin/empresas">Administración</a>
+        <nav class="links" aria-label="Información">
+          <a class="mb-link" routerLink="/como-moderamos">Cómo moderamos</a>
+          <a class="mb-link" routerLink="/privacidad">Privacidad</a>
+          <a class="mb-link" routerLink="/terminos">Términos</a>
+        </nav>
       </div>
     </footer>
   `,

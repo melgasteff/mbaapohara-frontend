@@ -55,7 +55,12 @@
     <div class="mb-field" [class.mb-field-error]="show('aceptaTerminos')">
       <label class="check body-sm">
         <input type="checkbox" formControlName="aceptaTerminos" [attr.aria-invalid]="show('aceptaTerminos')" />
-        <span>Acepto los términos de uso y la política de privacidad.</span>
+        <span>
+          Tengo 18 años o más y acepto los
+          <a class="mb-link" routerLink="/terminos" target="_blank" rel="noopener">términos de uso</a> y la
+          <a class="mb-link" routerLink="/privacidad" target="_blank" rel="noopener">política de privacidad</a>
+          <span class="visually-hidden">(se abren en otra pestaña)</span>.
+        </span>
       </label>
       @if (show('aceptaTerminos')) {
         <span class="mb-help"><svg lucideCircleAlert [size]="16" aria-hidden="true"></svg>Para crear la cuenta hay que aceptarlos.</span>

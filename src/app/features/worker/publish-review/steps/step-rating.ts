@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { LucideCircleAlert, LucideInfo, LucideLock } from '@lucide/angular';
 import { OverallRatingConfig, ReviewTextField } from '../../../../core/models/review';
 import { StarRating } from '../../../../shared/ui/star-rating/star-rating';
@@ -8,7 +9,7 @@ import { ReviewForm } from '../review-form';
 /** Paso 4: calificación general (R3) y los dos textos, «Lo bueno» y «A mejorar» (R6). */
 @Component({
   selector: 'app-step-rating',
-  imports: [ReactiveFormsModule, StarRating, LucideCircleAlert, LucideInfo, LucideLock],
+  imports: [ReactiveFormsModule, RouterLink, StarRating, LucideCircleAlert, LucideInfo, LucideLock],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './step.css',
   template: `
@@ -59,6 +60,20 @@ import { ReviewForm } from '../review-form';
           </span>
         </div>
       }
+
+      <div class="mb-field" [class.mb-field-error]="show('aceptaReglas')">
+        <label class="check body-sm">
+          <input type="checkbox" formControlName="aceptaReglas" [attr.aria-invalid]="show('aceptaReglas')" />
+          <span>
+            Acepto las
+            <a class="mb-link" routerLink="/como-moderamos" fragment="reglas" target="_blank" rel="noopener">reglas de publicación</a>
+            <span class="visually-hidden">(se abren en otra pestaña)</span>.
+          </span>
+        </label>
+        @if (show('aceptaReglas')) {
+          <span class="mb-help"><svg lucideCircleAlert [size]="16" aria-hidden="true"></svg>Para publicar hay que aceptarlas.</span>
+        }
+      </div>
     </ng-container>
   `,
   styles: `
@@ -69,6 +84,8 @@ import { ReviewForm } from '../review-form';
     }
     .reminder svg { flex: none; color: var(--yerba-text); }
     textarea.mb-input { min-height: 140px; }
+    .check { display: flex; gap: var(--space-3); align-items: flex-start; cursor: pointer; font-weight: 400; }
+    .check input { accent-color: var(--yerba); width: 20px; height: 20px; margin: 2px 0 0; flex: none; }
   `,
 })
 export class StepRating {
@@ -77,7 +94,7 @@ export class StepRating {
   readonly rating = input.required<OverallRatingConfig>();
   readonly texts = input.required<ReviewTextField[]>();
 
-  protected show(name: 'calificacion' | 'loBueno' | 'aMejorar'): boolean {
+  protected show(name: 'calificacion' | 'loBueno' | 'aMejorar' | 'aceptaReglas'): boolean {
     const control = this.group().controls[name];
     return control.invalid && (control.touched || this.showErrors());
   }

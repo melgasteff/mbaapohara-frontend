@@ -37,6 +37,8 @@ export function createReviewForm() {
       calificacion: new FormControl<number | null>(null, Validators.required),
       loBueno: new FormControl('', { nonNullable: true, validators: Validators.required }),
       aMejorar: new FormControl('', { nonNullable: true, validators: Validators.required }),
+      // Reglas de publicación (política de moderación, sección 3): aceptarlas es obligatorio.
+      aceptaReglas: new FormControl(false, { nonNullable: true, validators: Validators.requiredTrue }),
     }),
   });
 }
