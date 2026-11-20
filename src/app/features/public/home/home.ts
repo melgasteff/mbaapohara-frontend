@@ -1,13 +1,21 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { LucideArrowRight, LucideLock, LucideScale, LucideSearch } from '@lucide/angular';
 
+/** Portada: buscar una empresa o escribir una reseña. */
 @Component({
   selector: 'app-home',
+  imports: [RouterLink, LucideSearch, LucideArrowRight, LucideLock, LucideScale],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <section class="page" aria-labelledby="titulo">
-      <h1 id="titulo" class="h1">Tu experiencia vale</h1>
-      <p class="body">Contá cómo es trabajar en tu empresa y buscá información real antes de postularte.</p>
-    </section>
-  `,
+  styleUrl: './home.css',
+  templateUrl: './home.html',
 })
-export class Home {}
+export class Home {
+  private readonly router = inject(Router);
+
+  protected search(event: Event, term: string): void {
+    event.preventDefault();
+    const q = term.trim();
+    this.router.navigate(['/empresas'], { queryParams: q ? { q } : {} });
+  }
+}

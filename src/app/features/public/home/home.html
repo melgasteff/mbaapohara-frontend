@@ -1,0 +1,30 @@
+<section class="page" aria-labelledby="titulo">
+  <div class="hero">
+    <h1 id="titulo" class="h1">Tu experiencia vale</h1>
+    <p class="body-lg">Contá cómo es trabajar en tu empresa y buscá información real antes de postularte.</p>
+
+    <form class="hero__search" role="search" (submit)="search($event, term.value)">
+      <label class="mb-search">
+        <svg lucideSearch [size]="20"></svg>
+        <span class="visually-hidden">Nombre de la empresa</span>
+        <input #term type="search" name="q" placeholder="Buscá una empresa" autocomplete="off" />
+      </label>
+      <button type="submit" class="mb-btn mb-btn-primary">Buscar</button>
+    </form>
+
+    <div class="hero__actions">
+      <a class="mb-btn mb-btn-accent" routerLink="/publicar">Escribí tu reseña</a>
+      <a class="mb-link" routerLink="/empresas">Ver todas las empresas <svg lucideArrowRight [size]="16" aria-hidden="true"></svg></a>
+    </div>
+    <p class="mb-help anon"><svg lucideLock [size]="16" aria-hidden="true"></svg>Tu nombre nunca se muestra.</p>
+  </div>
+
+  <aside class="rights" aria-labelledby="derechos">
+    <svg lucideScale [size]="28" aria-hidden="true"></svg>
+    <div>
+      <h2 id="derechos" class="h3">Conocé tus derechos</h2>
+      <p class="body-sm">Qué dice la ley sobre el contrato, el IPS, la jornada, las horas extra y el aguinaldo.</p>
+    </div>
+    <span class="mb-tag mb-tag-tierra">Próximamente</span>
+  </aside>
+</section>

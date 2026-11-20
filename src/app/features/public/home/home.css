@@ -1,0 +1,20 @@
+.hero { display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-6) 0; max-width: 720px; }
+.hero h1, .hero p { margin: 0; }
+.hero__search { display: flex; gap: var(--space-2); align-items: center; }
+.hero__search .mb-search { flex: 1; max-width: none; height: 48px; }
+.hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); }
+.hero__actions .mb-link { display: inline-flex; align-items: center; gap: var(--space-1); }
+.anon { display: flex; align-items: center; gap: var(--space-1); }
+
+.rights {
+  display: grid; grid-template-columns: auto 1fr; gap: var(--space-3) var(--space-4); align-items: start;
+  max-width: 720px; padding: var(--space-5);
+  background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-lg);
+}
+.rights > svg { color: var(--tierra-text); }
+.rights h2, .rights p { margin: 0; }
+.rights .mb-tag { grid-column: 2; justify-self: start; }
+@media (min-width: 600px) {
+  .rights { grid-template-columns: auto 1fr auto; align-items: center; }
+  .rights .mb-tag { grid-column: auto; }
+}
