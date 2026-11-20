@@ -59,8 +59,10 @@ Para comprobar que se hablan: `http://localhost:4200/empresas` debe listar las e
 - **Criterios provisionales:** [public/criterios-provisionales.json](public/criterios-provisionales.json), tomados
   de las preguntas 5 a 8 del cuestionario. Se reemplazan con los resultados de la encuesta cambiando solo ese
   archivo.
-- **Moderación simulada:** `src/app/mocks/reviews-api.mock.ts`. Si el texto tiene un correo o un número de seis
-  dígitos o más (teléfono o cédula), la reseña queda «En revisión»; si no, «Publicada». La moderación real es la
+- **Moderación simulada:** `src/app/mocks/reviews-api.mock.ts` imita dos filas de la
+  [política de moderación](../mbaapohara-backend/docs/politica-moderacion.md): un correo, un teléfono, una cédula o
+  un enlace → «Rechazada», con el mensaje de qué corregir; una palabra que sugiere un delito («roba», «acosa»…) →
+  «En revisión»; si no, «Publicada». La moderación real (reglas, modelo de lenguaje y revisión humana) es la
   tarea 2.3.
 - Las empresas y locales de la semilla son reales; las reseñas y textos de ejemplo siempre son ficticios.
 
@@ -86,8 +88,10 @@ Una cuenta común se crea desde `/registro`.
    4. estrellas y los dos textos, con contador y el recordatorio de anonimato.
 4. **Publicar** → «Publicada», con la vista previa de la tarjeta.
 5. **«Escribir otra reseña»** y poner un teléfono en «Lo bueno» (por ejemplo «llamá al 0981 123 456») →
-   «En revisión», con el motivo. Explicar que la moderación real combina reglas, un modelo de lenguaje y
-   revisión humana (Fase 2).
+   «Rechazada», con qué corregir. «Editar y volver a enviar» vuelve al paso 4 con todo lo escrito; sacar el
+   teléfono → «Publicada». Con una acusación («la supervisora acosa a las cajeras») → «En revisión».
+   Explicar la política: la crítica a la empresa siempre se publica; se modera lo que identifica o acusa a
+   personas y lo que rompe el anonimato (Fase 2).
 6. **Ingresar como administrador** → «Administración»: crear una empresa ficticia con su local, agregar un
    cargo común (por ejemplo «Cajera») y mostrar la cola de locales pendientes.
 7. Cerrar con qué es real, qué es prototipo y qué falta.
