@@ -57,12 +57,14 @@ Para comprobar que se hablan: `http://localhost:4200/empresas` debe listar las e
 | Cómo moderamos, privacidad, términos | `/como-moderamos`, `/privacidad`, `/terminos` | Borradores (tarea 1.9), con enlaces en el pie, el registro y el asistente |
 | Mi cuenta | `/mi-cuenta` | **Real:** ver los datos, descargarlos y eliminar la cuenta con sus reseñas (exige sesión) |
 | Ingresar, crear cuenta | `/ingresar`, `/registro` | **Reales:** JWT de la API; la sesión se guarda en `sessionStorage` y vence con el token |
-| Administración | `/admin/…` | Solo administradores. **Reales:** empresas por estado (aprobar, rechazar, eliminar), alta de empresa con su primer local, gestión de una empresa aprobada y sus locales, cola de locales pendientes, cargos (con los propuestos desde reseñas) **moderación** (`/admin/moderacion`: publicar o rechazar con motivo las reseñas en revisión, con las señales del modelo y sin el autor), **reportes** (`/admin/reportes`: mantener o retirar) y **solicitudes de empresas** (`/admin/solicitudes`: responder por correo y registrar) |
+| Administración | `/admin/…` | Solo administradores. **Reales:** empresas por estado (aprobar, rechazar, eliminar), alta de empresa con su primer local, gestión de una empresa aprobada y sus locales, cola de locales pendientes, cargos (con los propuestos desde reseñas) **moderación** (`/admin/moderacion`: publicar o rechazar con motivo las reseñas en revisión, con las señales del modelo y sin el autor), **reportes** (`/admin/reportes`: mantener o retirar), **solicitudes de empresas** (`/admin/solicitudes`: responder por correo y registrar) y **criterios** (`/admin/criterios`: agregar, editar con aviso si ya tienen respuestas, activar o desactivar) |
 | Solicitud de una empresa | `/solicitud-revision` | **Real:** formulario público para pedir revisar una reseña o corregir datos; se llega desde el perfil |
 
-- **Criterios provisionales:** [public/criterios-provisionales.json](public/criterios-provisionales.json), tomados
-  de las preguntas 5 a 8 del cuestionario. Se reemplazan con los resultados de la encuesta cambiando solo ese
-  archivo.
+- **Criterios (3.8):** las categorías e ítems vienen de la API (`GET /criteria`) y se administran en
+  `/admin/criterios`: alta, corrección de texto y orden, y activar o desactivar (no se borran). Los provisionales
+  salen de las preguntas 5 a 8 del cuestionario y se ajustan desde esa pantalla con los resultados de la encuesta.
+  [public/criterios-provisionales.json](public/criterios-provisionales.json) guarda solo la forma de la reseña
+  (opciones de respuesta, situaciones, calificación y textos).
 - **Publicación real (3.3):** el asistente publica con `POST /reviews` (`src/app/core/api/http-reviews-api.ts`) y
   muestra el resultado de la moderación real del backend. El simulador `src/app/mocks/reviews-api.mock.ts`, que imita
   dos filas de la [política de moderación](../mbaapohara-backend/docs/politica-moderacion.md), queda solo para
@@ -119,6 +121,6 @@ src/app/
     worker/   asistente de publicación
     admin/    administración
   mocks/      implementaciones simuladas, detrás de la misma interfaz que el servicio real
-public/       fuentes, logos y criterios provisionales (archivos estáticos)
+public/       fuentes, logos y la forma de la reseña (archivos estáticos)
 docs/         plan, decisiones, demo y manual de marca
 ```
