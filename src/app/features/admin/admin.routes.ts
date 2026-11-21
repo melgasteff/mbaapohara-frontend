@@ -48,6 +48,11 @@ export const ADMIN_ROUTES: Routes = [
         title: 'Cargos · Mbaapohara',
         loadComponent: () => import('./jobs-admin/jobs-admin').then((m) => m.JobsAdmin),
       },
+      {
+        path: 'criterios',
+        title: 'Criterios · Mbaapohara',
+        loadComponent: () => import('./criteria-admin/criteria-admin').then((m) => m.CriteriaAdmin),
+      },
     ],
   },
 ];

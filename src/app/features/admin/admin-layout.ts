@@ -34,6 +34,7 @@ import { ModerationAdminApi } from '../../core/api/moderation-admin-api';
         <a routerLink="/admin/locales" routerLinkActive ariaCurrentWhenActive="page">Locales pendientes</a>
         <a routerLink="/admin/empresas/nueva" routerLinkActive ariaCurrentWhenActive="page">Nueva empresa</a>
         <a routerLink="/admin/cargos" routerLinkActive ariaCurrentWhenActive="page">Cargos</a>
+        <a routerLink="/admin/criterios" routerLinkActive ariaCurrentWhenActive="page">Criterios</a>
       </nav>
       <router-outlet />
     </div>

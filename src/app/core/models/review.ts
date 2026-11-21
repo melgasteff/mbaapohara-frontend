@@ -1,5 +1,6 @@
 // Forma de la reseña (R2 a R7, sección 7 del PLAN). El contenido de los criterios es provisional y llega como
-// datos desde public/criterios-provisionales.json: nunca se escribe en el código.
+// datos: las categorías e ítems desde la API (GET /criteria, 3.8) y la forma desde public/criterios-provisionales.json.
+// Nunca se escriben en el código.
 
 /** Opción de una lista fija del JSON (respuestas, situaciones). */
 export interface ReviewOption {
@@ -37,7 +38,7 @@ export interface OverallRatingConfig {
   palabras: Record<string, string>;
 }
 
-/** Contenido de public/criterios-provisionales.json que usa el asistente. */
+/** Lo que usa el asistente: la forma de public/criterios-provisionales.json más las categorías de GET /criteria. */
 export interface CriteriaConfig {
   version: string;
   opcionesRespuesta: ReviewOption[];
