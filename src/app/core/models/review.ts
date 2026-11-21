@@ -131,3 +131,36 @@ export interface MyReview {
   publicada: boolean;
   ultimaVersion: MyReviewVersion;
 }
+
+/** Reseña publicada, tal como la ve cualquier persona (GET /reviews). Nunca trae el autor. */
+export interface PublicReview {
+  id: number;
+  empresa: { id: number; nombre: string };
+  local: { id: number; nombre: string; ciudad: string };
+  /** `null` si es un cargo propuesto que el administrador todavía no aprobó («Otro cargo»). */
+  cargo: string | null;
+  situacion: WorkSituation;
+  ultimoAnio: number | null;
+  tipoContrato: CatalogItem;
+  modalidad: CatalogItem;
+  calificacion: number;
+  loBueno: string;
+  aMejorar: string;
+  /** Respuestas a los criterios activos, en su orden. */
+  respuestas: SavedAnswer[];
+  /** Mes de publicación, «2026-11»: nunca el día. */
+  mesPublicacion: string;
+}
+
+/** Filtros del listado público de reseñas (RF5). */
+export interface PublicReviewsQuery {
+  empresa?: number;
+  local?: number;
+  cargo?: number;
+  ciudad?: number;
+  tipoContrato?: number;
+  modalidad?: number;
+  situacion?: WorkSituation;
+  page?: number;
+  pageSize?: number;
+}

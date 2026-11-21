@@ -51,9 +51,7 @@
 
     <section aria-labelledby="resenas">
       <h2 id="resenas" class="h2">Reseñas</h2>
-      <app-page-state kind="empty" icon="reviews" title="Todavía no hay reseñas. Sé la primera persona en contar.">
-        <a class="mb-btn mb-btn-primary" routerLink="/publicar">Escribí tu reseña</a>
-      </app-page-state>
+      <app-company-reviews [company]="data" [filters]="reviewFilters()" />
     </section>
   } @else {
     <h1 id="titulo" class="h1 visually-hidden">Perfil de la empresa</h1>

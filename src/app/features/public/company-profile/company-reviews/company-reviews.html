@@ -1,0 +1,141 @@
+<div class="filters" role="group" aria-label="Filtrar reseñas">
+  <div class="mb-field">
+    <label for="f-local">Local</label>
+    <select id="f-local" class="mb-input" #local (change)="select('local', local.value)">
+      <option value="" [selected]="!filters().local">Todos</option>
+      @for (group of officeGroups(); track group.ciudad) {
+        <optgroup [label]="group.ciudad">
+          @for (office of group.locales; track office.id) {
+            <option [value]="office.id" [selected]="office.id === filters().local">{{ office.nombre }}</option>
+          }
+        </optgroup>
+      }
+    </select>
+  </div>
+  <div class="mb-field">
+    <label for="f-cargo">Cargo</label>
+    <select id="f-cargo" class="mb-input" #cargo (change)="select('cargo', cargo.value)">
+      <option value="" [selected]="!filters().cargo">Todos</option>
+      @if (jobs.hasValue()) {
+        @for (job of jobs.value().data; track job.id) {
+          <option [value]="job.id" [selected]="job.id === filters().cargo">{{ job.descripcion }}</option>
+        }
+      }
+    </select>
+  </div>
+  <div class="mb-field">
+    <label for="f-contrato">Tipo de contrato</label>
+    <select id="f-contrato" class="mb-input" #contrato (change)="select('tipoContrato', contrato.value)">
+      <option value="" [selected]="!filters().tipoContrato">Todos</option>
+      @if (contractTypes.hasValue()) {
+        @for (item of contractTypes.value().data; track item.id) {
+          <option [value]="item.id" [selected]="item.id === filters().tipoContrato">{{ item.nombre }}</option>
+        }
+      }
+    </select>
+  </div>
+  <div class="mb-field">
+    <label for="f-modalidad">Modalidad</label>
+    <select id="f-modalidad" class="mb-input" #modalidad (change)="select('modalidad', modalidad.value)">
+      <option value="" [selected]="!filters().modalidad">Todas</option>
+      @if (workModes.hasValue()) {
+        @for (item of workModes.value().data; track item.id) {
+          <option [value]="item.id" [selected]="item.id === filters().modalidad">{{ item.nombre }}</option>
+        }
+      }
+    </select>
+  </div>
+  <div class="mb-field">
+    <label for="f-situacion">Situación</label>
+    <select id="f-situacion" class="mb-input" #situacion (change)="select('situacion', situacion.value)">
+      <option value="" [selected]="!filters().situacion">Todas</option>
+      <option value="ACTUAL" [selected]="filters().situacion === 'ACTUAL'">Trabaja ahí</option>
+      <option value="ANTERIOR" [selected]="filters().situacion === 'ANTERIOR'">Trabajó ahí</option>
+    </select>
+  </div>
+</div>
+
+@if (reviews.error()) {
+  <app-page-state kind="error" title="No pudimos cargar las reseñas." (retry)="reviews.reload()" />
+} @else if (reviews.hasValue()) {
+  @let result = reviews.value();
+  @if (result.total === 0 && hasFilters()) {
+    <app-page-state kind="empty" icon="reviews" title="No hay reseñas con estos filtros." message="Probá con otros o quitalos.">
+      <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm" (click)="clearFilters()">Quitar filtros</button>
+    </app-page-state>
+  } @else if (result.total === 0) {
+    <app-page-state kind="empty" icon="reviews" title="Todavía no hay reseñas. Sé la primera persona en contar.">
+      <a class="mb-btn mb-btn-primary" routerLink="/publicar">Escribí tu reseña</a>
+    </app-page-state>
+  } @else {
+    <div class="count">
+      <p class="body-sm" aria-live="polite">
+        {{ result.total | number }} {{ result.total === 1 ? 'reseña' : 'reseñas' }}{{ hasFilters() ? ' con estos filtros' : '' }}
+      </p>
+      @if (hasFilters()) {
+        <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm" (click)="clearFilters()">Quitar filtros</button>
+      }
+    </div>
+
+    <ul class="list" [class.is-reloading]="reviews.isLoading()">
+      @for (review of result.data; track review.id) {
+        <li>
+          <app-review-card
+            [rating]="review.calificacion"
+            [meta]="meta(review)"
+            [good]="review.loBueno"
+            [toImprove]="review.aMejorar"
+            [footer]="footer(review)"
+          >
+            @if (compliance(review); as groups) {
+              @if (groups.length) {
+                <details class="compliance">
+                  <summary>Ver cumplimiento de derechos</summary>
+                  <p class="body-sm compliance__context">{{ review.tipoContrato.nombre }} · {{ review.modalidad.nombre }}</p>
+                  @for (group of groups; track group.categoria) {
+                    <h3 class="compliance__category">{{ group.categoria }}</h3>
+                    <ul class="compliance__rows">
+                      @for (row of group.filas; track row.codigo) {
+                        <li>
+                          <span class="body-sm">{{ row.texto }}</span>
+                          @switch (row.valor) {
+                            @case ('SI') {
+                              <span class="mb-tag mb-tag-success"><svg lucideCircleCheck aria-hidden="true"></svg>{{ row.etiqueta }}</span>
+                            }
+                            @case ('EN_PARTE') {
+                              <span class="mb-tag mb-tag-warning"><svg lucideCircleDot aria-hidden="true"></svg>{{ row.etiqueta }}</span>
+                            }
+                            @case ('NO') {
+                              <span class="mb-tag mb-tag-danger"><svg lucideCircleX aria-hidden="true"></svg>{{ row.etiqueta }}</span>
+                            }
+                            @default {
+                              <span class="mb-tag"><svg lucideCircleQuestionMark aria-hidden="true"></svg>{{ row.etiqueta }}</span>
+                            }
+                          }
+                        </li>
+                      }
+                    </ul>
+                  }
+                </details>
+              }
+            }
+          </app-review-card>
+        </li>
+      }
+    </ul>
+
+    @if (totalPages() > 1) {
+      <nav class="pager" aria-label="Páginas de reseñas">
+        <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm" [disabled]="filters().page <= 1" (click)="goToPage(filters().page - 1)">
+          <svg lucideChevronLeft [size]="16" aria-hidden="true"></svg>Anterior
+        </button>
+        <span class="body-sm">Página {{ filters().page }} de {{ totalPages() }}</span>
+        <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm" [disabled]="filters().page >= totalPages()" (click)="goToPage(filters().page + 1)">
+          Siguiente<svg lucideChevronRight [size]="16" aria-hidden="true"></svg>
+        </button>
+      </nav>
+    }
+  }
+} @else {
+  <app-page-state kind="loading" message="Cargando reseñas…" />
+}

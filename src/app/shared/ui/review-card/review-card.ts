@@ -32,6 +32,8 @@ import { Stars } from '../stars/stars';
         <span class="mb-con"><svg lucideCircleMinus [size]="20" aria-hidden="true"></svg></span>
         <p><strong>A mejorar</strong>{{ toImprove() }}</p>
       </div>
+      <!-- Contenido opcional debajo de los textos (por ejemplo, el cumplimiento de derechos en el perfil). -->
+      <ng-content />
       @if (footer()) {
         <div class="mb-review-foot">
           <span class="mb-meta"><span>{{ footer() }}</span></span>
