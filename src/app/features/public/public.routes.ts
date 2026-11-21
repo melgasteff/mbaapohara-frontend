@@ -39,6 +39,11 @@ export const PUBLIC_ROUTES: Routes = [
     loadComponent: () => import('./legal/terms').then((m) => m.Terms),
   },
   {
+    path: 'solicitud-revision',
+    title: 'Solicitud de una empresa · Mbaapohara',
+    loadComponent: () => import('./company-request/company-request').then((m) => m.CompanyRequestPage),
+  },
+  {
     path: 'registro',
     title: 'Crear cuenta · Mbaapohara',
     loadComponent: () => import('./auth/sign-up/sign-up').then((m) => m.SignUp),

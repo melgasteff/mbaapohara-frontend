@@ -1,0 +1,70 @@
+<article class="page legal" aria-labelledby="titulo">
+  <h1 id="titulo" class="h1">Solicitud de una empresa</h1>
+  <p class="body">
+    Las empresas no tienen cuenta en Mbaapohara. Con este formulario podés pedirnos que revisemos una reseña o que
+    corrijamos los datos de tu empresa. Evaluamos cada pedido con las mismas
+    <a class="mb-link" routerLink="/como-moderamos">reglas de moderación</a>:
+    <strong>una reseña nunca se retira por ser negativa</strong>, solo si incumple las reglas.
+  </p>
+
+  @if (done(); as message) {
+    <p class="alert alert--ok body" role="status"><svg lucideCircleCheck [size]="20" aria-hidden="true"></svg>{{ message }}</p>
+  } @else if (!type()) {
+    <app-page-state kind="empty" title="Empezá desde el perfil de la empresa." message="Cada reseña tiene el enlace «¿Sos de la empresa? Pedí una revisión», y el perfil, uno para corregir sus datos.">
+      <a class="mb-btn mb-btn-secondary mb-btn-sm" routerLink="/empresas">Ir a empresas</a>
+    </app-page-state>
+  } @else {
+    @if (type() === 'revision_resena') {
+      <h2 class="h2">Reseña que querés que revisemos</h2>
+      @if (review.error()) {
+        <app-page-state kind="empty" title="Esa reseña no existe o ya no está publicada." />
+      } @else if (review.hasValue()) {
+        <div class="quote body-sm">
+          <p><strong>{{ review.value().empresa.nombre }}</strong> · {{ review.value().local.nombre }}, {{ review.value().local.ciudad }}</p>
+          <p><strong>Lo bueno:</strong> {{ review.value().loBueno }}</p>
+          <p><strong>A mejorar:</strong> {{ review.value().aMejorar }}</p>
+        </div>
+      } @else {
+        <app-page-state kind="loading" message="Cargando la reseña…" />
+      }
+    } @else {
+      <h2 class="h2">Empresa</h2>
+      @if (company.error()) {
+        <app-page-state kind="empty" title="No encontramos esa empresa." />
+      } @else if (company.hasValue()) {
+        <p class="body"><strong>{{ company.value().nombre }}</strong>: contanos qué dato hay que corregir (nombre, rubro, locales o direcciones).</p>
+      }
+    }
+
+    <form class="form" (submit)="send($event)" novalidate>
+      <div class="mb-field" [class.mb-field-error]="invalid('nombre')">
+        <label for="nombre">Tu nombre</label>
+        <input id="nombre" class="mb-input" autocomplete="name" maxlength="100" [formControl]="form.controls.nombre" />
+      </div>
+      <div class="mb-field" [class.mb-field-error]="invalid('correo')">
+        <label for="correo">Correo para responderte</label>
+        <input id="correo" class="mb-input" type="email" autocomplete="email" maxlength="254" [formControl]="form.controls.correo" />
+        @if (invalid('correo')) { <span class="mb-help">Escribí un correo válido.</span> }
+      </div>
+      <div class="mb-field" [class.mb-field-error]="invalid('mensaje')">
+        <label for="mensaje">{{ type() === 'revision_resena' ? '¿Qué regla creés que rompe la reseña?' : '¿Qué hay que corregir?' }}</label>
+        <textarea id="mensaje" class="mb-input" rows="5" maxlength="2000" [formControl]="form.controls.mensaje"></textarea>
+        <span class="mb-help">De 20 a 2.000 caracteres.</span>
+      </div>
+      <label class="check body-sm">
+        <input type="checkbox" [formControl]="form.controls.aceptaPrivacidad" />
+        <span>
+          Acepto la <a class="mb-link" routerLink="/privacidad">política de privacidad</a>: guardan mi nombre y mi correo
+          solo hasta responderme.
+        </span>
+      </label>
+      @if (invalid('aceptaPrivacidad')) {
+        <p class="mb-help error">Para enviar tenés que aceptar la política de privacidad.</p>
+      }
+      @if (error(); as message) {
+        <p class="alert alert--error body-sm" role="alert"><svg lucideCircleAlert [size]="16" aria-hidden="true"></svg>{{ message }}</p>
+      }
+      <button type="submit" class="mb-btn mb-btn-primary" [disabled]="sending()">{{ sending() ? 'Enviando…' : 'Enviar solicitud' }}</button>
+    </form>
+  }
+</article>

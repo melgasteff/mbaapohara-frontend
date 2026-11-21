@@ -23,6 +23,9 @@
       @if (data.rubro.nombre; as rubro) {
         <div class="mb-meta"><span>{{ rubro }}</span></div>
       }
+      <a class="mb-link body-sm" routerLink="/solicitud-revision" [queryParams]="{ tipo: 'correccion_datos', empresa: data.id }">
+        ¿Sos de esta empresa? Pedí corregir sus datos
+      </a>
     </header>
 
     <section aria-labelledby="locales">

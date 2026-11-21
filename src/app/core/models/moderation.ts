@@ -73,3 +73,59 @@ export const FAILURE_LABELS: Record<string, string> = {
   rechazo_del_modelo: 'El modelo no quiso clasificar el texto',
   respuesta_invalida: 'El modelo respondió algo inválido',
 };
+
+/** Categoría de un reporte: una de la política u «Otro» con comentario (3.9b). */
+export type ReportCategory = ModerationCategory | 'OTRO';
+export const REPORT_CATEGORIES: ReportCategory[] = [...CATEGORIES, 'OTRO'];
+export const REPORT_LABELS: Record<ReportCategory, string> = {
+  DP: 'Tiene datos de contacto',
+  TER: 'Nombra o señala a una persona',
+  ACU: 'Acusa de un delito a una persona',
+  INS: 'Tiene insultos o discriminación',
+  SPAM: 'Es publicidad o un texto repetido',
+  TEMA: 'No habla de trabajar en la empresa',
+  OTRO: 'Otro motivo',
+};
+
+/** Reseña con reportes pendientes (GET /moderation/reports). Sin el autor ni quién reportó. */
+export interface ReportedReview {
+  idResena: number;
+  empresa: { id: number; nombre: string };
+  local: { id: number; nombre: string; ciudad: string };
+  publicada: boolean;
+  calificacion: number | null;
+  loBueno: string | null;
+  aMejorar: string | null;
+  cantidad: number;
+  primerReporte: string;
+  reportes: { categoria: ReportCategory; comentario: string | null; fecha: string }[];
+}
+
+export type CompanyRequestType = 'revision_resena' | 'correccion_datos';
+export type CompanyRequestStatus = 'pendiente' | 'respondida';
+
+/** Solicitud pública de una empresa (POST /company-requests). */
+export interface NewCompanyRequest {
+  tipo: CompanyRequestType;
+  idResena?: number;
+  idEmpresa?: number;
+  nombre: string;
+  correo: string;
+  mensaje: string;
+  aceptaPrivacidad: boolean;
+}
+
+/** Solicitud para la administración. Nombre y correo solo mientras está abierta. */
+export interface CompanyRequest {
+  id: number;
+  tipo: CompanyRequestType;
+  estado: CompanyRequestStatus;
+  empresa: { id: number; nombre: string } | null;
+  resena: { id: number; publicada: boolean; loBueno: string | null; aMejorar: string | null } | null;
+  nombre: string | null;
+  correo: string | null;
+  mensaje: string;
+  respuesta: string | null;
+  fecha: string;
+  fechaRespuesta: string | null;
+}

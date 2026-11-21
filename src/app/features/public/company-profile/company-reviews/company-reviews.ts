@@ -19,6 +19,7 @@ import { PublicReview, WorkSituation } from '../../../../core/models/review';
 import { toId } from '../../../../shared/route-params';
 import { PageState } from '../../../../shared/ui/page-state/page-state';
 import { ReviewCard } from '../../../../shared/ui/review-card/review-card';
+import { ReviewActions } from './review-actions';
 import { complianceGroups, publicationLabel, publicReviewMeta } from './review-view';
 
 const PAGE_SIZE = 10;
@@ -51,6 +52,7 @@ export function toSituation(value: unknown): WorkSituation | undefined {
     RouterLink,
     PageState,
     ReviewCard,
+    ReviewActions,
     LucideChevronLeft,
     LucideChevronRight,
     LucideCircleCheck,

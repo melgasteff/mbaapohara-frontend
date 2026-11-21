@@ -28,6 +28,8 @@ import { ModerationAdminApi } from '../../core/api/moderation-admin-api';
             <span class="count" [attr.aria-label]="pending.value().total + ' pendientes'">{{ pending.value().total }}</span>
           }
         </a>
+        <a routerLink="/admin/reportes" routerLinkActive ariaCurrentWhenActive="page">Reportes</a>
+        <a routerLink="/admin/solicitudes" routerLinkActive ariaCurrentWhenActive="page">Solicitudes</a>
         <a routerLink="/admin/empresas" routerLinkActive ariaCurrentWhenActive="page" [routerLinkActiveOptions]="{ exact: true }">Empresas</a>
         <a routerLink="/admin/locales" routerLinkActive ariaCurrentWhenActive="page">Locales pendientes</a>
         <a routerLink="/admin/empresas/nueva" routerLinkActive ariaCurrentWhenActive="page">Nueva empresa</a>

@@ -14,6 +14,16 @@ export const ADMIN_ROUTES: Routes = [
         loadComponent: () => import('./moderation-queue/moderation-queue').then((m) => m.ModerationQueue),
       },
       {
+        path: 'reportes',
+        title: 'Reportes · Mbaapohara',
+        loadComponent: () => import('./reports/reports-admin').then((m) => m.ReportsAdmin),
+      },
+      {
+        path: 'solicitudes',
+        title: 'Solicitudes de empresas · Mbaapohara',
+        loadComponent: () => import('./company-requests/requests-admin').then((m) => m.RequestsAdmin),
+      },
+      {
         path: 'empresas',
         title: 'Administrar empresas · Mbaapohara',
         loadComponent: () => import('./companies-admin/companies-admin').then((m) => m.CompaniesAdmin),

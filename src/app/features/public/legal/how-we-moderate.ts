@@ -73,8 +73,9 @@ import { RouterLink } from '@angular/router';
       <ul>
         <li><strong>Reportes:</strong> si una reseña rompe estas reglas, cualquier cuenta puede reportarla. La reseña sigue visible
           mientras la revisamos, para que nadie pueda bajar reseñas negativas reportándolas muchas veces.</li>
-        <li><strong>Empresas:</strong> no tienen cuenta. Pueden pedirnos que revisemos una reseña con un formulario. La evaluamos con
-          estas mismas reglas: <strong>una reseña nunca se retira por ser negativa</strong>.</li>
+        <li><strong>Empresas:</strong> no tienen cuenta. Pueden pedirnos que revisemos una reseña o que corrijamos sus datos con un
+          formulario, desde el perfil de la empresa. La evaluamos con estas mismas reglas:
+          <strong>una reseña nunca se retira por ser negativa</strong>. Respondemos por correo.</li>
         <li>Si retiramos una reseña, quien la escribió ve el motivo y puede corregirla.</li>
       </ul>
 

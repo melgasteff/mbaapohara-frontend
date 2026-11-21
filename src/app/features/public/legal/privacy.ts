@@ -44,6 +44,8 @@ const CONTACT = 'melgasteff@gmail.com';
             <tr><td>Rol y estado de la cuenta</td><td>Saber si es una cuenta común o de administración, y si está bloqueada</td></tr>
             <tr><td>Fecha en que aceptaste estos términos</td><td>Dejar constancia de tu consentimiento</td></tr>
             <tr><td>Tus reseñas: local, cargo, situación, último año, tipo de contrato, modalidad, respuestas, calificación y texto</td><td>Publicarlas y calcular indicadores sobre las empresas</td></tr>
+            <tr><td>Tus reportes de reseñas: la categoría y el comentario</td><td>Revisar si la reseña incumple las reglas. Nadie más ve que reportaste</td></tr>
+            <tr><td>Si escribís en nombre de una empresa: tu nombre, tu correo y tu mensaje</td><td>Responderte por correo. <strong>El nombre y el correo se borran al responder</strong>; quedan el mensaje y la respuesta</td></tr>
           </tbody>
         </table>
       </div>
