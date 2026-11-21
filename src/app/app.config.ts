@@ -4,9 +4,9 @@ import localeEsPy from '@angular/common/locales/es-PY';
 import { ApplicationConfig, LOCALE_ID, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
 import { routes } from './app.routes';
+import { HttpReviewsApi } from './core/api/http-reviews-api';
 import { ReviewsApi } from './core/api/reviews-api';
 import { authInterceptor } from './core/auth/auth.interceptor';
-import { MockReviewsApi } from './mocks/reviews-api.mock';
 
 // Números a la paraguaya: coma decimal y punto de miles.
 registerLocaleData(localeEsPy);
@@ -21,7 +21,7 @@ export const appConfig: ApplicationConfig = {
     ),
     provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
     { provide: LOCALE_ID, useValue: 'es-PY' },
-    // PROTOTIPO: la publicación es simulada hasta la tarea 3.3, que enlaza aquí la implementación HTTP.
-    { provide: ReviewsApi, useClass: MockReviewsApi },
+    // Publicación real (tarea 3.3). El simulador de src/app/mocks queda para las pruebas de los componentes.
+    { provide: ReviewsApi, useClass: HttpReviewsApi },
   ],
 };

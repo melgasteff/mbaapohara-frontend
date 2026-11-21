@@ -61,11 +61,10 @@ Para comprobar que se hablan: `http://localhost:4200/empresas` debe listar las e
 - **Criterios provisionales:** [public/criterios-provisionales.json](public/criterios-provisionales.json), tomados
   de las preguntas 5 a 8 del cuestionario. Se reemplazan con los resultados de la encuesta cambiando solo ese
   archivo.
-- **Moderación simulada:** `src/app/mocks/reviews-api.mock.ts` imita dos filas de la
-  [política de moderación](../mbaapohara-backend/docs/politica-moderacion.md): un correo, un teléfono, una cédula o
-  un enlace → «Rechazada», con el mensaje de qué corregir; una palabra que sugiere un delito («roba», «acosa»…) →
-  «En revisión»; si no, «Publicada». La moderación real (reglas, modelo de lenguaje y revisión humana) es la
-  tarea 2.3.
+- **Publicación real (3.3):** el asistente publica con `POST /reviews` (`src/app/core/api/http-reviews-api.ts`) y
+  muestra el resultado de la moderación real del backend. El simulador `src/app/mocks/reviews-api.mock.ts`, que imita
+  dos filas de la [política de moderación](../mbaapohara-backend/docs/politica-moderacion.md), queda solo para
+  probar los componentes sin la API.
 - Las empresas y locales de la semilla son reales; las reseñas y textos de ejemplo siempre son ficticios.
 
 ### Cuenta de administrador

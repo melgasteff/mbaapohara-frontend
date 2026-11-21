@@ -33,7 +33,7 @@ const GROUPS: StepGroup[] = ['lugar', 'relacion', 'criterios', 'texto'];
 
 /**
  * Asistente de publicación en 4 pasos (1.7, paso 3 de FRONTEND-DEMO.md). Empresas, locales y catálogos son
- * reales; los criterios vienen del JSON provisional y el envío es simulado (ReviewsApi → MockReviewsApi).
+ * reales; los criterios vienen del JSON provisional y el envío va a la API (ReviewsApi → HttpReviewsApi, 3.3).
  */
 @Component({
   selector: 'app-publish-review',
