@@ -86,9 +86,48 @@ export type ReviewStatus = 'publicada' | 'en_revision' | 'rechazada';
 export type ModerationCategory = 'DP' | 'TER' | 'ACU' | 'INS' | 'SPAM' | 'TEMA';
 
 export interface PublishResult {
+  /** Id de la reseña: con él se corrige una reseña rechazada (PUT /reviews/:id). */
+  id: number;
   estado: ReviewStatus;
   /** Categoría que motivó el rechazo o la revisión. */
   categoria?: ModerationCategory;
   /** Motivo para quien escribió: qué corregir o por qué se revisa. */
   motivo?: string;
+}
+
+/** Respuesta de un criterio en una reseña guardada. */
+export interface SavedAnswer {
+  codigo: string;
+  respuesta: string;
+}
+
+/** Última versión de una reseña propia (GET /reviews/mine). */
+export interface MyReviewVersion {
+  numero: number;
+  estado: ReviewStatus;
+  categoria: ModerationCategory | null;
+  /** Mensaje de la moderación para quien escribió. */
+  motivo: string | null;
+  /** `aprobado` es `false` mientras un cargo propuesto espera la aprobación del administrador. */
+  cargo: { id: number; descripcion: string; aprobado: boolean };
+  situacion: WorkSituation;
+  ultimoAnio: number | null;
+  tipoContrato: CatalogItem;
+  modalidad: CatalogItem;
+  calificacion: number;
+  loBueno: string;
+  aMejorar: string;
+  respuestas: SavedAnswer[];
+  /** Fecha de envío (ISO). */
+  fecha: string;
+}
+
+/** Reseña propia, para «Mis reseñas» y para editarla. */
+export interface MyReview {
+  id: number;
+  empresa: { id: number; nombre: string };
+  local: { id: number; nombre: string; ciudad: string };
+  /** Hay una versión publicada visible (puede ser anterior a la última). */
+  publicada: boolean;
+  ultimaVersion: MyReviewVersion;
 }

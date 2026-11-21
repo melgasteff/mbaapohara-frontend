@@ -15,3 +15,11 @@
 
 .summary { color: var(--danger); display: flex; align-items: center; gap: var(--space-1); }
 .actions { display: flex; gap: var(--space-3); flex-wrap: wrap; padding-top: var(--space-2); }
+
+.editing-place { margin: var(--space-4) 0 0; color: var(--ink-muted); }
+.send-error {
+  display: flex; flex-direction: column; gap: var(--space-2); max-width: 640px;
+  padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--danger-soft); color: var(--danger);
+}
+.send-error p { display: flex; align-items: center; gap: var(--space-1); margin: 0; }
+.send-error ul { margin: 0; padding-left: var(--space-5); }

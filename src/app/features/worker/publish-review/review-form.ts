@@ -2,7 +2,7 @@ import { DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Company, Office } from '../../../core/models/company';
-import { CatalogItem, CriteriaConfig, Job, ReviewDraft, WorkSituation } from '../../../core/models/review';
+import { CatalogItem, CriteriaConfig, Job, MyReview, ReviewDraft, WorkSituation } from '../../../core/models/review';
 
 export const CURRENT_YEAR = new Date().getFullYear();
 /** Valor del select de cargo para «Mi cargo no está en la lista». */
@@ -114,4 +114,40 @@ export function draftMeta(draft: ReviewDraft): string[] {
     ...(draft.local.ciudad ? [draft.local.ciudad] : []),
     ...(draft.situacion === 'ANTERIOR' ? [`hasta ${draft.ultimoAnio}`] : []),
   ];
+}
+
+/**
+ * Carga en el formulario la última versión de una reseña propia, para editarla. Los criterios tienen que estar
+ * aplicados antes (applyCriteriaConfig). El local no se edita: se carga lo justo para la vista previa y el envío.
+ * Un cargo propuesto que todavía no está en la lista vuelve como «Mi cargo no está en la lista», con su texto.
+ */
+export function fromMyReview(form: ReviewForm, review: MyReview, jobs: Job[]): void {
+  const v = review.ultimaVersion;
+  const listed = v.cargo.aprobado && jobs.some((job) => job.id === v.cargo.id);
+  const empresa = { id: review.empresa.id, nombre: review.empresa.nombre } as Company;
+  const local = {
+    id: review.local.id,
+    nombre: review.local.nombre,
+    idEmpresa: review.empresa.id,
+    ciudad: { nombre: review.local.ciudad },
+  } as Office;
+  const criterios: Record<string, string> = {};
+  for (const { codigo, respuesta } of v.respuestas) {
+    // Un criterio que ya no se usa no tiene control: se ignora.
+    if (form.controls.criterios.contains(codigo)) criterios[codigo] = respuesta;
+  }
+  form.patchValue({
+    lugar: { empresa, local },
+    relacion: {
+      cargo: listed ? v.cargo.id : OTHER_JOB,
+      cargoNuevo: listed ? '' : v.cargo.descripcion,
+      situacion: v.situacion,
+      ultimoAnio: v.situacion === 'ANTERIOR' ? v.ultimoAnio : null,
+      tipoContrato: v.tipoContrato.id,
+      modalidad: v.modalidad.id,
+    },
+    criterios,
+    // Las reglas de publicación se vuelven a aceptar en cada envío.
+    texto: { calificacion: v.calificacion, loBueno: v.loBueno, aMejorar: v.aMejorar, aceptaReglas: false },
+  });
 }

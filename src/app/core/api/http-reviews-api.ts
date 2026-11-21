@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { PublishResult, ReviewDraft } from '../models/review';
+import { MyReview, PublishResult, ReviewDraft } from '../models/review';
 import { ReviewsApi } from './reviews-api';
 
 /** Cuerpo de POST /reviews (mbaapohara-backend, tarea 3.3). */
@@ -38,15 +38,31 @@ export function toPublishBody(draft: ReviewDraft): PublishReviewBody {
   };
 }
 
-/** Publicación real de reseñas: la API guarda la reseña, la modera y responde el resultado. */
+/** Reseñas contra la API: guarda, modera y responde el resultado (mbaapohara-backend, tarea 3.3). */
 @Injectable()
 export class HttpReviewsApi extends ReviewsApi {
   private readonly http = inject(HttpClient);
   private readonly url = `${environment.apiUrl}/reviews`;
 
   publish(draft: ReviewDraft): Observable<PublishResult> {
-    return this.http
-      .post<PublishResult & { id: number }>(this.url, toPublishBody(draft))
-      .pipe(map(({ estado, categoria, motivo }) => ({ estado, categoria, motivo })));
+    return this.http.post<PublishResult>(this.url, toPublishBody(draft)).pipe(map(toResult));
   }
+
+  update(id: number, draft: ReviewDraft): Observable<PublishResult> {
+    // El local no se cambia al editar: la API no lo acepta.
+    const { idLocal: _local, ...body } = toPublishBody(draft);
+    return this.http.put<PublishResult>(`${this.url}/${id}`, body).pipe(map(toResult));
+  }
+
+  remove(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.url}/${id}`);
+  }
+
+  mine(): Observable<MyReview[]> {
+    return this.http.get<MyReview[]>(`${this.url}/mine`);
+  }
+}
+
+function toResult({ id, estado, categoria, motivo }: PublishResult): PublishResult {
+  return { id, estado, categoria, motivo };
 }

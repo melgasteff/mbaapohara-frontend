@@ -1,0 +1,82 @@
+<section class="page mine" aria-labelledby="titulo">
+  <h1 id="titulo" class="h1">Mis reseñas</h1>
+  <p class="mb-help anon"><svg lucideLock [size]="16" aria-hidden="true"></svg>Solo vos ves esta lista. Tu nombre nunca se muestra.</p>
+
+  @if (reviews.error()) {
+    <app-page-state kind="error" title="No pudimos cargar tus reseñas." (retry)="reviews.reload()" />
+  } @else if (reviews.hasValue()) {
+    @if (reviews.value().length === 0) {
+      <app-page-state kind="empty" icon="reviews" title="Todavía no escribiste reseñas." message="Contá cómo es trabajar en una empresa: ayuda a otras personas a decidir.">
+        <a class="mb-btn mb-btn-primary mb-btn-sm" routerLink="/publicar">Escribí tu reseña</a>
+      </app-page-state>
+    } @else {
+      <ul class="list">
+        @for (review of reviews.value(); track review.id) {
+          @let v = review.ultimaVersion;
+          <li class="item">
+            <div class="item__head">
+              <h2 class="h3">
+                <a class="mb-link" [routerLink]="['/empresas', review.empresa.id]">{{ review.empresa.nombre }}</a>
+                <small class="body-sm">{{ review.local.nombre }}</small>
+              </h2>
+              @switch (v.estado) {
+                @case ('publicada') {
+                  <span class="mb-tag mb-tag-success"><svg lucideCircleCheck aria-hidden="true"></svg>Publicada</span>
+                }
+                @case ('en_revision') {
+                  <span class="mb-tag mb-tag-warning"><svg lucideClock aria-hidden="true"></svg>En revisión</span>
+                }
+                @default {
+                  <span class="mb-tag mb-tag-danger"><svg lucideCircleX aria-hidden="true"></svg>Rechazada</span>
+                }
+              }
+            </div>
+
+            @if (v.estado === 'rechazada' && v.motivo) {
+              <p class="body-sm reason">{{ v.motivo }}</p>
+            } @else if (v.estado === 'en_revision') {
+              <p class="body-sm reason">Una persona del equipo la revisa sin saber quién la escribió. Vas a poder editarla cuando se decida.</p>
+            }
+            @if (review.publicada && v.estado !== 'publicada') {
+              <p class="body-sm reason">Mientras tanto, se sigue viendo tu versión anterior.</p>
+            }
+
+            <app-review-card
+              [rating]="v.calificacion"
+              [meta]="meta(review)"
+              [good]="v.loBueno"
+              [toImprove]="v.aMejorar"
+              [footer]="'Enviada el ' + (v.fecha | date: 'longDate')"
+            />
+
+            @if (deleteError(); as error) {
+              @if (error.id === review.id) {
+                <p class="alert body-sm" role="alert"><svg lucideCircleAlert [size]="16" aria-hidden="true"></svg>{{ error.message }}</p>
+              }
+            }
+
+            <div class="actions">
+              @if (review.publicada) {
+                <a class="mb-btn mb-btn-secondary mb-btn-sm" [routerLink]="['/empresas', review.empresa.id]">Ver en el perfil</a>
+              }
+              @if (v.estado === 'en_revision') {
+                <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm" disabled>
+                  <svg lucidePencil [size]="16" aria-hidden="true"></svg>Editar
+                </button>
+              } @else {
+                <a class="mb-btn mb-btn-secondary mb-btn-sm" [routerLink]="['/publicar', review.id, 'editar']">
+                  <svg lucidePencil [size]="16" aria-hidden="true"></svg>{{ v.estado === 'rechazada' ? 'Corregir' : 'Editar' }}
+                </a>
+              }
+              <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm delete" [disabled]="deleting() === review.id" (click)="remove(review)">
+                <svg lucideTrash2 [size]="16" aria-hidden="true"></svg>{{ deleting() === review.id ? 'Borrando…' : 'Borrar' }}
+              </button>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  } @else {
+    <app-page-state kind="loading" message="Cargando tus reseñas…" />
+  }
+</section>

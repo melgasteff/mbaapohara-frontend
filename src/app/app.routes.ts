@@ -15,6 +15,12 @@ export const routes: Routes = [
     loadComponent: () => import('./features/worker/my-account/my-account').then((m) => m.MyAccount),
   },
   {
+    path: 'mis-resenas',
+    canMatch: [authGuard],
+    title: 'Mis reseñas · Mbaapohara',
+    loadComponent: () => import('./features/worker/my-reviews/my-reviews').then((m) => m.MyReviews),
+  },
+  {
     path: 'admin',
     canMatch: [adminGuard],
     loadChildren: () => import('./features/admin/admin.routes').then((m) => m.ADMIN_ROUTES),

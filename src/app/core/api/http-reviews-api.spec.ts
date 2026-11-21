@@ -42,7 +42,24 @@ describe('HttpReviewsApi', () => {
     const req = http.expectOne((r) => r.method === 'POST' && r.url.endsWith('/reviews'));
     expect(req.request.body.respuestas).toEqual({ CP01: 'SI', CP02: 'NO_SABE' });
     req.flush({ id: 9, estado: 'rechazada', categoria: 'DP', motivo: 'Sacá los datos de contacto.' });
-    expect(result).toEqual({ estado: 'rechazada', categoria: 'DP', motivo: 'Sacá los datos de contacto.' });
+    expect(result).toEqual({ id: 9, estado: 'rechazada', categoria: 'DP', motivo: 'Sacá los datos de contacto.' });
+    http.verify();
+  });
+
+  it('edita con PUT /reviews/:id sin mandar el local, y borra con DELETE', () => {
+    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting(), HttpReviewsApi] });
+    const api = TestBed.inject(HttpReviewsApi);
+    const http = TestBed.inject(HttpTestingController);
+    api.update(9, draft).subscribe();
+    const put = http.expectOne((r) => r.method === 'PUT' && r.url.endsWith('/reviews/9'));
+    expect('idLocal' in put.request.body).toBe(false);
+    expect(put.request.body).toMatchObject({ idCargo: 2, calificacion: 4 });
+    put.flush({ id: 9, estado: 'publicada' });
+
+    api.remove(9).subscribe();
+    http.expectOne((r) => r.method === 'DELETE' && r.url.endsWith('/reviews/9')).flush(null);
+    api.mine().subscribe();
+    http.expectOne((r) => r.method === 'GET' && r.url.endsWith('/reviews/mine')).flush([]);
     http.verify();
   });
 });

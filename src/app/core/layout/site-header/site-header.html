@@ -32,6 +32,7 @@
       <a routerLink="/admin" routerLinkActive ariaCurrentWhenActive="page" (click)="closeMenu()">Administración</a>
     }
     @if (session.isAuthenticated()) {
+      <a routerLink="/mis-resenas" routerLinkActive ariaCurrentWhenActive="page" (click)="closeMenu()">Mis reseñas</a>
       <a routerLink="/mi-cuenta" routerLinkActive ariaCurrentWhenActive="page" (click)="closeMenu()">Mi cuenta</a>
       <button type="button" class="site-header__logout" (click)="signOut()">Salir</button>
     } @else {

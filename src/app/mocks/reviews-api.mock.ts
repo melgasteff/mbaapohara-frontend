@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { delay, Observable, of } from 'rxjs';
 import { ReviewsApi } from '../core/api/reviews-api';
-import { PublishResult, ReviewDraft } from '../core/models/review';
+import { MyReview, PublishResult, ReviewDraft } from '../core/models/review';
 
 // PROTOTIPO: no guarda nada. Imita dos filas de la tabla de decisión de la política de moderación
 // (mbaapohara-backend/docs/politica-moderacion.md, sección 5) para que la demo muestre los tres estados.
@@ -21,7 +21,7 @@ const ACU_MESSAGE =
   'Tu reseña menciona un posible delito. Una persona del equipo la revisa antes de publicarla, sin saber quién la escribió.';
 
 /** Resultado simulado de la moderación de un texto. */
-export function simulateModeration(text: string): PublishResult {
+export function simulateModeration(text: string): Omit<PublishResult, 'id'> {
   // Fila 1: regla de datos de contacto → rechazada con explicación.
   if (EMAIL.test(text) || LONG_NUMBER.test(text) || LINK.test(text)) {
     return { estado: 'rechazada', categoria: 'DP', motivo: DP_MESSAGE };
@@ -35,7 +35,25 @@ export function simulateModeration(text: string): PublishResult {
 
 @Injectable()
 export class MockReviewsApi extends ReviewsApi {
+  private nextId = 1;
+
   publish(draft: ReviewDraft): Observable<PublishResult> {
-    return of(simulateModeration(`${draft.loBueno}\n${draft.aMejorar}`)).pipe(delay(800));
+    return this.simulate(this.nextId++, draft);
+  }
+
+  update(id: number, draft: ReviewDraft): Observable<PublishResult> {
+    return this.simulate(id, draft);
+  }
+
+  remove(): Observable<void> {
+    return of(undefined).pipe(delay(300));
+  }
+
+  mine(): Observable<MyReview[]> {
+    return of([]);
+  }
+
+  private simulate(id: number, draft: ReviewDraft): Observable<PublishResult> {
+    return of({ id, ...simulateModeration(`${draft.loBueno}\n${draft.aMejorar}`) }).pipe(delay(800));
   }
 }

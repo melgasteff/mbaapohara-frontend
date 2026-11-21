@@ -1,5 +1,5 @@
 <section class="page" aria-labelledby="titulo">
-  <h1 id="titulo" class="h1">Escribí tu reseña</h1>
+  <h1 id="titulo" class="h1">{{ editing() ? 'Editá tu reseña' : 'Escribí tu reseña' }}</h1>
   <p class="mb-help anon"><svg lucideLock [size]="16" aria-hidden="true"></svg>Tu nombre nunca se muestra.</p>
 
   @if (published(); as done) {
@@ -7,7 +7,21 @@
     <app-publish-result [draft]="done.draft" [result]="done.result" (restart)="restart()" (edit)="editRejected()" />
   } @else if (loadError()) {
     <app-page-state kind="error" title="No pudimos preparar el formulario." (retry)="reloadAll()" />
+  } @else if (cannotEdit() === 'not-found') {
+    <app-page-state kind="empty" title="No encontramos esa reseña." message="Solo podés editar tus propias reseñas.">
+      <a class="mb-btn mb-btn-secondary mb-btn-sm" routerLink="/mis-resenas">Ir a Mis reseñas</a>
+    </app-page-state>
+  } @else if (cannotEdit() === 'in-review') {
+    <app-page-state kind="empty" title="Tu reseña está en revisión." message="Vas a poder editarla cuando se decida.">
+      <a class="mb-btn mb-btn-secondary mb-btn-sm" routerLink="/mis-resenas">Ir a Mis reseñas</a>
+    </app-page-state>
   } @else if (ready()) {
+    @if (editable(); as review) {
+      <p class="body editing-place">
+        Reseña de <strong>{{ review.empresa.nombre }}</strong> · {{ review.local.nombre }}, {{ review.local.ciudad }}.
+        El local no se puede cambiar.
+      </p>
+    }
     <ol class="stepper" aria-label="Pasos">
       @for (name of steps; track name; let i = $index) {
         <li [class.is-current]="step() === i + 1" [class.is-done]="step() > i + 1" [attr.aria-current]="step() === i + 1 ? 'step' : null">
@@ -59,14 +73,22 @@
         <svg lucideCircleAlert [size]="16" aria-hidden="true"></svg>Revisá los campos marcados para seguir.
       </p>
     }
-    @if (sendError()) {
-      <p class="mb-help summary" role="alert">
-        <svg lucideCircleAlert [size]="16" aria-hidden="true"></svg>No pudimos enviar tu reseña. Intentá de nuevo.
-      </p>
+    @if (sendError(); as error) {
+      <div class="send-error body-sm" role="alert">
+        <p><svg lucideCircleAlert [size]="16" aria-hidden="true"></svg>{{ error.problems.length ? 'Falta corregir algunas cosas:' : error.message }}</p>
+        @if (error.problems.length) {
+          <ul>
+            @for (problem of error.problems; track problem) { <li>{{ problem }}</li> }
+          </ul>
+        }
+        @if (error.conflict) {
+          <a class="mb-link" routerLink="/mis-resenas">Ir a Mis reseñas</a>
+        }
+      </div>
     }
 
     <div class="actions">
-      @if (step() > 1) {
+      @if (step() > firstStep()) {
         <button type="button" class="mb-btn mb-btn-secondary" (click)="back()" [disabled]="sending()">
           <svg lucideArrowLeft [size]="16" aria-hidden="true"></svg>Anterior
         </button>
@@ -77,7 +99,7 @@
         } @else if (sending()) {
           Publicando…
         } @else {
-          Publicar reseña
+          {{ editing() ? 'Guardar cambios' : 'Publicar reseña' }}
         }
       </button>
     </div>
