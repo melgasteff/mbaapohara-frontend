@@ -9,6 +9,11 @@ export const ADMIN_ROUTES: Routes = [
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'empresas' },
       {
+        path: 'moderacion',
+        title: 'Moderación · Mbaapohara',
+        loadComponent: () => import('./moderation-queue/moderation-queue').then((m) => m.ModerationQueue),
+      },
+      {
         path: 'empresas',
         title: 'Administrar empresas · Mbaapohara',
         loadComponent: () => import('./companies-admin/companies-admin').then((m) => m.CompaniesAdmin),

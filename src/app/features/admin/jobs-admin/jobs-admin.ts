@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { Observable } from 'rxjs';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LucideCircleAlert, LucideCircleCheck } from '@lucide/angular';
 import { JobsApi } from '../../../core/api/jobs-api';
@@ -35,6 +36,31 @@ import { Notice } from '../status';
       }
     </div>
 
+    <section class="proposed" aria-labelledby="propuestos">
+      <h2 id="propuestos" class="h3">Propuestos desde reseñas</h2>
+      <p class="body-sm hint">Mientras no se aprueban, sus reseñas muestran «Otro cargo». Si se rechazan, siguen así.</p>
+      @if (pending.error()) {
+        <app-page-state kind="error" title="No pudimos cargar los cargos propuestos." (retry)="pending.reload()" />
+      } @else if (pending.hasValue()) {
+        @if (pending.value().total === 0) {
+          <p class="body-sm hint">No hay cargos propuestos pendientes.</p>
+        } @else {
+          <ul class="rows">
+            @for (job of pending.value().data; track job.id) {
+              <li class="row">
+                <span class="row__title">{{ job.descripcion }}</span>
+                <div class="row__actions">
+                  <button type="button" class="mb-btn mb-btn-primary mb-btn-sm" [disabled]="busy()" (click)="approve(job)">Aprobar</button>
+                  <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm" [disabled]="busy()" (click)="reject(job)">Rechazar</button>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      }
+    </section>
+
+    <h2 class="h3">En la lista</h2>
     @if (jobs.error()) {
       <app-page-state kind="error" title="No pudimos cargar los cargos." (retry)="jobs.reload()" />
     } @else if (jobs.hasValue()) {
@@ -52,12 +78,17 @@ import { Notice } from '../status';
   `,
   styles: `
     .toolbar { align-items: flex-end; }
+    .proposed { display: flex; flex-direction: column; gap: var(--space-3); }
+    h2 { margin: var(--space-2) 0 0; }
+    .hint { margin: 0; color: var(--ink-muted); }
     .add { flex: 1; min-width: 220px; max-width: 420px; }
   `,
 })
 export class JobsAdmin {
   private readonly api = inject(JobsApi);
   protected readonly jobs = this.api.allResource();
+  /** Cargos que se propusieron al escribir una reseña (3.9a). */
+  protected readonly pending = this.api.adminResource('pendiente');
   protected readonly name = new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(100)] });
   protected readonly busy = signal(false);
   protected readonly notice = signal<Notice | null>(null);
@@ -79,6 +110,33 @@ export class JobsAdmin {
       error: (error: unknown) => {
         this.busy.set(false);
         this.notice.set({ kind: 'error', text: apiErrorMessage(error) });
+      },
+    });
+  }
+
+  protected approve(job: Job): void {
+    this.run(this.api.approve(job.id), `Aprobaste el cargo «${job.descripcion}»: ya está en la lista.`);
+  }
+
+  protected reject(job: Job): void {
+    if (!confirmAction(`¿Rechazar el cargo «${job.descripcion}»? Sus reseñas van a seguir mostrando «Otro cargo».`)) return;
+    this.run(this.api.reject(job.id), `Rechazaste el cargo «${job.descripcion}».`);
+  }
+
+  private run(action: Observable<unknown>, success: string): void {
+    this.busy.set(true);
+    this.notice.set(null);
+    action.subscribe({
+      next: () => {
+        this.busy.set(false);
+        this.notice.set({ kind: 'ok', text: success });
+        this.pending.reload();
+        this.jobs.reload();
+      },
+      error: (error: unknown) => {
+        this.busy.set(false);
+        this.notice.set({ kind: 'error', text: apiErrorMessage(error) });
+        this.pending.reload();
       },
     });
   }

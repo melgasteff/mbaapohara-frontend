@@ -57,7 +57,7 @@ Para comprobar que se hablan: `http://localhost:4200/empresas` debe listar las e
 | Cómo moderamos, privacidad, términos | `/como-moderamos`, `/privacidad`, `/terminos` | Borradores (tarea 1.9), con enlaces en el pie, el registro y el asistente |
 | Mi cuenta | `/mi-cuenta` | **Real:** ver los datos, descargarlos y eliminar la cuenta con sus reseñas (exige sesión) |
 | Ingresar, crear cuenta | `/ingresar`, `/registro` | **Reales:** JWT de la API; la sesión se guarda en `sessionStorage` y vence con el token |
-| Administración | `/admin/…` | Solo administradores. **Reales:** empresas por estado (aprobar, rechazar, eliminar), alta de empresa con su primer local, gestión de una empresa aprobada y sus locales, cola de locales pendientes y cargos |
+| Administración | `/admin/…` | Solo administradores. **Reales:** empresas por estado (aprobar, rechazar, eliminar), alta de empresa con su primer local, gestión de una empresa aprobada y sus locales, cola de locales pendientes, cargos (con los propuestos desde reseñas) y **moderación** (`/admin/moderacion`: publicar o rechazar con motivo las reseñas en revisión, con las señales del modelo y sin el autor) |
 
 - **Criterios provisionales:** [public/criterios-provisionales.json](public/criterios-provisionales.json), tomados
   de las preguntas 5 a 8 del cuestionario. Se reemplazan con los resultados de la encuesta cambiando solo ese
