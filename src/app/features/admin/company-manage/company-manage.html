@@ -1,9 +1,9 @@
-<a class="mb-link back" routerLink="/admin/empresas" [queryParams]="{ estado: 'aprobada' }">
+<a class="back" routerLink="/admin/empresas" [queryParams]="{ estado: 'aprobada' }">
   <svg lucideArrowLeft [size]="16" aria-hidden="true"></svg>Empresas aprobadas
 </a>
 
 @if (notFound()) {
-  <h1 class="h1">No encontramos esta empresa</h1>
+  <h1 class="title" tabindex="-1">No encontramos esta empresa</h1>
   <app-page-state
     kind="empty"
     title="Solo se gestionan empresas aprobadas."
@@ -12,16 +12,9 @@
 } @else if (company.error()) {
   <app-page-state kind="error" title="No pudimos cargar la empresa." (retry)="company.reload()" />
 } @else if (company.hasValue()) {
-  <h1 class="h1">{{ company.value().nombre }}</h1>
+  <h1 class="title" tabindex="-1">{{ company.value().nombre }}</h1>
 
-  <div role="status">
-    @if (notice(); as n) {
-      <p class="notice body-sm" [class.notice--ok]="n.kind === 'ok'" [class.notice--error]="n.kind === 'error'">
-        @if (n.kind === 'ok') { <svg lucideCircleCheck [size]="16" aria-hidden="true"></svg> } @else { <svg lucideCircleAlert [size]="16" aria-hidden="true"></svg> }
-        {{ n.text }}
-      </p>
-    }
-  </div>
+  <app-admin-notice [notice]="actions.notice()" />
 
   <form class="form" [formGroup]="companyForm" (ngSubmit)="saveCompany()" novalidate aria-labelledby="datos">
     <h2 id="datos" class="h2">Datos</h2>
@@ -38,7 +31,7 @@
       </select>
     </div>
     <div class="form-actions">
-      <button type="submit" class="mb-btn mb-btn-primary" [disabled]="busy() || companyForm.pristine">Guardar datos</button>
+      <button type="submit" class="mb-btn mb-btn-primary">{{ actions.busy() === 'guardar' ? 'Guardando…' : 'Guardar datos' }}</button>
     </div>
   </form>
 
@@ -51,26 +44,30 @@
     } @else {
       <ul class="rows">
         @for (office of offices.value().data; track office.id) {
-          <li class="row">
-            <div class="row__main">
-              <span class="row__title">{{ office.nombre }}</span>
-              <span class="mb-meta">
-                @if (office.ciudad.nombre) { <span>{{ office.ciudad.nombre }}</span> }
-                @if (office.direccionReferencia) { <span>{{ office.direccionReferencia }}</span> }
-              </span>
+          <li>
+            <div class="row">
+              <div class="row__main">
+                <h3>{{ office.nombre }}</h3>
+                <p class="small">{{ office.ciudad.nombre }}@if (office.direccionReferencia) { · {{ office.direccionReferencia }} }</p>
+              </div>
+              <span [class]="status[office.estado].tag">{{ status[office.estado].label }}</span>
+              <div class="row__actions">
+                @if (office.estado === 'pendiente') {
+                  <button type="button" class="mb-btn mb-btn-primary" (click)="approveOffice(office)">Aprobar<span class="visually-hidden"> {{ office.nombre }}</span></button>
+                  <button type="button" class="mb-btn mb-btn-borrar" [attr.data-accion]="'rechazar-' + office.id" (click)="actions.ask('rechazar-' + office.id)">Rechazar<span class="visually-hidden"> {{ office.nombre }}</span></button>
+                }
+                <button type="button" class="mb-btn mb-btn-secondary" [attr.aria-expanded]="editingId() === office.id" (click)="startEdit(office)">Editar<span class="visually-hidden"> {{ office.nombre }}</span></button>
+                <button type="button" class="mb-btn mb-btn-texto delete" [attr.data-accion]="'eliminar-' + office.id" (click)="actions.ask('eliminar-' + office.id)">Eliminar<span class="visually-hidden"> {{ office.nombre }}</span></button>
+              </div>
             </div>
-            <span [class]="status[office.estado].tag">{{ status[office.estado].label }}</span>
-            <div class="row__actions">
-              @if (office.estado === 'pendiente') {
-                <button type="button" class="mb-btn mb-btn-primary mb-btn-sm" [disabled]="busy()" (click)="approveOffice(office)">Aprobar</button>
-                <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm" [disabled]="busy()" (click)="rejectOffice(office)">Rechazar</button>
-              }
-              <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm" [disabled]="busy()" (click)="startEdit(office)">Editar</button>
-              <button type="button" class="mb-btn mb-btn-ghost mb-btn-sm" [disabled]="busy()" (click)="removeOffice(office)">Eliminar</button>
-            </div>
+            @if (actions.confirming() === 'rechazar-' + office.id) {
+              <app-inline-confirm confirmLabel="Sí, rechazar" [message]="'¿Rechazar el local «' + office.nombre + '»?'" (confirmed)="rejectOffice(office)" (cancelled)="actions.cancel()" />
+            } @else if (actions.confirming() === 'eliminar-' + office.id) {
+              <app-inline-confirm confirmLabel="Sí, eliminar" [message]="'¿Eliminar el local «' + office.nombre + '»? No se puede deshacer.'" (confirmed)="removeOffice(office)" (cancelled)="actions.cancel()" />
+            }
             @if (editingId() === office.id) {
-              <form class="form office-edit" [formGroup]="editOffice" (ngSubmit)="saveOffice(office)" novalidate [attr.aria-label]="'Editar ' + office.nombre">
-                <div class="mb-field">
+              <form class="form mb-entra" [formGroup]="editOffice" (ngSubmit)="saveOffice(office)" novalidate [attr.aria-label]="'Editar ' + office.nombre">
+                <div class="mb-field" [class.mb-field-error]="editOffice.controls.nombre.invalid && editOffice.controls.nombre.touched">
                   <label [for]="'edit-nombre-' + office.id">Nombre del local</label>
                   <input class="mb-input" [id]="'edit-nombre-' + office.id" formControlName="nombre" maxlength="120" />
                 </div>
@@ -80,8 +77,8 @@
                   <input class="mb-input" [id]="'edit-ref-' + office.id" formControlName="direccionReferencia" maxlength="200" />
                 </div>
                 <div class="form-actions">
-                  <button type="submit" class="mb-btn mb-btn-primary mb-btn-sm" [disabled]="busy()">Guardar local</button>
-                  <button type="button" class="mb-btn mb-btn-ghost mb-btn-sm" (click)="editingId.set(null)">Cancelar</button>
+                  <button type="submit" class="mb-btn mb-btn-primary">{{ actions.busy() === 'editar-' + office.id ? 'Guardando…' : 'Guardar local' }}</button>
+                  <button type="button" class="mb-btn mb-btn-texto" (click)="editingId.set(null)">Cancelar</button>
                 </div>
               </form>
             }
@@ -108,7 +105,7 @@
       <input id="nuevo-ref" class="mb-input" formControlName="direccionReferencia" maxlength="200" />
     </div>
     <div class="form-actions">
-      <button type="submit" class="mb-btn mb-btn-primary" [disabled]="busy()">Agregar local</button>
+      <button type="submit" class="mb-btn mb-btn-primary">{{ actions.busy() === 'agregar' ? 'Agregando…' : 'Agregar local' }}</button>
     </div>
   </form>
 } @else {

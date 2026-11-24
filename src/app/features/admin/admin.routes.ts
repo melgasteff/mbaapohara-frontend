@@ -1,4 +1,5 @@
-import { Routes } from '@angular/router';
+import { inject } from '@angular/core';
+import { Router, Routes } from '@angular/router';
 import { AdminLayout } from './admin-layout';
 
 // Todo el grupo está protegido por adminGuard (app.routes.ts).
@@ -39,9 +40,9 @@ export const ADMIN_ROUTES: Routes = [
         loadComponent: () => import('./company-manage/company-manage').then((m) => m.CompanyManage),
       },
       {
+        // Los locales pendientes son una pestaña de Empresas; se conserva la dirección anterior.
         path: 'locales',
-        title: 'Locales pendientes · Mbaapohara',
-        loadComponent: () => import('./offices-pending/offices-pending').then((m) => m.OfficesPending),
+        redirectTo: () => inject(Router).createUrlTree(['/admin/empresas'], { queryParams: { estado: 'locales' } }),
       },
       {
         path: 'cargos',

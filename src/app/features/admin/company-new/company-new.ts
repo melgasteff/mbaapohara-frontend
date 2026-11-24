@@ -1,13 +1,14 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { LucideCircleAlert, LucideCircleCheck } from '@lucide/angular';
+import { LucideArrowLeft, LucideCircleAlert } from '@lucide/angular';
 import { switchMap } from 'rxjs';
 import { CompaniesAdminApi } from '../../../core/api/companies-admin-api';
 import { SectorsApi } from '../../../core/api/sectors-api';
 import { Company } from '../../../core/models/company';
 import { CityPicker } from '../../../shared/ui/city-picker/city-picker';
-import { apiErrorMessage } from '../api-error';
+import { apiErrorMessage } from '../../../core/api/api-error';
+import { AdminCounts } from '../../../core/api/admin-counts';
 
 /**
  * Alta de empresa con su primer local. La API crea los dos pendientes (D10); como la carga la hace el
@@ -15,23 +16,23 @@ import { apiErrorMessage } from '../api-error';
  */
 @Component({
   selector: 'app-company-new',
-  imports: [ReactiveFormsModule, RouterLink, CityPicker, LucideCircleAlert, LucideCircleCheck],
+  imports: [ReactiveFormsModule, RouterLink, CityPicker, LucideArrowLeft, LucideCircleAlert],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: '../admin.css',
   host: { class: 'admin-screen' },
   template: `
-    <h1 class="h1">Nueva empresa</h1>
+    <a class="back" routerLink="/admin/empresas"><svg lucideArrowLeft [size]="16" aria-hidden="true"></svg>Empresas</a>
+    <h1 class="title">Nueva empresa</h1>
 
     <div role="status">
       @if (created(); as company) {
-        <p class="notice notice--ok body-sm">
-          <svg lucideCircleCheck [size]="16" aria-hidden="true"></svg>
+        <p class="mb-aviso">
           Creaste y aprobaste «{{ company.nombre }}».
-          <a class="mb-link" [routerLink]="['/admin/empresas', company.id]">Gestionar sus locales</a>
+          <a [routerLink]="['/admin/empresas', company.id]">Gestionar sus locales</a>
         </p>
       }
       @if (error(); as message) {
-        <p class="notice notice--error body-sm"><svg lucideCircleAlert [size]="16" aria-hidden="true"></svg>{{ message }}</p>
+        <p class="failure"><svg lucideCircleAlert [size]="16" aria-hidden="true"></svg>{{ message }}</p>
       }
     </div>
 
@@ -77,17 +78,19 @@ import { apiErrorMessage } from '../api-error';
       </fieldset>
 
       <div class="form-actions">
-        <button type="submit" class="mb-btn mb-btn-primary" [disabled]="sending()">
+        <button type="submit" class="mb-btn mb-btn-primary">
           {{ sending() ? 'Guardando…' : 'Crear empresa' }}
         </button>
-        <a class="mb-btn mb-btn-ghost" routerLink="/admin/empresas">Cancelar</a>
+        <a class="mb-btn mb-btn-texto" routerLink="/admin/empresas">Cancelar</a>
       </div>
     </form>
   `,
-  styles: `.error-text { color: var(--naranja-texto); display: flex; align-items: center; gap: var(--space-1); }`,
+  styles: `.failure { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-3) 14px; border-radius: var(--radio-sm); background: var(--naranja-suave); color: var(--naranja-texto); font-size: 15px; line-height: 22px; font-weight: 600; }
+    .error-text { color: var(--naranja-texto); display: flex; align-items: center; gap: var(--space-1); }`,
 })
 export class CompanyNew {
   private readonly api = inject(CompaniesAdminApi);
+  private readonly counts = inject(AdminCounts);
   protected readonly sectors = inject(SectorsApi).allResource();
 
   protected readonly form = new FormGroup({
@@ -109,6 +112,8 @@ export class CompanyNew {
   }
 
   protected submit(): void {
+    // Un doble clic no la crea dos veces; el botón no se deshabilita.
+    if (this.sending()) return;
     this.submitted.set(true);
     this.created.set(null);
     this.error.set(null);
@@ -137,11 +142,13 @@ export class CompanyNew {
         next: (company) => {
           this.sending.set(false);
           this.created.set(company);
+          this.counts.refresh();
           this.form.reset();
           this.submitted.set(false);
         },
         error: (error: unknown) => {
           this.sending.set(false);
+          if (createdName) this.counts.refresh();
           const message = apiErrorMessage(error);
           this.error.set(createdName ? `Creamos «${createdName}», pero no pudimos aprobarla: ${message} Quedó en Pendientes.` : message);
         },

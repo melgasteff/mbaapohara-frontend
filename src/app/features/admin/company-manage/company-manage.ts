@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { LucideArrowLeft, LucideCircleAlert, LucideCircleCheck } from '@lucide/angular';
+import { LucideArrowLeft, LucideCircleAlert } from '@lucide/angular';
 import { Observable, switchMap } from 'rxjs';
 import { CompaniesAdminApi } from '../../../core/api/companies-admin-api';
 import { CompaniesApi } from '../../../core/api/companies-api';
@@ -10,10 +10,12 @@ import { OfficesAdminApi } from '../../../core/api/offices-admin-api';
 import { SectorsApi } from '../../../core/api/sectors-api';
 import { Office, SaveOffice } from '../../../core/models/company';
 import { CityPicker } from '../../../shared/ui/city-picker/city-picker';
+import { InlineConfirm } from '../../../shared/ui/inline-confirm/inline-confirm';
 import { PageState } from '../../../shared/ui/page-state/page-state';
 import { toId } from '../../../shared/route-params';
-import { apiErrorMessage, confirmAction } from '../api-error';
-import { Notice, STATUS } from '../status';
+import { AdminActions } from '../admin-actions';
+import { AdminNotice } from '../admin-notice/admin-notice';
+import { STATUS } from '../status';
 
 function officeForm() {
   return new FormGroup({
@@ -34,14 +36,16 @@ function toSaveOffice(form: ReturnType<typeof officeForm>): SaveOffice {
  */
 @Component({
   selector: 'app-company-manage',
-  imports: [ReactiveFormsModule, RouterLink, CityPicker, PageState, LucideArrowLeft, LucideCircleAlert, LucideCircleCheck],
+  imports: [ReactiveFormsModule, RouterLink, CityPicker, InlineConfirm, PageState, AdminNotice, LucideArrowLeft, LucideCircleAlert],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [AdminActions],
   styleUrl: '../admin.css',
   host: { class: 'admin-screen' },
   templateUrl: './company-manage.html',
   styles: `
-    .office-edit { flex-basis: 100%; }
     h2 { margin: var(--space-4) 0 0; }
+    h3 { font-size: 16px; line-height: 24px; }
+    .delete { color: var(--naranja-texto); }
   `,
 })
 export class CompanyManage {
@@ -68,8 +72,7 @@ export class CompanyManage {
   protected readonly newOffice = officeForm();
   protected readonly editOffice = officeForm();
   protected readonly editingId = signal<number | null>(null);
-  protected readonly busy = signal(false);
-  protected readonly notice = signal<Notice | null>(null);
+  protected readonly actions = inject(AdminActions);
   protected readonly submittedNew = signal(false);
 
   constructor() {
@@ -86,7 +89,7 @@ export class CompanyManage {
     this.companyForm.markAllAsTouched();
     if (this.companyForm.invalid) return;
     const { nombre, idRubro } = this.companyForm.getRawValue();
-    this.run(this.companiesAdmin.update(this.id()!, { nombre: nombre.trim(), idRubro: idRubro! }), 'Guardaste los datos de la empresa.', () =>
+    this.run('guardar', this.companiesAdmin.update(this.id()!, { nombre: nombre.trim(), idRubro: idRubro! }), 'Guardaste los datos de la empresa.', () =>
       this.company.reload(),
     );
   }
@@ -96,6 +99,7 @@ export class CompanyManage {
     if (this.newOffice.invalid) return;
     const data = toSaveOffice(this.newOffice);
     this.run(
+      'agregar',
       this.officesAdmin.create(this.id()!, data).pipe(switchMap((office) => this.officesAdmin.approve(office.id))),
       `Agregaste el local «${data.nombre}».`,
       () => {
@@ -107,6 +111,7 @@ export class CompanyManage {
   }
 
   protected startEdit(office: Office): void {
+    this.actions.confirming.set(null);
     this.editOffice.reset({ nombre: office.nombre, idCiudad: office.ciudad.id, direccionReferencia: office.direccionReferencia ?? '' });
     this.editingId.set(office.id);
   }
@@ -114,24 +119,22 @@ export class CompanyManage {
   protected saveOffice(office: Office): void {
     this.editOffice.markAllAsTouched();
     if (this.editOffice.invalid) return;
-    this.run(this.officesAdmin.update(office.id, toSaveOffice(this.editOffice)), 'Guardaste el local.', () => {
+    this.run(`editar-${office.id}`, this.officesAdmin.update(office.id, toSaveOffice(this.editOffice)), 'Guardaste el local.', () => {
       this.editingId.set(null);
       this.offices.reload();
     });
   }
 
   protected approveOffice(office: Office): void {
-    this.run(this.officesAdmin.approve(office.id), `Aprobaste el local «${office.nombre}».`, () => this.offices.reload());
+    this.run(`aprobar-${office.id}`, this.officesAdmin.approve(office.id), `Aprobaste el local «${office.nombre}».`, () => this.offices.reload());
   }
 
   protected rejectOffice(office: Office): void {
-    if (!confirmAction(`¿Rechazar el local «${office.nombre}»?`)) return;
-    this.run(this.officesAdmin.reject(office.id), `Rechazaste el local «${office.nombre}».`, () => this.offices.reload());
+    this.run(`rechazar-${office.id}`, this.officesAdmin.reject(office.id), `Rechazaste el local «${office.nombre}».`, () => this.offices.reload());
   }
 
   protected removeOffice(office: Office): void {
-    if (!confirmAction(`¿Eliminar el local «${office.nombre}»? No se puede deshacer.`)) return;
-    this.run(this.officesAdmin.remove(office.id), `Eliminaste el local «${office.nombre}».`, () => this.offices.reload());
+    this.run(`eliminar-${office.id}`, this.officesAdmin.remove(office.id), `Eliminaste el local «${office.nombre}».`, () => this.offices.reload());
   }
 
   protected showNew(name: 'nombre' | 'idCiudad'): boolean {
@@ -139,18 +142,11 @@ export class CompanyManage {
     return control.invalid && (control.touched || this.submittedNew());
   }
 
-  private run(action: Observable<unknown>, success: string, after: () => void): void {
-    this.busy.set(true);
-    this.notice.set(null);
-    action.subscribe({
-      next: () => {
-        this.busy.set(false);
-        this.notice.set({ kind: 'ok', text: success });
+  private run(key: string, action: Observable<unknown>, success: string, after: () => void): void {
+    this.actions.run(key, action, success, {
+      done: () => {
         after();
-      },
-      error: (error: unknown) => {
-        this.busy.set(false);
-        this.notice.set({ kind: 'error', text: apiErrorMessage(error) });
+        this.actions.focus('h1');
       },
     });
   }
