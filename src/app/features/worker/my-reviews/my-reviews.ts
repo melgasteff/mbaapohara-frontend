@@ -2,13 +2,15 @@ import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { LucideCircleAlert, LucideCircleCheck, LucideCircleX, LucideClock, LucideLock, LucidePencil, LucideTrash2 } from '@lucide/angular';
+import { LucideCircleAlert, LucideLock, LucidePencil, LucideTrash2 } from '@lucide/angular';
 import { apiErrorMessage } from '../../../core/api/api-error';
+import { CriteriaApi } from '../../../core/api/criteria-api';
 import { ReviewsApi } from '../../../core/api/reviews-api';
-import { MyReview } from '../../../core/models/review';
+import { MyReview, REVIEW_STATUS_LABELS } from '../../../core/models/review';
 import { confirmAction } from '../../../shared/confirm-action';
 import { PageState } from '../../../shared/ui/page-state/page-state';
 import { ReviewCard } from '../../../shared/ui/review-card/review-card';
+import { Tag } from '../../../shared/ui/tag/tag';
 
 /** Metadatos sin género de la última versión: «Trabajó aquí · Cajera · Asunción · hasta 2025». */
 export function myReviewMeta(review: MyReview): string[] {
@@ -32,10 +34,8 @@ export function myReviewMeta(review: MyReview): string[] {
     RouterLink,
     PageState,
     ReviewCard,
+    Tag,
     LucideCircleAlert,
-    LucideCircleCheck,
-    LucideCircleX,
-    LucideClock,
     LucideLock,
     LucidePencil,
     LucideTrash2,
@@ -49,9 +49,16 @@ export class MyReviews {
 
   protected readonly reviews = rxResource({ stream: () => this.api.mine() });
   protected readonly meta = myReviewMeta;
+  protected readonly statusLabels = REVIEW_STATUS_LABELS;
+  private readonly config = inject(CriteriaApi).configResource();
   /** Reseña que se está borrando. */
   protected readonly deleting = signal<number | null>(null);
   protected readonly deleteError = signal<{ id: number; message: string } | null>(null);
+
+  /** Palabra de la calificación; sin ella (si no cargó la configuración) queda solo el número. */
+  protected word(rating: number): string | undefined {
+    return this.config.hasValue() ? this.config.value().calificacionGeneral.palabras[rating] : undefined;
+  }
 
   protected remove(review: MyReview): void {
     const question = `¿Borrar tu reseña de ${review.empresa.nombre} (${review.local.nombre})? Se borra de forma definitiva, con todas sus versiones.`;

@@ -1,9 +1,9 @@
 import { formatDate } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input, LOCALE_ID, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { LucideCircleCheck, LucideCircleX, LucideClock } from '@lucide/angular';
 import { PublishResult as Result, ReviewDraft } from '../../../../core/models/review';
 import { ReviewCard } from '../../../../shared/ui/review-card/review-card';
+import { Tag } from '../../../../shared/ui/tag/tag';
 import { draftMeta } from '../review-form';
 
 /**
@@ -12,23 +12,23 @@ import { draftMeta } from '../review-form';
  */
 @Component({
   selector: 'app-publish-result',
-  imports: [RouterLink, ReviewCard, LucideCircleCheck, LucideCircleX, LucideClock],
+  imports: [RouterLink, ReviewCard, Tag],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (result().estado === 'publicada') {
       <p class="status">
-        <span class="mb-tag mb-tag-success"><svg lucideCircleCheck aria-hidden="true"></svg>Publicada</span>
+        <app-tag kind="publicada">Publicada</app-tag>
         <span class="body">Gracias por contar. Así se va a ver tu reseña en el perfil de {{ draft().empresa.nombre }}.</span>
       </p>
     } @else if (result().estado === 'en_revision') {
       <p class="status">
-        <span class="mb-tag mb-tag-warning"><svg lucideClock aria-hidden="true"></svg>En revisión</span>
+        <app-tag kind="en_revision">En revisión</app-tag>
         <span class="body">{{ result().motivo || 'Tu reseña está en revisión. Te avisamos en 48 horas.' }}</span>
       </p>
       <p class="body-sm reason">Una persona del equipo la revisa sin saber quién la escribió. Podés ver cómo va en «Mis reseñas».</p>
     } @else {
       <p class="status">
-        <span class="mb-tag mb-tag-naranja"><svg lucideCircleX aria-hidden="true"></svg>Rechazada</span>
+        <app-tag kind="rechazada">Necesita un cambio</app-tag>
         <span class="body">{{ result().motivo }}</span>
       </p>
       <p class="body-sm reason">Solo vos ves esta reseña. Corregila y volvé a enviarla: lo que escribiste no se perdió.</p>
@@ -37,10 +37,11 @@ import { draftMeta } from '../review-form';
     @if (result().estado !== 'rechazada') {
       <app-review-card
         [rating]="draft().calificacion"
+        [word]="words()[draft().calificacion]"
         [meta]="meta()"
         [good]="draft().loBueno"
         [toImprove]="draft().aMejorar"
-        [footer]="footer()"
+        [when]="when()"
       />
     }
 
@@ -64,15 +65,17 @@ import { draftMeta } from '../review-form';
 export class PublishResult {
   readonly draft = input.required<ReviewDraft>();
   readonly result = input.required<Result>();
+  /** Palabra de cada calificación, del JSON. */
+  readonly words = input<Record<string, string>>({});
   readonly restart = output<void>();
   /** Volver al paso 4 con lo escrito, para corregir una reseña rechazada. */
   readonly edit = output<void>();
 
   private readonly locale = inject(LOCALE_ID);
   protected readonly meta = computed(() => draftMeta(this.draft()));
-  protected readonly footer = computed(() =>
-    this.result().estado === 'publicada'
-      ? `Publicada en ${formatDate(new Date(), "MMMM 'de' y", this.locale)}`
-      : undefined,
-  );
+  protected readonly when = computed(() => {
+    if (this.result().estado !== 'publicada') return undefined;
+    const text = formatDate(new Date(), "MMMM 'de' y", this.locale);
+    return text.charAt(0).toLocaleUpperCase('es') + text.slice(1);
+  });
 }

@@ -1,0 +1,34 @@
+:host { display: block; container-type: inline-size; }
+.mb-review { max-width: none; color: var(--noche); }
+.mb-review p { margin: 0; color: inherit; max-width: none; }
+.head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: var(--space-1) var(--space-3); }
+.mb-review .meta { margin-top: var(--space-1); color: var(--noche-suave); }
+.when { font-size: 13px; line-height: 20px; color: var(--noche-suave); }
+.texts { display: grid; border-top: 1px solid var(--linea-suave); }
+.texts > div { padding-top: var(--space-3); display: flex; flex-direction: column; gap: var(--space-1); }
+.texts .label { display: flex; align-items: center; gap: 6px; font-weight: 700; }
+.mb-review .mb-pro { color: var(--azul-texto); }
+.mb-review .mb-con { color: var(--naranja-texto); }
+.text { font-size: 15px; line-height: 22px; overflow-wrap: anywhere; white-space: pre-line; }
+@container (min-width: 460px) {
+  .texts { grid-template-columns: 1fr 1fr; }
+  .texts > div:first-child { padding-right: 14px; }
+  .texts > div:last-child { padding-left: 14px; border-left: 1px solid var(--linea-suave); }
+  .when { white-space: nowrap; }
+}
+.rights { border-top: 1px solid var(--linea-suave); padding-top: var(--space-1); display: flex; flex-direction: column; gap: var(--space-2); }
+.rights__toggle {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); width: 100%; min-height: 44px; padding: var(--space-1) 0;
+  border: 0; background: transparent; color: var(--noche); font: inherit; font-size: 14px; text-align: left; cursor: pointer;
+}
+.rights__toggle:focus-visible { outline: 2px solid var(--azul-texto); outline-offset: 2px; }
+.rights__toggle app-tag { padding: 2px 8px; }
+.rights__more { display: inline-flex; align-items: center; gap: var(--space-1); margin-left: auto; color: var(--azul-texto); font-weight: 600; }
+.rights__more svg { transition: transform .15s ease; }
+.rights__more svg.is-open { transform: rotate(180deg); }
+.mb-review .muted { color: var(--noche-suave); }
+.rights__category { margin: var(--space-3) 0 var(--space-1); font-size: 14px; line-height: 20px; font-weight: 700; }
+.rights ul { list-style: none; margin: 0; padding: 0; }
+.rights li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-1) var(--space-3); padding: 7px 0; border-bottom: 1px solid var(--linea-suave); }
+.rights li:last-child { border-bottom: 0; }
+.rights li > span { flex: 1 1 200px; }

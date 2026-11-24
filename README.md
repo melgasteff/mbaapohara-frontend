@@ -115,7 +115,7 @@ Una cuenta común se crea desde `/registro`.
 ```
 src/app/
   core/       lo que existe una sola vez: layout, modelos y servicios de la API (core/api)
-  shared/     piezas visuales reutilizables: logo, tarjetas, estados, estrellas, respuestas
+  shared/     piezas visuales reutilizables: logo, sello, fila, reseña, filtros, estados, estrellas, respuestas
   features/
     public/   inicio, directorio, perfil, ingresar y registro
     worker/   asistente de publicación

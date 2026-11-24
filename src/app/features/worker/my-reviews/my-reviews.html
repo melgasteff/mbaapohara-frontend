@@ -6,7 +6,7 @@
     <app-page-state kind="error" title="No pudimos cargar tus reseñas." (retry)="reviews.reload()" />
   } @else if (reviews.hasValue()) {
     @if (reviews.value().length === 0) {
-      <app-page-state kind="empty" icon="reviews" title="Todavía no escribiste reseñas." message="Contá cómo es trabajar en una empresa: ayuda a otras personas a decidir.">
+      <app-page-state kind="empty" illustration="20-resena" title="Todavía no escribiste reseñas." message="Contá cómo es trabajar en una empresa: ayuda a otras personas a decidir.">
         <a class="mb-btn mb-btn-primary mb-btn-sm" routerLink="/publicar">Escribí tu reseña</a>
       </app-page-state>
     } @else {
@@ -19,17 +19,7 @@
                 <a class="mb-link" [routerLink]="['/empresas', review.empresa.id]">{{ review.empresa.nombre }}</a>
                 <small class="body-sm">{{ review.local.nombre }}</small>
               </h2>
-              @switch (v.estado) {
-                @case ('publicada') {
-                  <span class="mb-tag mb-tag-success"><svg lucideCircleCheck aria-hidden="true"></svg>Publicada</span>
-                }
-                @case ('en_revision') {
-                  <span class="mb-tag mb-tag-warning"><svg lucideClock aria-hidden="true"></svg>En revisión</span>
-                }
-                @default {
-                  <span class="mb-tag mb-tag-naranja"><svg lucideCircleX aria-hidden="true"></svg>Rechazada</span>
-                }
-              }
+              <app-tag [kind]="v.estado">{{ statusLabels[v.estado] }}</app-tag>
             </div>
 
             @if (v.estado === 'rechazada' && v.motivo) {
@@ -43,10 +33,11 @@
 
             <app-review-card
               [rating]="v.calificacion"
+              [word]="word(v.calificacion)"
               [meta]="meta(review)"
               [good]="v.loBueno"
               [toImprove]="v.aMejorar"
-              [footer]="'Enviada el ' + (v.fecha | date: 'longDate')"
+              [when]="'Enviada el ' + (v.fecha | date: 'longDate')"
             />
 
             @if (deleteError(); as error) {
@@ -68,7 +59,7 @@
                   <svg lucidePencil [size]="16" aria-hidden="true"></svg>{{ v.estado === 'rechazada' ? 'Corregir' : 'Editar' }}
                 </a>
               }
-              <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm delete" [disabled]="deleting() === review.id" (click)="remove(review)">
+              <button type="button" class="mb-btn mb-btn-borrar mb-btn-sm" [disabled]="deleting() === review.id" (click)="remove(review)">
                 <svg lucideTrash2 [size]="16" aria-hidden="true"></svg>{{ deleting() === review.id ? 'Borrando…' : 'Borrar' }}
               </button>
             </div>
@@ -77,6 +68,6 @@
       </ul>
     }
   } @else {
-    <app-page-state kind="loading" message="Cargando tus reseñas…" />
+    <app-page-state kind="loading" skeleton="review" message="Cargando tus reseñas…" />
   }
 </section>

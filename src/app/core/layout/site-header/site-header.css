@@ -1,76 +1,55 @@
-/* Solo disposición: colores, radios y tipografía vienen de mb-tokens.css y mb-components.css. */
+/* Solo disposición: colores, radios y tipografía vienen de los tokens. */
+.site-header { background: var(--blanco); border-bottom: 1px solid var(--linea); }
+.bar, .subnav { max-width: var(--ancho-pagina); margin: 0 auto; padding: 0 var(--space-4); box-sizing: border-box; }
+.bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--space-4); min-height: 72px; }
+.site-header--compact .bar { min-height: 64px; }
+.brand { display: inline-flex; align-items: center; min-height: 44px; border-radius: var(--radio-xs); }
+app-logo { height: 28px; }
+a:focus-visible, nav button:focus-visible { outline: 2px solid var(--azul-texto); outline-offset: 2px; }
 
-/* Móvil (primero): logo y botón de menú arriba; buscador en una segunda fila; navegación desplegable. */
-.site-header {
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
+/* Navegación: enlaces y «Salir», que es una acción pero se ve igual. */
+nav a, nav button {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0; border: 0; background: none; cursor: pointer;
+  color: var(--noche); font: inherit; font-size: 15px; font-weight: 600; text-decoration: none; text-align: left;
 }
-.site-header__brand {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  margin-right: auto;
-}
-.site-header__search {
-  order: 3;
-  flex-basis: 100%;
-  display: flex;
-}
-.site-header__search .mb-search {
-  flex: 1;
-  max-width: none;
-  height: 44px;
-}
-.site-header__search .mb-search { background: var(--crema); border-color: transparent; }
-.site-header__search input { height: 100%; }
-.site-header__toggle { display: inline-flex; }
-.site-header__nav {
-  display: none;
-  order: 4;
-  flex-basis: 100%;
-  flex-direction: column;
-  align-items: stretch;
-  gap: var(--space-1);
-  margin-left: 0;
-  padding-top: var(--space-2);
-  border-top: 1px solid var(--linea);
-}
-.site-header__nav.is-open { display: flex; }
-.site-header__nav a:not(.mb-btn) { display: flex; align-items: center; min-height: 44px; }
-.site-header__nav .mb-btn { height: 44px; margin-top: var(--space-2); }
+nav a:hover, nav button:hover { color: var(--azul-texto); }
+nav a[aria-current='page'] { color: var(--azul-texto); }
 
-/* Desde 768px: una sola fila, como en la vista previa del manual. */
-@media (min-width: 768px) {
-  .site-header {
-    flex-wrap: nowrap;
-    gap: var(--space-5);
-    padding: var(--space-3) var(--space-6);
-  }
-  .site-header__brand { margin-right: 0; }
-  .site-header__search { order: 0; flex: 1; flex-basis: auto; max-width: 420px; }
-  .site-header__search .mb-search { height: 40px; }
-  .site-header__toggle { display: none; }
-  .site-header__nav,
-  .site-header__nav.is-open {
-    display: flex;
-    order: 0;
-    flex-basis: auto;
-    flex-direction: row;
-    align-items: center;
-    gap: var(--space-4);
-    margin-left: auto;
-    padding-top: 0;
-    border-top: 0;
-  }
-  .site-header__nav .mb-btn { height: 36px; margin-top: 0; }
-}
+/* Hasta 1159 px: logo, botón «Menú» y todo lo demás desplegable. */
+.toggle { margin-left: auto; padding: 0 14px; border-color: var(--borde-control); }
+.menu { display: none; flex-basis: 100%; flex-direction: column; gap: var(--space-3); padding: var(--space-3) 0 var(--space-4); border-top: 1px solid var(--linea); }
+.menu.is-open { display: flex; }
+.menu nav { display: flex; flex-direction: column; }
+.mb-search { max-width: none; height: 44px; background: var(--crema); border-color: transparent; }
+.mb-search input { height: 100%; }
 
-/* «Salir» es una acción (botón), pero se ve como los enlaces de la navegación. */
-.site-header__logout {
-  font: inherit; font-weight: 600; color: var(--noche); background: none; border: 0; padding: 0;
-  cursor: pointer; text-align: left; min-height: 44px;
+/* Variantes foco y admin */
+.task { padding-left: var(--space-4); border-left: 1px solid var(--linea); font-size: 16px; line-height: 24px; font-weight: 700; }
+.anon { display: none; align-items: center; gap: 6px; color: var(--noche-suave); }
+.leave { margin-left: auto; }
+.admin-label {
+  padding: 3px 8px; border-radius: var(--radio-xs); background: var(--noche); color: var(--blanco);
+  font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
 }
-.site-header__logout:hover { color: var(--azul-texto); }
-.site-header__logout:focus-visible { outline: 2px solid var(--azul-texto); outline-offset: 2px; }
-@media (min-width: 768px) { .site-header__logout { min-height: 0; } }
+.account { display: flex; gap: 22px; margin-left: auto; }
+@media (max-width: 599px) {
+  /* Logo y salida en una fila; el título de la tarea, debajo. */
+  .site-header--compact app-logo { height: 22px; }
+  .task { flex-basis: 100%; order: 3; padding: 0 0 var(--space-2); border: 0; }
+  .admin-label { order: 3; margin-bottom: var(--space-2); }
+}
+@media (min-width: 760px) { .anon { display: inline-flex; margin-left: auto; } .anon + .leave { margin-left: 0; } }
+@media (min-width: 1024px) { .bar, .subnav { padding-left: var(--space-7); padding-right: var(--space-7); } }
+
+@media (min-width: 1160px) {
+  app-logo { height: 32px; }
+  .site-header--compact app-logo { height: 28px; }
+  .bar { flex-wrap: nowrap; gap: 28px; }
+  .site-header--compact .bar { gap: var(--space-4); }
+  .toggle { display: none; }
+  .menu, .menu.is-open { display: flex; flex: 1; min-width: 0; flex-direction: row; align-items: center; gap: 26px; padding: 0; border: 0; }
+  .search { flex: 0 1 340px; min-width: 0; }
+  .menu nav { flex-direction: row; gap: 26px; margin-left: auto; }
+  .menu nav a, .menu nav button { white-space: nowrap; }
+  .menu nav a[aria-current='page'] { box-shadow: inset 0 -2px 0 var(--azul-texto); }
+}

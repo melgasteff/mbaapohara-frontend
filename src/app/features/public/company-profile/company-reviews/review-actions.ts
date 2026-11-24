@@ -45,23 +45,30 @@ import { REPORT_CATEGORIES, REPORT_LABELS, ReportCategory } from '../../../../co
     } @else {
       <div class="links">
         @if (session.isAuthenticated()) {
-          <button type="button" class="mb-btn mb-btn-ghost mb-btn-sm" (click)="open.set(true)">
+          <button type="button" class="action" (click)="open.set(true)">
             <svg lucideFlag [size]="16" aria-hidden="true"></svg>Reportar
           </button>
         } @else {
-          <a class="mb-btn mb-btn-ghost mb-btn-sm" routerLink="/ingresar" [queryParams]="{ volver: returnUrl() }">
+          <a class="action" routerLink="/ingresar" [queryParams]="{ volver: returnUrl() }">
             <svg lucideFlag [size]="16" aria-hidden="true"></svg>Reportar
           </a>
         }
-        <a class="mb-link body-sm" routerLink="/solicitud-revision" [queryParams]="{ tipo: 'revision_resena', resena: reviewId() }">
+        <a class="action" routerLink="/solicitud-revision" [queryParams]="{ tipo: 'revision_resena', resena: reviewId() }">
           ¿Sos de la empresa? Pedí una revisión
         </a>
       </div>
     }
   `,
   styles: `
-    :host { display: block; border-top: 1px solid var(--linea); padding-top: var(--space-3); }
-    .links { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); }
+    :host { display: block; border-top: 1px solid var(--linea-suave); padding-top: var(--space-1); }
+    .links { display: flex; flex-wrap: wrap; align-items: center; gap: 0 18px; }
+    .action {
+      display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0; border: 0; background: none; cursor: pointer;
+      color: var(--noche-suave); font: inherit; font-size: 14px; line-height: 20px; text-decoration: underline; text-underline-offset: 3px;
+    }
+    .action:hover { color: var(--noche); }
+    .action:focus-visible { outline: 2px solid var(--azul-texto); outline-offset: 2px; }
+    .report { padding-top: var(--space-3); }
     .report { display: flex; flex-direction: column; gap: var(--space-3); }
     fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: var(--space-1); }
     legend { padding: 0; margin-bottom: var(--space-1); }

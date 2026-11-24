@@ -1,14 +1,7 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input, LOCALE_ID } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import {
-  LucideChevronLeft,
-  LucideChevronRight,
-  LucideCircleCheck,
-  LucideCircleDot,
-  LucideCircleQuestionMark,
-  LucideCircleX,
-} from '@lucide/angular';
+import { LucideChevronLeft, LucideChevronRight } from '@lucide/angular';
 import { ContractTypesApi } from '../../../../core/api/contract-types-api';
 import { CriteriaApi } from '../../../../core/api/criteria-api';
 import { JobsApi } from '../../../../core/api/jobs-api';
@@ -20,7 +13,7 @@ import { toId } from '../../../../shared/route-params';
 import { PageState } from '../../../../shared/ui/page-state/page-state';
 import { ReviewCard } from '../../../../shared/ui/review-card/review-card';
 import { ReviewActions } from './review-actions';
-import { complianceGroups, publicationLabel, publicReviewMeta } from './review-view';
+import { complianceGroups, publicationMonth, publicReviewMeta } from './review-view';
 
 const PAGE_SIZE = 10;
 
@@ -55,10 +48,6 @@ export function toSituation(value: unknown): WorkSituation | undefined {
     ReviewActions,
     LucideChevronLeft,
     LucideChevronRight,
-    LucideCircleCheck,
-    LucideCircleDot,
-    LucideCircleX,
-    LucideCircleQuestionMark,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './company-reviews.html',
@@ -102,8 +91,12 @@ export class CompanyReviews {
 
   protected readonly meta = publicReviewMeta;
 
-  protected footer(review: PublicReview): string {
-    return publicationLabel(review.mesPublicacion, this.locale);
+  protected month(review: PublicReview): string {
+    return publicationMonth(review.mesPublicacion, this.locale);
+  }
+
+  protected word(review: PublicReview): string | undefined {
+    return this.config.hasValue() ? this.config.value().calificacionGeneral.palabras[review.calificacion] : undefined;
   }
 
   protected compliance(review: PublicReview) {

@@ -7,12 +7,3 @@
 .list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-4); }
 .list.is-reloading { opacity: 0.6; }
 .pager { display: flex; align-items: center; justify-content: center; gap: var(--space-4); padding-top: var(--space-2); }
-
-.compliance { border-top: 1px solid var(--linea); padding-top: var(--space-3); }
-.compliance summary { cursor: pointer; font-weight: 600; color: var(--azul-texto); }
-.compliance summary:focus-visible { outline: 2px solid var(--azul-texto); outline-offset: 2px; }
-.compliance__context { margin: var(--space-2) 0 0; color: var(--noche-suave); }
-.compliance__category { margin: var(--space-3) 0 var(--space-2); font-size: 14px; line-height: 20px; font-weight: 600; }
-.compliance__rows { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
-.compliance__rows li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-1) var(--space-3); }
-.compliance__rows .body-sm { flex: 1 1 240px; }

@@ -1,5 +1,5 @@
 import { formatDate } from '@angular/common';
-import { CriteriaConfig, PublicReview } from '../../../../core/models/review';
+import { ComplianceGroup, CriteriaConfig, PublicReview } from '../../../../core/models/review';
 
 /** Metadatos sin género: «Trabajó aquí · Cajera · Casa central, Asunción · hasta 2025». */
 export function publicReviewMeta(review: PublicReview): string[] {
@@ -12,24 +12,12 @@ export function publicReviewMeta(review: PublicReview): string[] {
   ];
 }
 
-/** «2026-11» → «Publicada en noviembre de 2026». La API da solo el mes, nunca el día. */
-export function publicationLabel(month: string, locale: string): string {
+/** «2026-11» → «Noviembre de 2026». La API da solo el mes, nunca el día. */
+export function publicationMonth(month: string, locale: string): string {
   const [year, monthNumber] = month.split('-').map(Number);
   if (!year || !monthNumber) return '';
-  return `Publicada en ${formatDate(new Date(year, monthNumber - 1, 1), "MMMM 'de' y", locale)}`;
-}
-
-/** Respuesta de un criterio para mostrar: texto del criterio y la respuesta en palabras. */
-export interface ComplianceRow {
-  codigo: string;
-  texto: string;
-  valor: string;
-  etiqueta: string;
-}
-
-export interface ComplianceGroup {
-  categoria: string;
-  filas: ComplianceRow[];
+  const text = formatDate(new Date(year, monthNumber - 1, 1), "MMMM 'de' y", locale);
+  return text.charAt(0).toLocaleUpperCase('es') + text.slice(1);
 }
 
 /**

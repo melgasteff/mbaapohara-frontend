@@ -83,6 +83,13 @@ export interface ReviewDraft {
 /** Estados de una reseña después de la moderación (política de moderación, sección 7). */
 export type ReviewStatus = 'publicada' | 'en_revision' | 'rechazada';
 
+/** Cómo se le muestra cada estado a quien escribió. */
+export const REVIEW_STATUS_LABELS: Record<ReviewStatus, string> = {
+  publicada: 'Publicada',
+  en_revision: 'En revisión',
+  rechazada: 'Necesita un cambio',
+};
+
 /** Categorías de moderación (política de moderación, sección 4). */
 export type ModerationCategory = 'DP' | 'TER' | 'ACU' | 'INS' | 'SPAM' | 'TEMA';
 
@@ -151,6 +158,19 @@ export interface PublicReview {
   respuestas: SavedAnswer[];
   /** Mes de publicación, «2026-11»: nunca el día. */
   mesPublicacion: string;
+}
+
+/** Respuesta de un criterio para mostrar: texto del criterio y la respuesta en palabras. */
+export interface ComplianceRow {
+  codigo: string;
+  texto: string;
+  valor: string;
+  etiqueta: string;
+}
+
+export interface ComplianceGroup {
+  categoria: string;
+  filas: ComplianceRow[];
 }
 
 /** Filtros del listado público de reseñas (RF5). */

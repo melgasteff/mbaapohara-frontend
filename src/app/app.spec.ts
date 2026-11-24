@@ -19,7 +19,7 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.querySelector('header .mb-btn-primary')?.textContent).toContain('Escribí tu reseña');
+    expect(el.querySelector('header .mb-btn-accent')?.textContent).toContain('Escribí tu reseña');
     expect(el.querySelector('footer')?.textContent).toContain('Tu experiencia vale');
   });
 });

@@ -1,43 +1,56 @@
-<header class="mb-header site-header">
-  <a class="site-header__brand" routerLink="/" aria-label="Mbaapohara, inicio" (click)="closeMenu()">
-    <app-logo />
-  </a>
+<header class="site-header" [class.site-header--compact]="variant() === 'foco' || variant() === 'admin'">
+  <div class="bar">
+    <a class="brand" routerLink="/" aria-label="Mbaapohara, inicio" (click)="closeMenu()"><app-logo /></a>
 
-  <form class="site-header__search" role="search" (submit)="search($event, term.value)">
-    <label class="mb-search">
-      <svg lucideSearch [size]="20"></svg>
-      <span class="visually-hidden">Buscar empresas</span>
-      <input #term type="search" name="q" placeholder="Buscá una empresa" autocomplete="off" />
-    </label>
-  </form>
-
-  <button
-    type="button"
-    class="mb-btn mb-btn-ghost site-header__toggle"
-    aria-controls="menu-principal"
-    [attr.aria-expanded]="menuOpen()"
-    (click)="toggleMenu()"
-  >
-    @if (menuOpen()) {
-      <svg lucideX [size]="20"></svg>
-    } @else {
-      <svg lucideMenu [size]="20"></svg>
+    @switch (variant()) {
+      @case ('foco') {
+        <span class="task">{{ task() }}</span>
+        <span class="anon body-sm"><svg lucideLock [size]="16" aria-hidden="true"></svg>Tu nombre nunca se muestra</span>
+        <!-- Fase 4: pasa a «Guardar y salir», con el borrador. -->
+        <a class="mb-btn mb-btn-secondary mb-btn-sm leave" routerLink="/">Salir sin guardar</a>
+      }
+      @case ('admin') {
+        <span class="admin-label">Administración</span>
+        <nav class="account" aria-label="Cuenta">
+          <a routerLink="/">Ver el sitio</a>
+          <button type="button" (click)="signOut()">Salir</button>
+        </nav>
+      }
+      @default {
+        <button #toggle type="button" class="mb-btn mb-btn-secondary toggle" aria-controls="menu-principal" [attr.aria-expanded]="menuOpen()" (click)="toggleMenu()">
+          @if (menuOpen()) { <svg lucideX [size]="20" aria-hidden="true"></svg> } @else { <svg lucideMenu [size]="20" aria-hidden="true"></svg> }
+          Menú
+        </button>
+        <div id="menu-principal" class="menu" [class.is-open]="menuOpen()">
+          @if (variant() === 'normal') {
+            <form class="search" role="search" (submit)="search($event, term.value)">
+              <label class="mb-search">
+                <svg lucideSearch [size]="20" aria-hidden="true"></svg>
+                <span class="visually-hidden">Buscar empresas</span>
+                <input #term type="search" name="q" placeholder="Buscar empresa" autocomplete="off" />
+              </label>
+            </form>
+          }
+          <nav aria-label="Principal">
+            <a routerLink="/empresas" routerLinkActive ariaCurrentWhenActive="page" (click)="closeMenu()">Empresas</a>
+            @if (session.isAuthenticated()) {
+              @if (session.isAdmin()) { <a routerLink="/admin" (click)="closeMenu()">Administración</a> }
+              <a routerLink="/mis-resenas" routerLinkActive ariaCurrentWhenActive="page" (click)="closeMenu()">Mis reseñas</a>
+              <a routerLink="/mi-cuenta" routerLinkActive ariaCurrentWhenActive="page" (click)="closeMenu()">Mi cuenta</a>
+              <button type="button" (click)="signOut()">Salir</button>
+            } @else {
+              <a routerLink="/como-moderamos" routerLinkActive ariaCurrentWhenActive="page" (click)="closeMenu()">Cómo moderamos</a>
+              <a routerLink="/ingresar" routerLinkActive ariaCurrentWhenActive="page" (click)="closeMenu()">Ingresar</a>
+            }
+          </nav>
+          <a class="mb-btn mb-btn-accent" routerLink="/publicar" (click)="closeMenu()"><svg lucidePencil [size]="18" aria-hidden="true"></svg>Escribí tu reseña</a>
+        </div>
+      }
     }
-    Menú
-  </button>
-
-  <nav id="menu-principal" class="mb-nav site-header__nav" [class.is-open]="menuOpen()" aria-label="Principal">
-    <a routerLink="/empresas" routerLinkActive ariaCurrentWhenActive="page" (click)="closeMenu()">Empresas</a>
-    @if (session.isAdmin()) {
-      <a routerLink="/admin" routerLinkActive ariaCurrentWhenActive="page" (click)="closeMenu()">Administración</a>
-    }
-    @if (session.isAuthenticated()) {
-      <a routerLink="/mis-resenas" routerLinkActive ariaCurrentWhenActive="page" (click)="closeMenu()">Mis reseñas</a>
-      <a routerLink="/mi-cuenta" routerLinkActive ariaCurrentWhenActive="page" (click)="closeMenu()">Mi cuenta</a>
-      <button type="button" class="site-header__logout" (click)="signOut()">Salir</button>
-    } @else {
-      <a routerLink="/ingresar" routerLinkActive ariaCurrentWhenActive="page" (click)="closeMenu()">Ingresar</a>
-    }
-    <a class="mb-btn mb-btn-primary mb-btn-sm" routerLink="/publicar" (click)="closeMenu()">Escribí tu reseña</a>
-  </nav>
+  </div>
+  @if (variant() === 'admin') {
+    <div class="subnav">
+      @defer { <app-admin-nav /> }
+    </div>
+  }
 </header>

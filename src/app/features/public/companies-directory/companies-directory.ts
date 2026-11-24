@@ -5,7 +5,7 @@ import { LucideChevronLeft, LucideChevronRight, LucideSearch } from '@lucide/ang
 import { CitiesApi } from '../../../core/api/cities-api';
 import { CompaniesApi } from '../../../core/api/companies-api';
 import { DepartmentsApi } from '../../../core/api/departments-api';
-import { CompanyCard } from '../../../shared/ui/company-card/company-card';
+import { CompanyRow } from '../../../shared/ui/company-row/company-row';
 import { PageState } from '../../../shared/ui/page-state/page-state';
 import { toId } from '../../../shared/route-params';
 
@@ -17,7 +17,7 @@ const PAGE_SIZE = 12;
  */
 @Component({
   selector: 'app-companies-directory',
-  imports: [DecimalPipe, CompanyCard, PageState, LucideSearch, LucideChevronLeft, LucideChevronRight],
+  imports: [DecimalPipe, CompanyRow, PageState, LucideSearch, LucideChevronLeft, LucideChevronRight],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './companies-directory.css',
   templateUrl: './companies-directory.html',

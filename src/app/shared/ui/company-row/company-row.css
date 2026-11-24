@@ -1,0 +1,32 @@
+/* Móvil: sello y nombre arriba; los datos de reseñas debajo del nombre. */
+:host {
+  position: relative; display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: var(--space-2) var(--space-4);
+  align-items: center; padding: 18px var(--space-4); margin: 0 calc(-1 * var(--space-4));
+  border-bottom: 1px solid var(--linea); transition: background-color .15s ease;
+}
+:host(:hover) { background: var(--blanco); }
+:host(.is-many), :host(.is-many:hover) { background: var(--amarillo-suave); }
+p { margin: 0; }
+.muted { color: var(--noche-suave); }
+.name { margin: 0; font-size: 18px; line-height: 24px; font-weight: 700; overflow-wrap: anywhere; }
+.name a { color: var(--noche); text-decoration: none; }
+/* El enlace del nombre cubre toda la fila; «Contá la primera» queda por encima. */
+.name a::after { content: ""; position: absolute; inset: 0; }
+.name a:focus-visible { outline: none; }
+.name a:focus-visible::after { outline: 2px solid var(--azul-texto); outline-offset: -2px; }
+.cta { position: relative; z-index: 1; }
+.side { grid-column: 2; display: grid; gap: var(--space-1); justify-items: start; }
+.rating { color: var(--noche); display: inline-flex; align-items: center; gap: 6px; font-size: 15px; line-height: 20px; }
+.star { width: 18px; height: 18px; }
+.topic { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-2); }
+.bar { display: inline-block; width: 84px; height: 6px; border-radius: var(--radio-xs); background: var(--azul-suave); overflow: hidden; }
+.bar span { display: block; height: 100%; background: var(--azul-texto); }
+:host(.is-many) .bar { background: var(--blanco); }
+.arrow { display: none; }
+@media (min-width: 760px) {
+  :host { grid-template-columns: 52px minmax(0, 1fr) auto 24px; gap: 18px; }
+  .side { grid-column: 3; justify-items: end; text-align: right; }
+  .topic { justify-content: flex-end; }
+  .arrow { display: block; grid-column: 4; opacity: 0; transform: translateX(-6px); transition: transform .15s ease, opacity .15s ease; }
+  :host(:hover) .arrow, :host(:focus-within) .arrow { opacity: 1; transform: none; }
+}

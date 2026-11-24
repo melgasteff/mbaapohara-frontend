@@ -10,12 +10,7 @@
   .filters__search { grid-column: 1 / -1; }
 }
 
-
-.grid {
-  list-style: none; margin: 0; padding: 0;
-  display: grid; gap: var(--space-4);
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
-}
-.grid.is-reloading { opacity: 0.6; }
+.rows { list-style: none; margin: 0; padding: 0; }
+.rows.is-reloading { opacity: 0.6; }
 
 .pager { display: flex; align-items: center; justify-content: center; gap: var(--space-4); padding-top: var(--space-2); }

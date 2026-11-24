@@ -44,13 +44,14 @@
   </div>
 
   @if (companies.error()) {
-    <app-page-state kind="error" title="No pudimos cargar las empresas." (retry)="companies.reload()" />
+    <app-page-state kind="error" title="No pudimos cargar las empresas" (retry)="companies.reload()" />
   } @else if (companies.hasValue()) {
     @let result = companies.value();
     @if (result.total === 0) {
       <app-page-state
         kind="empty"
-        title="No encontramos empresas con esa búsqueda."
+        illustration="13-carretilla"
+        title="No encontramos empresas con esa búsqueda"
         message="Probá con otro nombre o quitá el filtro de ciudad."
       >
         @if (hasFilters()) {
@@ -61,9 +62,9 @@
       <p class="body-sm results-count" aria-live="polite">
         {{ result.total | number }} {{ result.total === 1 ? 'empresa' : 'empresas' }}
       </p>
-      <ul class="grid" [class.is-reloading]="companies.isLoading()">
-        @for (company of result.data; track company.id; let i = $index) {
-          <li><app-company-card [company]="company" [index]="i" /></li>
+      <ul class="rows" [class.is-reloading]="companies.isLoading()">
+        @for (company of result.data; track company.id) {
+          <li><app-company-row [company]="company" /></li>
         }
       </ul>
 
@@ -92,6 +93,6 @@
       }
     }
   } @else {
-    <app-page-state kind="loading" message="Cargando empresas…" />
+    <app-page-state kind="loading" skeleton="row" message="Cargando empresas…" />
   }
 </section>

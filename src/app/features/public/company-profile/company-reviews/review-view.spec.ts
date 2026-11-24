@@ -1,7 +1,7 @@
 import { registerLocaleData } from '@angular/common';
 import localeEsPy from '@angular/common/locales/es-PY';
 import { CriteriaConfig, PublicReview } from '../../../../core/models/review';
-import { complianceGroups, publicationLabel, publicReviewMeta } from './review-view';
+import { complianceGroups, publicationMonth, publicReviewMeta } from './review-view';
 
 // El mismo idioma que registra app.config.ts.
 registerLocaleData(localeEsPy);
@@ -37,8 +37,8 @@ describe('Vista de una reseña pública', () => {
   });
 
   it('muestra solo el mes de publicación', () => {
-    expect(publicationLabel('2026-11', 'es-PY')).toBe('Publicada en noviembre de 2026');
-    expect(publicationLabel('', 'es-PY')).toBe('');
+    expect(publicationMonth('2026-11', 'es-PY')).toBe('Noviembre de 2026');
+    expect(publicationMonth('', 'es-PY')).toBe('');
   });
 
   it('agrupa las respuestas por categoría en el orden del JSON y omite criterios retirados', () => {

@@ -15,6 +15,14 @@ export interface Company {
   nombre: string;
   rubro: Sector;
   estado: ProposalStatus;
+  // Resumen de reseñas publicadas. Opcional hasta que la API lo devuelva (fase 2 del rediseño).
+  cantidadResenas?: number;
+  /** Promedio con un decimal; `null` sin reseñas. */
+  promedio?: number | null;
+  /** Tema con más «Sí», sin contar «No sé»; solo con 3 reseñas o más. */
+  temaPrincipal?: { nombre: string; porcentajeSi: number } | null;
+  /** Logo con permiso de la empresa. */
+  logoUrl?: string | null;
 }
 
 export interface OfficeCity {

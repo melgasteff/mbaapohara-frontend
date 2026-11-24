@@ -76,6 +76,7 @@ export class PublishReview {
   private readonly injector = inject(Injector);
 
   protected readonly config = inject(CriteriaApi).configResource();
+  protected readonly words = computed(() => (this.config.hasValue() ? this.config.value().calificacionGeneral.palabras : {}));
   protected readonly jobs = inject(JobsApi).allResource();
   protected readonly contractTypes = inject(ContractTypesApi).allResource();
   protected readonly workModes = inject(WorkModesApi).allResource();

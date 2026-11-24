@@ -24,6 +24,15 @@ Si algo de este archivo choca con ellas, gana este archivo.
   rechazos automáticos y el plazo de 48 horas.
 - Grupos de rubro por sección CIIU: Comercio (G), Industria y construcción (B a F), Gastronomía (I), Transporte (H),
   Servicios y oficinas (J a R, T y U) y Agro y otros (A y S), que reemplaza a «Talleres y oficios».
+- Encabezado: el menú desplegable aparece por debajo de 1160px (no 760), porque con sesión la navegación no entra.
+  Con sesión, «Cómo moderamos» queda solo en el pie, como en la lámina 07. En el asistente a 360px el logo baja a 22px.
+- Administración y asistente no llevan pie, como en sus láminas. La administración usa el contenedor de 1280px.
+- Asistente: «Salir sin guardar» hasta que exista el borrador (fase 4). Se evita «Salir», que cierra la sesión.
+- Pie: sin «Responsabilidad por las reseñas» hasta que exista su página (fase 6).
+- Sello: las iniciales saltan artículos, preposiciones y tipos de sociedad («Supermercado La Amistad» es «SA»), como
+  pide el documento; la lámina 00 dice «LA». «Agro y otros» usa la ilustración 12 (herramientas).
+- Fila de empresa: si la API no trae la cantidad de reseñas, no se muestra la columna derecha. «Muy comentada» desde
+  50 reseñas (TODO(decision) en el código).
 - Moderación: no se resalta el fragmento marcado, porque la API no lo devuelve.
 - Asistente: sin «¿No está la empresa? Proponela», porque ese flujo no existe.
 
@@ -43,7 +52,7 @@ Si algo de este archivo choca con ellas, gana este archivo.
 - **Calificación general:** entrada de 1 a 5 estrellas con radios y la palabra del valor:
   1 Muy malo, 2 Malo, 3 Regular, 4 Bueno, 5 Excelente.
 - **Criterios de cumplimiento:** cada afirmación se responde con cuatro opciones (Sí / En parte / No /
-  No sé o no aplica) que se ven como `.mb-chip`, pero se implementan como un grupo de radios
+  No sé o no aplica) que se ven como botones en grilla, pero se implementan como un grupo de radios
   (`role="radiogroup"`) para que funcionen con teclado.
 - Sin rojo en ningún lado. El «No», los rechazos, los errores y «Borrar» usan `--naranja-texto` (sobre
   `--naranja-suave` en las etiquetas), siempre con palabra o ícono.
@@ -52,7 +61,7 @@ Si algo de este archivo choca con ellas, gana este archivo.
 ## Estados de moderación (etiquetas)
 - Publicada: `.mb-tag-success`.
 - En revisión: `.mb-tag-warning`, con el texto del manual: «Tu reseña está en revisión. Te avisamos en 48 horas.»
-- Rechazada: `.mb-tag-naranja`, visible solo para quien la escribió, junto con el motivo.
+- Rechazada: `.mb-tag-naranja` con el texto «Necesita un cambio», visible solo para quien la escribió, junto con el motivo.
 
 ## Datos de ejemplo
 - Las empresas y locales de la demo son reales: vienen de la semilla del backend (decisión del 19/11).

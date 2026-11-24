@@ -5,6 +5,7 @@ export const PUBLIC_ROUTES: Routes = [
     path: '',
     pathMatch: 'full',
     title: 'Mbaapohara · Tu experiencia vale',
+    data: { encabezado: 'inicio' },
     loadComponent: () => import('./home/home').then((m) => m.Home),
   },
   {

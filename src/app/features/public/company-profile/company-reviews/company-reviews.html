@@ -56,15 +56,15 @@
 </div>
 
 @if (reviews.error()) {
-  <app-page-state kind="error" title="No pudimos cargar las reseñas." (retry)="reviews.reload()" />
+  <app-page-state kind="error" title="No pudimos cargar las reseñas" (retry)="reviews.reload()" />
 } @else if (reviews.hasValue()) {
   @let result = reviews.value();
   @if (result.total === 0 && hasFilters()) {
-    <app-page-state kind="empty" icon="reviews" title="No hay reseñas con estos filtros." message="Probá con otros o quitalos.">
+    <app-page-state kind="empty" illustration="20-resena" title="No hay reseñas con estos filtros" message="Probá con otros o quitalos.">
       <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm" (click)="clearFilters()">Quitar filtros</button>
     </app-page-state>
   } @else if (result.total === 0) {
-    <app-page-state kind="empty" icon="reviews" title="Todavía no hay reseñas. Sé la primera persona en contar.">
+    <app-page-state kind="empty" illustration="20-resena" title="Todavía no hay reseñas. Sé la primera persona en contar.">
       <a class="mb-btn mb-btn-primary" routerLink="/publicar">Escribí tu reseña</a>
     </app-page-state>
   } @else {
@@ -82,43 +82,14 @@
         <li>
           <app-review-card
             [rating]="review.calificacion"
+            [word]="word(review)"
             [meta]="meta(review)"
+            [when]="month(review)"
             [good]="review.loBueno"
             [toImprove]="review.aMejorar"
-            [footer]="footer(review)"
+            [compliance]="compliance(review)"
+            [complianceContext]="review.tipoContrato.nombre + ' · ' + review.modalidad.nombre"
           >
-            @if (compliance(review); as groups) {
-              @if (groups.length) {
-                <details class="compliance">
-                  <summary>Ver cumplimiento de derechos</summary>
-                  <p class="body-sm compliance__context">{{ review.tipoContrato.nombre }} · {{ review.modalidad.nombre }}</p>
-                  @for (group of groups; track group.categoria) {
-                    <h3 class="compliance__category">{{ group.categoria }}</h3>
-                    <ul class="compliance__rows">
-                      @for (row of group.filas; track row.codigo) {
-                        <li>
-                          <span class="body-sm">{{ row.texto }}</span>
-                          @switch (row.valor) {
-                            @case ('SI') {
-                              <span class="mb-tag mb-tag-success"><svg lucideCircleCheck aria-hidden="true"></svg>{{ row.etiqueta }}</span>
-                            }
-                            @case ('EN_PARTE') {
-                              <span class="mb-tag mb-tag-warning"><svg lucideCircleDot aria-hidden="true"></svg>{{ row.etiqueta }}</span>
-                            }
-                            @case ('NO') {
-                              <span class="mb-tag mb-tag-naranja"><svg lucideCircleX aria-hidden="true"></svg>{{ row.etiqueta }}</span>
-                            }
-                            @default {
-                              <span class="mb-tag"><svg lucideCircleQuestionMark aria-hidden="true"></svg>{{ row.etiqueta }}</span>
-                            }
-                          }
-                        </li>
-                      }
-                    </ul>
-                  }
-                </details>
-              }
-            }
             <app-review-actions [reviewId]="review.id" />
           </app-review-card>
         </li>
@@ -138,5 +109,5 @@
     }
   }
 } @else {
-  <app-page-state kind="loading" message="Cargando reseñas…" />
+  <app-page-state kind="loading" skeleton="review" message="Cargando reseñas…" />
 }
