@@ -7,7 +7,7 @@ export const ADMIN_ROUTES: Routes = [
     path: '',
     component: AdminLayout,
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'empresas' },
+      { path: '', pathMatch: 'full', redirectTo: 'moderacion' },
       {
         path: 'moderacion',
         title: 'Moderación · Mbaapohara',

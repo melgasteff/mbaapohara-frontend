@@ -1,18 +1,32 @@
-.anon { display: flex; align-items: center; gap: var(--space-1); }
-.count, .hint { margin: 0; color: var(--noche-suave); }
-.item {
-  display: flex; flex-direction: column; gap: var(--space-3);
-  padding: var(--space-4); background: var(--blanco); border: 1px solid var(--linea); border-radius: var(--radio-md);
+.panels { display: grid; gap: var(--space-5); align-items: start; }
+.queue { border-top: 1px solid var(--linea); }
+.queue button {
+  width: 100%; display: flex; flex-direction: column; gap: var(--space-1); padding: 14px var(--space-4); border: 0; border-bottom: 1px solid var(--linea); background: transparent;
+  color: var(--noche); font: inherit; text-align: left; cursor: pointer; transition: background-color .15s ease;
 }
-.item__head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--space-2) var(--space-3); }
-.texts { display: grid; gap: var(--space-3); }
-.texts p { margin: var(--space-1) 0 0; white-space: pre-line; overflow-wrap: anywhere; }
-.signals { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3); background: var(--amarillo-suave); border-radius: var(--radio-md); }
-.signals__title { margin: 0; font-size: 14px; line-height: 20px; font-weight: 600; }
-.signals__list { margin: 0; padding-left: var(--space-5); }
-.scores { margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr)); gap: var(--space-1) var(--space-3); }
-.scores div { display: flex; justify-content: space-between; gap: var(--space-2); color: var(--noche-suave); }
-.scores div.is-high { color: var(--noche); font-weight: 600; }
-.scores dt, .scores dd { margin: 0; }
-.reject { display: flex; flex-direction: column; gap: var(--space-3); }
-.reject .mb-field { width: 100%; max-width: 560px; }
+.queue button:hover { background: var(--blanco); }
+.queue button[aria-current] { background: var(--blanco); box-shadow: inset 3px 0 0 var(--azul-texto); }
+.queue button:focus-visible { outline: 2px solid var(--azul-texto); outline-offset: -2px; }
+.queue__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); font-size: 15px; line-height: 22px; }
+.queue__head strong { min-width: 0; overflow-wrap: anywhere; }
+.wait { flex: none; padding: 2px 8px; border-radius: var(--radio-xs); background: var(--neutro-suave); font-size: 13px; line-height: 18px; font-weight: 700; white-space: nowrap; }
+.wait--late { background: var(--naranja); }
+
+.detail { display: flex; flex-direction: column; gap: 20px; min-width: 0; padding: 20px var(--space-4); border-radius: var(--radio-md); background: var(--blanco); }
+.detail__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: var(--space-3); }
+h2 { font-size: 22px; line-height: 28px; font-weight: 700; }
+h2:focus { outline: none; }
+.facts { display: grid; gap: var(--space-4); }
+.facts dt { font-size: 13px; line-height: 18px; color: var(--noche-suave); }
+.facts dd { display: flex; flex-direction: column; font-weight: 700; }
+.facts .score { flex-direction: row; align-items: center; gap: var(--space-2); }
+.bar { flex: 1; height: 8px; border-radius: var(--radio-xs); background: var(--blanco); overflow: hidden; }
+.bar span { display: block; height: 100%; background: var(--noche); }
+summary { display: inline-flex; align-items: center; min-height: 44px; color: var(--azul-texto); font-weight: 600; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+summary:focus-visible { outline: 2px solid var(--azul-texto); outline-offset: 2px; }
+.scores { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: var(--space-1) var(--space-5); font-size: 14px; line-height: 20px; }
+.scores > div { display: flex; justify-content: space-between; gap: var(--space-2); }
+.decision { padding-top: 18px; border-top: 1px solid var(--linea-suave); }
+.decision .row__actions .mb-btn { height: 48px; }
+@media (min-width: 760px) { .facts { grid-template-columns: repeat(3, minmax(0, 1fr)); } .detail { padding: 28px; } }
+@media (min-width: 1000px) { .panels { grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); gap: 28px; } }

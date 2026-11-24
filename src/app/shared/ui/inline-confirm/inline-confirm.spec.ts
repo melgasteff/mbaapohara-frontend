@@ -31,4 +31,12 @@ describe('Confirmación en línea', () => {
     expect(events).toEqual(['sí', 'no', 'no']);
     el.remove();
   });
+
+  it('en tono neutro no usa el botón de borrar', async () => {
+    const fixture = TestBed.createComponent(InlineConfirm);
+    fixture.componentRef.setInput('message', '¿Mantener?');
+    fixture.componentRef.setInput('tone', 'neutro');
+    await fixture.whenStable();
+    expect((fixture.nativeElement as HTMLElement).querySelector('button')?.className).toContain('mb-btn-primary');
+  });
 });

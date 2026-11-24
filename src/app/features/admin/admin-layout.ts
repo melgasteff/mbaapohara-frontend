@@ -6,6 +6,7 @@ import { RouterOutlet } from '@angular/router';
   selector: 'app-admin-layout',
   imports: [RouterOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<div class="page"><router-outlet /></div>`,
+  styles: `.mb-wrap { padding-top: var(--space-6); padding-bottom: 56px; }`,
+  template: `<div class="mb-wrap"><router-outlet /></div>`,
 })
 export class AdminLayout {}

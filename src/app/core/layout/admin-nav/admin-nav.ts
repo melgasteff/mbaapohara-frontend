@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, Signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { ModerationAdminApi } from '../../api/moderation-admin-api';
+import { AdminCounts, sumCounts } from '../../api/admin-counts';
 
 /** Navegación de la administración, segunda fila del encabezado `admin`. */
 @Component({
@@ -17,28 +17,32 @@ import { ModerationAdminApi } from '../../api/moderation-admin-api';
     a:focus-visible { outline: 2px solid var(--azul-texto); outline-offset: -2px; }
     .count {
       min-width: 22px; height: 22px; padding: 0 6px; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center;
-      border-radius: var(--radio-pildora); background: var(--naranja); color: var(--noche); font-size: 12px; font-weight: 700;
+      border-radius: var(--radio-pildora); background: var(--neutro-suave); color: var(--noche); font-size: 12px; font-weight: 700;
     }
+    .count--urgent { background: var(--naranja); }
   `,
   template: `
     <nav aria-label="Administración">
-      <a routerLink="/admin/moderacion" routerLinkActive ariaCurrentWhenActive="page">
-        Moderación
-        @if (pending.hasValue() && pending.value().total > 0) {
-          <span class="count">{{ pending.value().total }}<span class="visually-hidden"> pendientes</span></span>
-        }
-      </a>
-      <a routerLink="/admin/reportes" routerLinkActive ariaCurrentWhenActive="page">Reportes</a>
-      <a routerLink="/admin/solicitudes" routerLinkActive ariaCurrentWhenActive="page">Solicitudes</a>
-      <a routerLink="/admin/empresas" routerLinkActive ariaCurrentWhenActive="page" [routerLinkActiveOptions]="{ exact: true }">Empresas</a>
-      <a routerLink="/admin/locales" routerLinkActive ariaCurrentWhenActive="page">Locales pendientes</a>
-      <a routerLink="/admin/empresas/nueva" routerLinkActive ariaCurrentWhenActive="page">Nueva empresa</a>
-      <a routerLink="/admin/cargos" routerLinkActive ariaCurrentWhenActive="page">Cargos</a>
-      <a routerLink="/admin/criterios" routerLinkActive ariaCurrentWhenActive="page">Criterios</a>
+      @for (section of sections; track section.ruta) {
+        <a [routerLink]="section.ruta" routerLinkActive ariaCurrentWhenActive="page">
+          {{ section.nombre }}
+          @if (section.pendientes(); as total) {
+            <span class="count" [class.count--urgent]="section.urgente">{{ total }}<span class="visually-hidden"> pendientes</span></span>
+          }
+        </a>
+      }
     </nav>
   `,
 })
 export class AdminNav {
-  /** Cantidad de reseñas en revisión; se vuelve a pedir con cada decisión. */
-  protected readonly pending = inject(ModerationAdminApi).pendingResource();
+  private readonly counts = inject(AdminCounts);
+  /** Cada sección con lo que espera una decisión; se actualiza con cada una. */
+  protected readonly sections: { ruta: string; nombre: string; pendientes: Signal<number | undefined>; urgente?: boolean }[] = [
+    { ruta: '/admin/moderacion', nombre: 'Moderación', pendientes: this.counts.count('moderacion'), urgente: true },
+    { ruta: '/admin/reportes', nombre: 'Reportes', pendientes: this.counts.count('reportes') },
+    { ruta: '/admin/solicitudes', nombre: 'Solicitudes', pendientes: this.counts.count('solicitudes') },
+    { ruta: '/admin/empresas', nombre: 'Empresas', pendientes: sumCounts(this.counts.count('empresas'), this.counts.count('locales')) },
+    { ruta: '/admin/cargos', nombre: 'Cargos', pendientes: this.counts.count('cargos') },
+    { ruta: '/admin/criterios', nombre: 'Criterios', pendientes: signal<number | undefined>(undefined) },
+  ];
 }
