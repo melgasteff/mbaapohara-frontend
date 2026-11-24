@@ -21,7 +21,7 @@ const lookups = { jobs, contractTypes: [{ id: 1, nombre: 'Indefinido' }], workMo
 function review(overrides: Partial<MyReview['ultimaVersion']> = {}): MyReview {
   return {
     id: 9,
-    empresa: { id: 4, nombre: 'Empresa Ficticia' },
+    empresa: { id: 4, nombre: 'Empresa Ficticia', grupo: 'comercio' },
     local: { id: 5, nombre: 'Casa central', ciudad: 'Asunción' },
     publicada: true,
     ultimaVersion: {

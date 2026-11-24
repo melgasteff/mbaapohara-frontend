@@ -243,7 +243,7 @@ describe('Asistente', () => {
 
   describe('edición', () => {
     const review = {
-      id: 9, empresa: { id: 4, nombre: 'Empresa 4' }, local: { id: 5, nombre: 'Local 5', ciudad: 'Asunción' }, publicada: true,
+      id: 9, empresa: { id: 4, nombre: 'Empresa 4', grupo: 'comercio' }, local: { id: 5, nombre: 'Local 5', ciudad: 'Asunción' }, publicada: true,
       ultimaVersion: {
         numero: 1, estado: 'publicada', categoria: null, motivo: null, cargo: { id: 2, descripcion: 'Cajera', aprobado: true }, situacion: 'ACTUAL',
         ultimoAnio: null, tipoContrato: { id: 1, nombre: 'Indefinido' }, modalidad: { id: 3, nombre: 'Presencial' }, calificacion: 4, loBueno: TEXT,

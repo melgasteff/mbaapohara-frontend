@@ -2,6 +2,8 @@
 // datos: las categorías e ítems desde la API (GET /criteria, 3.8) y la forma desde public/criterios-provisionales.json.
 // Nunca se escriben en el código.
 
+import { SectorGroup } from './sector-group';
+
 /** Opción de una lista fija del JSON (respuestas, situaciones). */
 export interface ReviewOption {
   valor: string;
@@ -133,7 +135,8 @@ export interface MyReviewVersion {
 /** Reseña propia, para «Mis reseñas» y para editarla. */
 export interface MyReview {
   id: number;
-  empresa: { id: number; nombre: string };
+  /** `grupo` define el color del sello. */
+  empresa: { id: number; nombre: string; grupo: SectorGroup };
   local: { id: number; nombre: string; ciudad: string };
   /** Hay una versión publicada visible (puede ser anterior a la última). */
   publicada: boolean;
