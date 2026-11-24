@@ -1,15 +1,20 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { LucideChevronLeft, LucideChevronRight, LucideCircleAlert, LucideCircleCheck, LucideMail } from '@lucide/angular';
-import { Observable } from 'rxjs';
+import { LucideCircleAlert, LucideMail, LucideMinus, LucidePlus } from '@lucide/angular';
 import { ModerationAdminApi } from '../../../core/api/moderation-admin-api';
-import { CATEGORIES, CATEGORY_LABELS, CompanyRequest, CompanyRequestStatus, REJECTION_MESSAGES } from '../../../core/models/moderation';
-import { ModerationCategory } from '../../../core/models/review';
+import { CompanyRequest, CompanyRequestStatus } from '../../../core/models/moderation';
+import { keepWhileLoading } from '../../../shared/keep-while-loading';
+import { InlineConfirm } from '../../../shared/ui/inline-confirm/inline-confirm';
 import { PageState } from '../../../shared/ui/page-state/page-state';
-import { apiErrorMessage, confirmAction } from '../api-error';
-import { Notice } from '../status';
+import { Pager } from '../../../shared/ui/pager/pager';
+import { TabItem, Tabs } from '../../../shared/ui/tabs/tabs';
+import { AdminActions } from '../admin-actions';
+import { AdminNotice } from '../admin-notice/admin-notice';
+import { RejectForm, Rejection } from '../reject-form/reject-form';
+
+type RequestTab = CompanyRequestStatus | 'todas';
 
 /** Enlace para responder desde el programa de correo, con el texto escrito. */
 export function mailtoLink(request: CompanyRequest, body: string): string {
@@ -18,218 +23,213 @@ export function mailtoLink(request: CompanyRequest, body: string): string {
 }
 
 /**
- * Solicitudes de empresas (3.9b). La respuesta se manda por correo a mano (enlace «Responder por correo») y se
- * registra al marcarla como respondida: ahí se borran el nombre y el correo. Si la reseña incumple las reglas, se
- * puede retirar con la misma acción que los reportes.
+ * Solicitudes de empresas (3.9b). La respuesta se escribe una vez: sirve para el correo (enlace «Responder por correo») y
+ * para el registro. Al registrarla se borran el nombre y el correo. Si la reseña incumple las reglas, se puede retirar con la
+ * misma acción que los reportes.
  */
 @Component({
   selector: 'app-requests-admin',
-  imports: [DatePipe, ReactiveFormsModule, PageState, LucideCircleAlert, LucideCircleCheck, LucideMail, LucideChevronLeft, LucideChevronRight],
+  imports: [
+    DatePipe, ReactiveFormsModule, PageState, Pager, InlineConfirm, Tabs, AdminNotice, RejectForm, LucideCircleAlert, LucideMail, LucidePlus, LucideMinus,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['../admin.css', '../moderation-queue/moderation-queue.css'],
+  providers: [AdminActions],
+  styleUrl: '../admin.css',
   host: { class: 'admin-screen' },
   template: `
-    <h1 class="h1">Solicitudes de empresas</h1>
-    <p class="body">
-      Pedidos que llegan por el formulario público. Respondé por correo y después marcá la solicitud como respondida: se
-      borran el nombre y el correo, y queda la respuesta.
+    <h1 class="title" tabindex="-1">Solicitudes de empresas</h1>
+    <p class="lead">
+      Pedidos del formulario público. Respondé por correo y después registrá la respuesta: se borran el nombre y el correo, y queda la respuesta.
     </p>
+    <app-admin-notice [notice]="actions.notice()" />
+    <app-tabs label="Estado" panelId="solicitudes" [tabs]="tabs" [value]="tab()" (valueChange)="select($event)" />
 
-    <nav class="tabs" aria-label="Estado">
-      @for (tab of tabs; track tab.label) {
-        <a class="mb-chip" href="" [attr.aria-current]="estado() === tab.value ? 'page' : null" (click)="$event.preventDefault(); select(tab.value)">{{ tab.label }}</a>
-      }
-    </nav>
+    <div id="solicitudes" role="tabpanel" [attr.aria-labelledby]="'solicitudes-' + tab()">
+      @if (requests.error()) {
+        <app-page-state kind="error" title="No pudimos cargar las solicitudes." (retry)="requests.reload()" />
+      } @else if (data(); as result) {
+        @if (result.total === 0) {
+          <app-page-state kind="empty" [title]="tab() === 'pendiente' ? 'No hay solicitudes pendientes' : 'No hay solicitudes'" />
+        } @else {
+          <ul class="rows">
+            @for (item of result.data; track item.id) {
+              <li>
+                <div class="row">
+                  <div class="row__main">
+                    <h2 class="row__title">
+                      {{ item.tipo === 'revision_resena' ? 'Revisar una reseña' : 'Corregir datos' }}@if (item.empresa) { · {{ item.empresa.nombre }} }
+                    </h2>
+                    <p class="message">{{ item.mensaje }}</p>
+                    <p class="small">
+                      @if (item.nombre) { {{ item.nombre }} · {{ item.correo }} · }
+                      recibida el {{ item.fecha | date: 'shortDate' }}@if (item.fechaRespuesta) {, respondida el {{ item.fechaRespuesta | date: 'shortDate' }}}
+                    </p>
+                    @if (item.respuesta) { <p class="message"><strong>Respuesta:</strong> {{ item.respuesta }}</p> }
+                  </div>
+                  <span class="mb-tag" [class.mb-tag-warning]="item.estado === 'pendiente'" [class.mb-tag-success]="item.estado === 'respondida'">
+                    {{ item.estado === 'pendiente' ? 'Sin responder' : 'Respondida' }}
+                  </span>
+                  @if (item.estado === 'pendiente') {
+                    <div class="row__actions">
+                      <button type="button" class="mb-btn mb-btn-primary" [attr.data-accion]="'abrir-' + item.id" [attr.aria-expanded]="answering() === item.id" (click)="startAnswer(item)">
+                        Responder…<span class="visually-hidden"> la solicitud de {{ item.empresa?.nombre ?? 'la empresa' }}</span>
+                      </button>
+                      @if (item.resena?.publicada) {
+                        <button type="button" class="mb-btn mb-btn-borrar" [attr.data-accion]="'retirar-' + item.id" [attr.aria-expanded]="retiring() === item.id" (click)="startRetire(item)">Retirar la reseña…</button>
+                      }
+                    </div>
+                  }
+                </div>
 
-    <div role="status">
-      @if (notice(); as n) {
-        <p class="notice body-sm" [class.notice--ok]="n.kind === 'ok'" [class.notice--error]="n.kind === 'error'">
-          @if (n.kind === 'ok') { <svg lucideCircleCheck [size]="16" aria-hidden="true"></svg> } @else { <svg lucideCircleAlert [size]="16" aria-hidden="true"></svg> }
-          {{ n.text }}
-        </p>
+                @if (item.resena; as review) {
+                  @if (review.publicada) {
+                    <div class="texts">
+                      <div><strong class="mb-pro"><svg lucidePlus [size]="18" aria-hidden="true"></svg>Lo bueno</strong><p>{{ review.loBueno }}</p></div>
+                      <div><strong class="mb-con"><svg lucideMinus [size]="18" aria-hidden="true"></svg>A mejorar</strong><p>{{ review.aMejorar }}</p></div>
+                    </div>
+                  } @else {
+                    <p class="small">La reseña ya no está publicada.</p>
+                  }
+                }
+
+                @if (retiring() === item.id && item.resena) {
+                  <app-reject-form
+                    initial="TER"
+                    categoryLabel="Regla que incumple la reseña"
+                    submitLabel="Retirar la reseña"
+                    [busy]="actions.busy() !== null"
+                    (confirmed)="retire(item, $event)"
+                    (cancelled)="cancelRetire(item)"
+                  />
+                } @else if (answering() === item.id) {
+                  <form class="answer mb-entra" (submit)="askAnswer($event, item)" novalidate>
+                    <div class="mb-field" [class.mb-field-error]="failed()">
+                      <label [for]="'respuesta-' + item.id">Respuesta a la empresa</label>
+                      <textarea [id]="'respuesta-' + item.id" class="mb-input" rows="4" maxlength="2000" [formControl]="answer" [attr.aria-invalid]="failed() ? true : null" [attr.aria-describedby]="'ayuda-' + item.id"></textarea>
+                      <span class="mb-help" [id]="'ayuda-' + item.id">
+                        @if (failed()) { <svg lucideCircleAlert [size]="16" aria-hidden="true"></svg> }
+                        De 10 a 2.000 caracteres. Mandala por correo y después registrala.
+                      </span>
+                    </div>
+                    <div class="row__actions">
+                      <a class="mb-btn mb-btn-secondary" [href]="mailto(item)"><svg lucideMail [size]="18" aria-hidden="true"></svg>Responder por correo</a>
+                      <button type="submit" class="mb-btn mb-btn-primary" [attr.data-accion]="'registrar-' + item.id">{{ actions.busy() ? 'Registrando…' : 'Registrar respuesta' }}</button>
+                      <button type="button" class="mb-btn mb-btn-texto" (click)="cancelAnswer(item)">Cancelar</button>
+                    </div>
+                    @if (actions.confirming() === 'registrar-' + item.id) {
+                      <app-inline-confirm
+                        tone="neutro"
+                        confirmLabel="Sí, registrar"
+                        message="¿Ya mandaste el correo? Al registrar se borran el nombre y el correo de esta solicitud."
+                        (confirmed)="register(item)"
+                        (cancelled)="actions.cancel()"
+                      />
+                    }
+                  </form>
+                }
+              </li>
+            }
+          </ul>
+          <app-pager label="Páginas de solicitudes" [page]="page()" [pageSize]="result.pageSize" [total]="result.total" (pageChange)="page.set($event)" />
+        }
+      } @else {
+        <app-page-state kind="loading" message="Cargando solicitudes…" />
       }
     </div>
-
-    @if (requests.error()) {
-      <app-page-state kind="error" title="No pudimos cargar las solicitudes." (retry)="requests.reload()" />
-    } @else if (requests.hasValue()) {
-      @if (requests.value().total === 0) {
-        <app-page-state kind="empty" [title]="estado() === 'pendiente' ? 'No hay solicitudes pendientes.' : 'No hay solicitudes.'" />
-      } @else {
-        <ul class="rows">
-          @for (item of requests.value().data; track item.id) {
-            <li class="item">
-              <div class="item__head">
-                <div class="row__main">
-                  <span class="row__title">
-                    {{ item.tipo === 'revision_resena' ? 'Revisar una reseña' : 'Corregir datos' }}
-                    @if (item.empresa) { · {{ item.empresa.nombre }} }
-                  </span>
-                  <span class="mb-meta"><span>Recibida el {{ item.fecha | date: 'short' }}</span>
-                    @if (item.fechaRespuesta) { <span>Respondida el {{ item.fechaRespuesta | date: 'short' }}</span> }
-                  </span>
-                </div>
-                <span class="mb-tag" [class.mb-tag-warning]="item.estado === 'pendiente'" [class.mb-tag-success]="item.estado === 'respondida'">
-                  {{ item.estado === 'pendiente' ? 'Pendiente' : 'Respondida' }}
-                </span>
-              </div>
-
-              @if (item.resena; as review) {
-                @if (review.publicada) {
-                  <div class="texts">
-                    <div><strong class="body-sm">Lo bueno</strong><p class="body">{{ review.loBueno }}</p></div>
-                    <div><strong class="body-sm">A mejorar</strong><p class="body">{{ review.aMejorar }}</p></div>
-                  </div>
-                } @else {
-                  <p class="body-sm hint">La reseña ya no está publicada.</p>
-                }
-              }
-
-              <div class="signals body-sm">
-                <h2 class="signals__title">Mensaje</h2>
-                <p class="message">{{ item.mensaje }}</p>
-                @if (item.nombre) { <p class="message">De: {{ item.nombre }} &lt;{{ item.correo }}&gt;</p> }
-                @if (item.respuesta) { <p class="message"><strong>Respuesta:</strong> {{ item.respuesta }}</p> }
-              </div>
-
-              @if (item.estado === 'pendiente') {
-                @if (retiring() === item.id && item.resena) {
-                  <form class="reject" (submit)="confirmRetire($event, item)" novalidate>
-                    <div class="mb-field">
-                      <label [for]="'cat-' + item.id">Regla que incumple la reseña</label>
-                      <select [id]="'cat-' + item.id" class="mb-input" [formControl]="category">
-                        @for (c of categories; track c) { <option [value]="c">{{ categoryLabels[c] }}</option> }
-                      </select>
-                    </div>
-                    <div class="mb-field" [class.mb-field-error]="reason.invalid && reason.touched">
-                      <label [for]="'motivo-' + item.id">Motivo que va a leer quien la escribió</label>
-                      <textarea [id]="'motivo-' + item.id" class="mb-input" rows="3" maxlength="500" [formControl]="reason"></textarea>
-                    </div>
-                    <div class="row__actions">
-                      <button type="submit" class="mb-btn mb-btn-primary mb-btn-sm" [disabled]="busy() === item.id">Retirar la reseña</button>
-                      <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm" (click)="retiring.set(null)">Cancelar</button>
-                    </div>
-                  </form>
-                } @else if (answering() === item.id) {
-                  <form class="reject" (submit)="confirmAnswer($event, item)" novalidate>
-                    <div class="mb-field" [class.mb-field-error]="answer.invalid && answer.touched">
-                      <label [for]="'respuesta-' + item.id">Respuesta a la empresa</label>
-                      <textarea [id]="'respuesta-' + item.id" class="mb-input" rows="4" maxlength="2000" [formControl]="answer"></textarea>
-                      <span class="mb-help">De 10 a 2.000 caracteres. Mandala por correo y después marcala como respondida.</span>
-                    </div>
-                    <div class="row__actions">
-                      <a class="mb-btn mb-btn-secondary mb-btn-sm" [href]="mailto(item)"><svg lucideMail [size]="16" aria-hidden="true"></svg>Responder por correo</a>
-                      <button type="submit" class="mb-btn mb-btn-primary mb-btn-sm" [disabled]="busy() === item.id">Marcar como respondida</button>
-                      <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm" (click)="answering.set(null)">Cancelar</button>
-                    </div>
-                  </form>
-                } @else {
-                  <div class="row__actions">
-                    <button type="button" class="mb-btn mb-btn-primary mb-btn-sm" (click)="startAnswer(item)">Responder…</button>
-                    @if (item.resena?.publicada) {
-                      <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm" (click)="startRetire(item)">Retirar la reseña…</button>
-                    }
-                  </div>
-                }
-              }
-            </li>
-          }
-        </ul>
-        @if (totalPages() > 1) {
-          <nav class="pager" aria-label="Páginas de solicitudes">
-            <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm" [disabled]="page() <= 1" (click)="page.set(page() - 1)">
-              <svg lucideChevronLeft [size]="16" aria-hidden="true"></svg>Anterior
-            </button>
-            <span class="body-sm">Página {{ page() }} de {{ totalPages() }}</span>
-            <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm" [disabled]="page() >= totalPages()" (click)="page.set(page() + 1)">
-              Siguiente<svg lucideChevronRight [size]="16" aria-hidden="true"></svg>
-            </button>
-          </nav>
-        }
-      }
-    } @else {
-      <app-page-state kind="loading" message="Cargando solicitudes…" />
-    }
   `,
-  styles: `.message { margin: 0; white-space: pre-line; overflow-wrap: anywhere; }`,
+  styles: `
+    .message { font-size: 15px; line-height: 22px; white-space: pre-line; }
+    .answer { display: flex; flex-direction: column; gap: var(--space-3); padding: 18px; border-radius: var(--radio-md); background: var(--blanco); }
+    .answer .mb-field { width: 100%; }
+  `,
 })
 export class RequestsAdmin {
   private readonly api = inject(ModerationAdminApi);
-  protected readonly tabs: { label: string; value: CompanyRequestStatus | undefined }[] = [
-    { label: 'Pendientes', value: 'pendiente' },
-    { label: 'Respondidas', value: 'respondida' },
-    { label: 'Todas', value: undefined },
+  protected readonly actions = inject(AdminActions);
+
+  protected readonly tabs: TabItem<RequestTab>[] = [
+    { valor: 'pendiente', etiqueta: 'Pendientes' },
+    { valor: 'respondida', etiqueta: 'Respondidas' },
+    { valor: 'todas', etiqueta: 'Todas' },
   ];
-  protected readonly estado = signal<CompanyRequestStatus | undefined>('pendiente');
+  protected readonly tab = signal<RequestTab>('pendiente');
+  private readonly estado = signal<CompanyRequestStatus | undefined>('pendiente');
   protected readonly page = signal(1);
   protected readonly requests = this.api.requestsResource(this.estado, this.page);
-  protected readonly busy = signal<number | null>(null);
-  protected readonly notice = signal<Notice | null>(null);
+  protected readonly data = keepWhileLoading(this.requests);
   protected readonly answering = signal<number | null>(null);
   protected readonly retiring = signal<number | null>(null);
+  protected readonly failed = signal(false);
 
-  protected readonly categories = CATEGORIES;
-  protected readonly categoryLabels = CATEGORY_LABELS;
-  protected readonly category = new FormControl<ModerationCategory>('TER', { nonNullable: true });
-  protected readonly reason = new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(10), Validators.maxLength(500)] });
-  protected readonly answer = new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(10), Validators.maxLength(2000)] });
+  protected readonly answer = new FormControl('', {
+    nonNullable: true,
+    validators: [Validators.required, Validators.maxLength(2000), (control) => ((control.value as string).trim().length >= 10 ? null : { corto: true })],
+  });
   private readonly answerText = toSignal(this.answer.valueChanges, { initialValue: '' });
   protected readonly mailto = (item: CompanyRequest) => mailtoLink(item, this.answerText());
 
-  protected readonly totalPages = computed(() => {
-    if (!this.requests.hasValue()) return 1;
-    const { total, pageSize } = this.requests.value();
-    return Math.max(1, Math.ceil(total / pageSize));
-  });
-
-  protected select(estado: CompanyRequestStatus | undefined): void {
-    this.estado.set(estado);
+  protected select(tab: RequestTab): void {
+    this.tab.set(tab);
+    this.estado.set(tab === 'todas' ? undefined : tab);
     this.page.set(1);
+    this.close();
   }
 
   protected startAnswer(item: CompanyRequest): void {
-    this.retiring.set(null);
+    if (this.actions.busy() !== null) return;
+    this.close();
     this.answer.reset('');
     this.answering.set(item.id);
+    this.actions.focus(`#respuesta-${item.id}`);
   }
 
-  protected confirmAnswer(event: Event, item: CompanyRequest): void {
+  protected cancelAnswer(item: CompanyRequest): void {
+    this.close();
+    this.actions.focus(`[data-accion="abrir-${item.id}"]`);
+  }
+
+  protected askAnswer(event: Event, item: CompanyRequest): void {
     event.preventDefault();
-    this.answer.markAsTouched();
-    if (this.answer.invalid) return;
-    if (!confirmAction('¿Marcar como respondida? Se borran el nombre y el correo de esta solicitud; asegurate de haber mandado el correo.')) return;
-    this.run(item, this.api.answer(item.id, this.answer.value.trim()), 'Registraste la respuesta. Se borraron el nombre y el correo.');
+    this.failed.set(this.answer.invalid);
+    if (this.answer.invalid) this.actions.focus(`#respuesta-${item.id}`);
+    else this.actions.ask(`registrar-${item.id}`);
+  }
+
+  protected register(item: CompanyRequest): void {
+    this.run(`registrar-${item.id}`, this.api.answer(item.id, this.answer.value.trim()), 'Registraste la respuesta. Se borraron el nombre y el correo.');
   }
 
   protected startRetire(item: CompanyRequest): void {
-    this.answering.set(null);
-    this.category.setValue('TER');
-    this.reason.reset(REJECTION_MESSAGES.TER);
+    if (this.actions.busy() !== null) return;
+    this.close();
     this.retiring.set(item.id);
   }
 
-  protected confirmRetire(event: Event, item: CompanyRequest): void {
-    event.preventDefault();
-    this.reason.markAsTouched();
-    if (this.reason.invalid || !item.resena) return;
-    this.run(item, this.api.retire(item.resena.id, this.category.value, this.reason.value.trim()),
-      'Retiraste la reseña. Respondé la solicitud para cerrarla.');
+  protected cancelRetire(item: CompanyRequest): void {
+    this.close();
+    this.actions.focus(`[data-accion="retirar-${item.id}"]`);
   }
 
-  private run(item: CompanyRequest, action: Observable<unknown>, success: string): void {
-    this.busy.set(item.id);
-    this.notice.set(null);
-    action.subscribe({
-      next: () => {
-        this.busy.set(null);
-        this.answering.set(null);
-        this.retiring.set(null);
-        this.notice.set({ kind: 'ok', text: success });
-        this.requests.reload();
-      },
-      error: (error: unknown) => {
-        this.busy.set(null);
-        this.notice.set({ kind: 'error', text: apiErrorMessage(error) });
+  protected retire(item: CompanyRequest, { categoria, motivo }: Rejection): void {
+    if (!item.resena) return;
+    this.run(`retirar-${item.id}`, this.api.retire(item.resena.id, categoria, motivo), 'Retiraste la reseña. Respondé la solicitud para cerrarla.');
+  }
+
+  private close(): void {
+    this.answering.set(null);
+    this.retiring.set(null);
+    this.failed.set(false);
+    this.actions.confirming.set(null);
+  }
+
+  private run(key: string, action: ReturnType<ModerationAdminApi['answer']>, success: string): void {
+    this.actions.run(key, action, success, {
+      done: () => {
+        this.close();
+        // Si era la única de la página, se vuelve a la anterior.
+        if (this.tab() === 'pendiente' && this.data()?.data.length === 1 && this.page() > 1) this.page.update((page) => page - 1);
+        else this.requests.reload();
+        this.actions.focus('h1');
       },
     });
   }
