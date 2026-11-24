@@ -18,7 +18,7 @@ export interface TabItem<T extends string = string> {
   selector: 'app-tabs',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
-    [role='tablist'] { display: flex; gap: var(--space-5); overflow-x: auto; border-bottom: 1px solid var(--linea); }
+    [role='tablist'] { position: relative; display: flex; gap: var(--space-5); overflow-x: auto; border-bottom: 1px solid var(--linea); }
     button {
       display: inline-flex; align-items: center; gap: var(--space-2); min-height: 48px; padding: 0; border: 0; background: transparent; color: var(--noche);
       font: inherit; font-size: 15px; line-height: 22px; font-weight: 600; white-space: nowrap; cursor: pointer;

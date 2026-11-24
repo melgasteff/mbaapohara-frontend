@@ -8,7 +8,8 @@ import { AdminCounts, sumCounts } from '../../api/admin-counts';
   imports: [RouterLink, RouterLinkActive],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
-    nav { display: flex; gap: 28px; overflow-x: auto; }
+    /* relative: los textos ocultos de los contadores se recortan con la barra y no ensanchan la página. */
+    nav { position: relative; display: flex; gap: 28px; overflow-x: auto; }
     a {
       display: inline-flex; align-items: center; gap: var(--space-2); min-height: 48px; white-space: nowrap;
       color: var(--noche); text-decoration: none; font-size: 15px; font-weight: 600;

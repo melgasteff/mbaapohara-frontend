@@ -70,7 +70,15 @@ Si algo de este archivo choca con ellas, gana este archivo.
 - Privacidad: con quién compartimos, cuánto tiempo, protección, responsable y edad son secciones visibles con la estética de la lámina.
 - Índice: marca la sección de la URL, no la que se está leyendo. Las preguntas y los términos completos son `<details>` nativos.
 - 404: usa el encabezado sin buscador, para no mostrar dos.
-- Moderación: no se resalta el fragmento marcado, porque la API no lo devuelve.
+- Administración: la entrada es Moderación. Los contadores cuentan lo pendiente: naranja en Moderación y neutro en el resto. En las
+  pestañas de Empresas solo tienen número las que esperan una decisión.
+- Moderación: no se resalta el fragmento marcado, porque la API no lo devuelve. El modelo da seis confianzas: se ve la de la categoría
+  marcada y «Ver todas las confianzas».
+- Solicitudes: la respuesta se escribe una vez y sirve para el correo y el registro. Al registrar se confirma, porque borra datos.
+- Empresas: sin origen de la propuesta ni cantidad de locales y reseñas, que la API de administración no trae.
+- Cargos: «Rechazar» en lugar de «Unificar», que no existe en la API. La lista son chips con botón para eliminar.
+- Criterios: las flechas también ordenan categorías. Miden 44px (26 en la lámina). «Mantener» y «Registrar» confirman en azul, porque no
+  borran reseñas.
 - Asistente: sin «¿No está la empresa? Proponela», porque ese flujo no existe.
 
 ## Voz

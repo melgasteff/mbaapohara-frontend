@@ -1,81 +1,82 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, signal, untracked } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { LucideCircleAlert, LucideCircleCheck, LucideTriangleAlert } from '@lucide/angular';
+import { LucideArrowDown, LucideArrowUp, LucideCircleAlert, LucidePlus, LucideTriangleAlert } from '@lucide/angular';
+import { concat, Observable, toArray } from 'rxjs';
 import { CriteriaApi } from '../../../core/api/criteria-api';
 import { AdminCriteriaCategory, AdminCriterion, CriteriaChange } from '../../../core/models/criteria';
+import { keepWhileLoading } from '../../../shared/keep-while-loading';
+import { InlineConfirm } from '../../../shared/ui/inline-confirm/inline-confirm';
 import { PageState } from '../../../shared/ui/page-state/page-state';
-import { apiErrorMessage, confirmAction } from '../api-error';
-import { Notice } from '../status';
+import { Switch } from '../../../shared/ui/switch/switch';
+import { AdminActions } from '../admin-actions';
+import { AdminNotice } from '../admin-notice/admin-notice';
+import { moveChanges } from './reorder';
 
 /** Código estable: letras sin tildes, números y guion bajo. La API lo pasa a mayúsculas. */
 const CODE = /^[A-Za-z0-9_]{2,30}$/;
 
-/** Lo que se está editando: una categoría o un ítem, de a uno por vez. */
-type Editing = { kind: 'category'; id: number } | { kind: 'item'; id: number; respuestas: number };
+/** Lo que se está editando o agregando, de a uno por vez. */
+type Open = { kind: 'category' | 'item' | 'new-item'; id: number } | { kind: 'new-category' };
 
 /**
- * Criterios de la reseña (tarea 3.8): agregar categorías e ítems, corregir su texto y su orden, y desactivarlos.
+ * Criterios de la reseña (tarea 3.8): agregar categorías e ítems, corregir su texto, ordenarlos y desactivarlos.
  * No se borran: así las respuestas guardadas siguen apuntando a su criterio.
  */
 @Component({
   selector: 'app-criteria-admin',
-  imports: [ReactiveFormsModule, PageState, LucideCircleAlert, LucideCircleCheck, LucideTriangleAlert],
+  imports: [
+    ReactiveFormsModule, InlineConfirm, PageState, Switch, AdminNotice, LucideArrowDown, LucideArrowUp, LucideCircleAlert, LucidePlus, LucideTriangleAlert,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrl: '../admin.css',
+  providers: [AdminActions],
+  styleUrls: ['../admin.css', './criteria-admin.css'],
   host: { class: 'admin-screen' },
   templateUrl: './criteria-admin.html',
-  styles: `
-    .category { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4); background: var(--blanco); border: 1px solid var(--linea); border-radius: var(--radio-md); }
-    .category--off { background: var(--crema); }
-    .category__head { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; justify-content: space-between; }
-    .category__head h2 { margin: 0; }
-    .rows .row { background: var(--crema); }
-    .row--off .row__title { color: var(--noche-suave); }
-    .code { color: var(--noche-suave); }
-    .meta { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
-    .hint { margin: 0; color: var(--noche-suave); }
-    .warning { display: flex; gap: var(--space-2); align-items: flex-start; margin: 0; padding: var(--space-3); border-radius: var(--radio-md); background: var(--amarillo-suave); color: var(--noche); }
-    .inline { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: flex-end; width: 100%; }
-    .inline .grow { flex: 1; min-width: 220px; width: auto; }
-    .inline .code-field { width: 160px; }
-    .inline .order-field { width: 96px; }
-    textarea.mb-input { resize: vertical; }
-    h2 { margin: 0; }
-    .add-item { align-self: flex-start; }
-  `,
 })
 export class CriteriaAdmin {
   private readonly api = inject(CriteriaApi);
+  protected readonly actions = inject(AdminActions);
   protected readonly criteria = this.api.adminResource();
-  protected readonly busy = signal(false);
-  protected readonly notice = signal<Notice | null>(null);
+  protected readonly data = keepWhileLoading(this.criteria);
 
+  protected readonly open = signal<Open | null>(null);
   protected readonly newCategory = new FormGroup({
     codigo: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.pattern(CODE)] }),
     nombre: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(100)] }),
   });
-
-  /** Categoría a la que se está agregando un ítem. */
-  protected readonly addingTo = signal<number | null>(null);
   protected readonly newItem = new FormGroup({
     codigo: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.pattern(CODE)] }),
     texto: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(300)] }),
   });
+  protected readonly edit = new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(300)] });
 
-  protected readonly editing = signal<Editing | null>(null);
-  protected readonly edit = new FormGroup({
-    texto: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(300)] }),
-    orden: new FormControl(0, { nonNullable: true, validators: [Validators.required, Validators.min(0)] }),
-  });
+  /** Botón que recupera el foco cuando llega la lista reordenada: al mover el elemento, el navegador lo pierde. */
+  private refocus: string | null = null;
+
+  constructor() {
+    effect(() => {
+      this.data();
+      if (this.refocus) untracked(() => this.actions.focus(this.refocus!));
+      this.refocus = null;
+    });
+  }
 
   protected show(control: FormControl): boolean {
     return control.invalid && control.touched;
   }
 
-  protected isEditing(kind: Editing['kind'], id: number): boolean {
-    const current = this.editing();
-    return current?.kind === kind && current.id === id;
+  protected isOpen(kind: Open['kind'], id?: number): boolean {
+    const current = this.open();
+    return current?.kind === kind && (current.kind === 'new-category' || current.id === id);
+  }
+
+  protected answers(total: number): string {
+    return total === 1 ? '1 respuesta' : `${total} respuestas`;
+  }
+
+  protected startNewCategory(): void {
+    this.newCategory.reset();
+    this.start({ kind: 'new-category' }, '#cat-codigo');
   }
 
   protected addCategory(event: Event): void {
@@ -83,15 +84,12 @@ export class CriteriaAdmin {
     this.newCategory.markAllAsTouched();
     if (this.newCategory.invalid) return;
     const { codigo, nombre } = this.newCategory.getRawValue();
-    this.run(this.api.createCategory(codigo.trim(), nombre.trim()), `Agregaste la categoría «${nombre.trim()}». Agregale sus ítems.`, () =>
-      this.newCategory.reset(),
-    );
+    this.run('categoria-nueva', this.api.createCategory(codigo.trim(), nombre.trim()), `Agregaste la categoría «${nombre.trim()}». Agregale sus ítems.`);
   }
 
-  protected startAdding(category: AdminCriteriaCategory): void {
-    this.editing.set(null);
+  protected startNewItem(category: AdminCriteriaCategory): void {
     this.newItem.reset();
-    this.addingTo.set(category.id);
+    this.start({ kind: 'new-item', id: category.id }, `#item-codigo-${category.id}`);
   }
 
   protected addItem(event: Event, category: AdminCriteriaCategory): void {
@@ -99,87 +97,92 @@ export class CriteriaAdmin {
     this.newItem.markAllAsTouched();
     if (this.newItem.invalid) return;
     const { codigo, texto } = this.newItem.getRawValue();
-    this.run(this.api.createItem(category.id, codigo.trim(), texto.trim()), `Agregaste el ítem a «${category.nombre}».`, () =>
-      this.addingTo.set(null),
-    );
+    this.run('item-nuevo', this.api.createItem(category.id, codigo.trim(), texto.trim()), `Agregaste el ítem a «${category.nombre}».`);
   }
 
-  protected startEditCategory(category: AdminCriteriaCategory): void {
-    this.addingTo.set(null);
-    this.edit.reset({ texto: category.nombre, orden: category.orden });
-    this.editing.set({ kind: 'category', id: category.id });
-  }
-
-  protected startEditItem(item: AdminCriterion): void {
-    this.addingTo.set(null);
-    this.edit.reset({ texto: item.texto, orden: item.orden });
-    this.editing.set({ kind: 'item', id: item.id, respuestas: item.respuestas });
+  protected startEdit(kind: 'category' | 'item', id: number, text: string): void {
+    this.edit.reset(text);
+    this.start({ kind, id }, `#editar-${kind}-${id}`);
   }
 
   protected saveCategory(event: Event, category: AdminCriteriaCategory): void {
     event.preventDefault();
-    this.edit.markAllAsTouched();
-    if (this.edit.invalid) return;
-    const { texto, orden } = this.edit.getRawValue();
-    this.update(this.api.updateCategory(category.id, { nombre: texto.trim(), orden }), `Guardaste la categoría «${texto.trim()}».`);
+    if (!this.validEdit()) return;
+    const nombre = this.edit.value.trim();
+    this.run(`categoria-${category.id}`, this.api.updateCategory(category.id, { nombre }), `Guardaste la categoría «${nombre}».`);
   }
 
-  protected saveItem(event: Event, item: AdminCriterion): void {
+  /** Con respuestas, cambiar el texto se confirma: quedan bajo el texto nuevo. */
+  protected askSaveItem(event: Event, item: AdminCriterion): void {
     event.preventDefault();
-    this.edit.markAllAsTouched();
-    if (this.edit.invalid) return;
-    const { texto, orden } = this.edit.getRawValue();
-    const change: CriteriaChange = { texto: texto.trim(), orden };
-    const textChanged = change.texto !== item.texto;
-    if (
-      textChanged &&
-      item.respuestas > 0 &&
-      !confirmAction(
-        `Este ítem ya tiene ${this.answers(item.respuestas)}, que quedarán bajo el texto nuevo. ` +
-          '¿Es solo una corrección de redacción, sin cambiar el sentido?',
-      )
-    ) {
-      return;
-    }
-    this.update(this.api.updateItem(item.id, change), 'Guardaste el ítem.');
+    if (!this.validEdit()) return;
+    if (this.edit.value.trim() !== item.texto && item.respuestas > 0) this.actions.ask(`texto-${item.id}`);
+    else this.saveItem(item);
   }
 
+  protected saveItem(item: AdminCriterion): void {
+    this.run(`texto-${item.id}`, this.api.updateItem(item.id, { texto: this.edit.value.trim() }), 'Guardaste el ítem.');
+  }
+
+  protected moveCategory(category: AdminCriteriaCategory, step: -1 | 1): void {
+    const changes = moveChanges(this.data() ?? [], category.id, step);
+    this.move(changes, (id, change) => this.api.updateCategory(id, change), category.nombre, `[data-mover="categoria-${category.id}-${step}"]`);
+  }
+
+  protected moveItem(category: AdminCriteriaCategory, item: AdminCriterion, step: -1 | 1): void {
+    const changes = moveChanges(category.items, item.id, step);
+    this.move(changes, (id, change) => this.api.updateItem(id, change), item.texto, `[data-mover="item-${item.id}-${step}"]`);
+  }
+
+  /** Activar es directo; desactivar se confirma. */
   protected toggleCategory(category: AdminCriteriaCategory): void {
-    if (category.activo && !confirmAction(`¿Desactivar «${category.nombre}»? Sus ítems dejan de pedirse y de mostrarse; las respuestas se conservan.`)) {
-      return;
-    }
-    const text = category.activo ? `Desactivaste «${category.nombre}».` : `Activaste «${category.nombre}».`;
-    this.run(this.api.updateCategory(category.id, { activo: !category.activo }), text);
+    if (category.activo) this.actions.ask(`apagar-categoria-${category.id}`);
+    else this.setCategory(category, true);
+  }
+
+  protected setCategory(category: AdminCriteriaCategory, activo: boolean): void {
+    this.run(`apagar-categoria-${category.id}`, this.api.updateCategory(category.id, { activo }), `${activo ? 'Activaste' : 'Desactivaste'} «${category.nombre}».`);
   }
 
   protected toggleItem(item: AdminCriterion): void {
-    if (item.activo && !confirmAction('¿Desactivar este ítem? Deja de pedirse en las reseñas y de mostrarse; las respuestas se conservan.')) {
-      return;
-    }
-    this.run(this.api.updateItem(item.id, { activo: !item.activo }), item.activo ? 'Desactivaste el ítem.' : 'Activaste el ítem.');
+    if (item.activo) this.actions.ask(`apagar-item-${item.id}`);
+    else this.setItem(item, true);
   }
 
-  protected answers(total: number): string {
-    return total === 1 ? '1 respuesta' : `${total} respuestas`;
+  protected setItem(item: AdminCriterion, activo: boolean): void {
+    this.run(`apagar-item-${item.id}`, this.api.updateItem(item.id, { activo }), activo ? 'Activaste el ítem.' : 'Desactivaste el ítem.');
   }
 
-  private update(action: Observable<unknown>, success: string): void {
-    this.run(action, success, () => this.editing.set(null));
+  private validEdit(): boolean {
+    this.edit.markAsTouched();
+    return this.edit.valid && this.edit.value.trim() !== '';
   }
 
-  private run(action: Observable<unknown>, success: string, done?: () => void): void {
-    this.busy.set(true);
-    this.notice.set(null);
-    action.subscribe({
-      next: () => {
-        this.busy.set(false);
-        this.notice.set({ kind: 'ok', text: success });
-        done?.();
+  private start(open: Open, focus: string): void {
+    if (this.actions.busy() !== null) return;
+    this.actions.confirming.set(null);
+    this.open.set(open);
+    this.actions.focus(focus);
+  }
+
+  /** Los cambios van de a uno, en orden. No es atómico: si uno falla, se vuelve a pedir la lista. */
+  private move(changes: { id: number; orden: number }[], update: (id: number, change: CriteriaChange) => Observable<unknown>, name: string, focus: string): void {
+    if (!changes.length) return;
+    this.actions.run('mover', concat(...changes.map(({ id, orden }) => update(id, { orden }))).pipe(toArray()), `Moviste «${name}».`, {
+      done: () => {
+        this.refocus = focus;
         this.criteria.reload();
       },
-      error: (error: unknown) => {
-        this.busy.set(false);
-        this.notice.set({ kind: 'error', text: apiErrorMessage(error) });
+      failed: () => this.criteria.reload(),
+    });
+  }
+
+  private run(key: string, action: Observable<unknown>, success: string): void {
+    this.actions.run(key, action, success, {
+      done: () => {
+        this.open.set(null);
+        this.criteria.reload();
+        this.actions.focus('h1');
       },
     });
   }

@@ -1,142 +1,162 @@
-<h1 class="h1">Criterios</h1>
-<p class="body">
-  Las afirmaciones que se responden al escribir una reseña, agrupadas por categoría. Un criterio no se borra: se desactiva,
-  deja de pedirse y de mostrarse, y sus respuestas se conservan.
-</p>
-
-<form class="inline" [formGroup]="newCategory" (submit)="addCategory($event)" novalidate>
-  <div class="mb-field code-field" [class.mb-field-error]="show(newCategory.controls.codigo)">
-    <label for="cat-codigo">Código</label>
-    <input id="cat-codigo" class="mb-input" formControlName="codigo" maxlength="30" placeholder="Ej.: BENEFICIOS" />
-  </div>
-  <div class="mb-field grow" [class.mb-field-error]="show(newCategory.controls.nombre)">
-    <label for="cat-nombre">Categoría nueva</label>
-    <input id="cat-nombre" class="mb-input" formControlName="nombre" maxlength="100" placeholder="Ej.: Beneficios y capacitación" />
-  </div>
-  <button type="submit" class="mb-btn mb-btn-primary" [disabled]="busy()">Agregar categoría</button>
-</form>
-@if (show(newCategory.controls.codigo)) {
-  <span class="mb-help"><svg lucideCircleAlert [size]="16" aria-hidden="true"></svg>El código lleva de 2 a 30 letras sin tildes, números o guiones bajos.</span>
-}
-<p class="body-sm hint">El código identifica al criterio en las respuestas y no se puede cambiar después.</p>
-
-<div role="status">
-  @if (notice(); as n) {
-    <p class="notice body-sm" [class.notice--ok]="n.kind === 'ok'" [class.notice--error]="n.kind === 'error'">
-      @if (n.kind === 'ok') { <svg lucideCircleCheck [size]="16" aria-hidden="true"></svg> } @else { <svg lucideCircleAlert [size]="16" aria-hidden="true"></svg> }
-      {{ n.text }}
-    </p>
-  }
+<div class="head">
+  <h1 class="title" tabindex="-1">Criterios</h1>
+  <button type="button" class="mb-btn mb-btn-primary" [attr.aria-expanded]="isOpen('new-category')" (click)="startNewCategory()">
+    <svg lucidePlus [size]="18" aria-hidden="true"></svg>Nueva categoría
+  </button>
 </div>
+<p class="lead">
+  Lo que se responde al escribir una reseña, por categoría. Un criterio no se borra: se desactiva, deja de pedirse y de mostrarse, y sus respuestas se
+  conservan.
+</p>
+<app-admin-notice [notice]="actions.notice()" />
+
+@if (isOpen('new-category')) {
+  <form class="block mb-entra" [formGroup]="newCategory" (submit)="addCategory($event)" novalidate>
+    <div class="inline">
+      <div class="mb-field code-field" [class.mb-field-error]="show(newCategory.controls.codigo)">
+        <label for="cat-codigo">Código</label>
+        <input id="cat-codigo" class="mb-input" formControlName="codigo" maxlength="30" placeholder="Ej.: BENEFICIOS" aria-describedby="cat-ayuda" [attr.aria-invalid]="show(newCategory.controls.codigo) ? true : null" />
+      </div>
+      <div class="mb-field grow" [class.mb-field-error]="show(newCategory.controls.nombre)">
+        <label for="cat-nombre">Nombre de la categoría</label>
+        <input id="cat-nombre" class="mb-input" formControlName="nombre" maxlength="100" placeholder="Ej.: Beneficios y capacitación" [attr.aria-invalid]="show(newCategory.controls.nombre) ? true : null" />
+      </div>
+      <button type="submit" class="mb-btn mb-btn-primary">Agregar</button>
+      <button type="button" class="mb-btn mb-btn-texto" (click)="open.set(null)">Cancelar</button>
+    </div>
+    <p class="mb-help" id="cat-ayuda" [class.error]="show(newCategory.controls.codigo)">
+      @if (show(newCategory.controls.codigo)) { <svg lucideCircleAlert [size]="16" aria-hidden="true"></svg> }
+      De 2 a 30 letras sin tildes, números o guiones bajos. No se puede cambiar después.
+    </p>
+  </form>
+}
 
 @if (criteria.error()) {
   <app-page-state kind="error" title="No pudimos cargar los criterios." (retry)="criteria.reload()" />
-} @else if (criteria.hasValue()) {
-  @if (criteria.value().length === 0) {
-    <app-page-state kind="empty" title="Todavía no hay criterios." />
-  }
-  @for (category of criteria.value(); track category.id) {
-    <section class="category" [class.category--off]="!category.activo" [attr.aria-labelledby]="'cat-' + category.id">
-      @if (isEditing('category', category.id)) {
-        <form class="inline" [formGroup]="edit" (submit)="saveCategory($event, category)" novalidate>
-          <div class="mb-field grow" [class.mb-field-error]="show(edit.controls.texto)">
-            <label [for]="'cat-edit-' + category.id">Nombre de la categoría</label>
-            <input [id]="'cat-edit-' + category.id" class="mb-input" formControlName="texto" maxlength="100" />
+} @else if (data(); as categories) {
+  @for (category of categories; track category.id) {
+    @let off = 'apagar-categoria-' + category.id;
+    <section class="block" [class.is-off]="!category.activo" [attr.aria-labelledby]="'cat-' + category.id">
+      @if (isOpen('category', category.id)) {
+        <form class="inline" (submit)="saveCategory($event, category)" novalidate>
+          <div class="mb-field grow" [class.mb-field-error]="show(edit)">
+            <label [for]="'editar-category-' + category.id">Nombre de la categoría</label>
+            <input [id]="'editar-category-' + category.id" class="mb-input" [formControl]="edit" maxlength="100" />
           </div>
-          <div class="mb-field order-field" [class.mb-field-error]="show(edit.controls.orden)">
-            <label [for]="'cat-orden-' + category.id">Orden</label>
-            <input [id]="'cat-orden-' + category.id" class="mb-input" type="number" min="0" formControlName="orden" />
-          </div>
-          <button type="submit" class="mb-btn mb-btn-primary mb-btn-sm" [disabled]="busy()">Guardar</button>
-          <button type="button" class="mb-btn mb-btn-ghost mb-btn-sm" (click)="editing.set(null)">Cancelar</button>
+          <button type="submit" class="mb-btn mb-btn-primary">Guardar</button>
+          <button type="button" class="mb-btn mb-btn-texto" (click)="open.set(null)">Cancelar</button>
         </form>
       } @else {
-        <div class="category__head">
+        <div class="row">
+          <div class="move">
+            <button type="button" [attr.data-mover]="'categoria-' + category.id + '--1'" [attr.aria-label]="'Subir ' + category.nombre" (click)="moveCategory(category, -1)"><svg lucideArrowUp [size]="16" aria-hidden="true"></svg></button>
+            <button type="button" [attr.data-mover]="'categoria-' + category.id + '-1'" [attr.aria-label]="'Bajar ' + category.nombre" (click)="moveCategory(category, 1)"><svg lucideArrowDown [size]="16" aria-hidden="true"></svg></button>
+          </div>
           <div class="row__main">
-            <h2 class="h3" [id]="'cat-' + category.id">{{ category.nombre }}</h2>
-            <div class="meta">
-              <span class="caption code">{{ category.codigo }} · orden {{ category.orden }}</span>
-              @if (!category.activo) { <span class="mb-tag mb-tag-warning">Inactiva</span> }
-            </div>
+            <h2 [id]="'cat-' + category.id">{{ category.nombre }}</h2>
+            <p class="small">{{ category.codigo }}@if (!category.activo) { · inactiva }</p>
           </div>
           <div class="row__actions">
-            <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm" [disabled]="busy()" (click)="startEditCategory(category)">Editar</button>
-            <button type="button" class="mb-btn mb-btn-ghost mb-btn-sm" [disabled]="busy()" (click)="toggleCategory(category)">
-              {{ category.activo ? 'Desactivar' : 'Activar' }}
-            </button>
+            <app-switch [checked]="category.activo" [label]="'Categoría activa: ' + category.nombre" [action]="off" (toggled)="toggleCategory(category)" />
+            <button type="button" class="mb-link-btn" (click)="startEdit('category', category.id, category.nombre)">Editar<span class="visually-hidden"> {{ category.nombre }}</span></button>
           </div>
         </div>
       }
+      @if (actions.confirming() === off) {
+        <app-inline-confirm
+          confirmLabel="Sí, desactivar"
+          [message]="'¿Desactivar «' + category.nombre + '»? Sus ítems dejan de pedirse y de mostrarse; las respuestas se conservan.'"
+          (confirmed)="setCategory(category, false)"
+          (cancelled)="actions.cancel()"
+        />
+      }
 
       @if (category.items.length === 0) {
-        <p class="body-sm hint">Esta categoría no tiene ítems: no se muestra hasta que tenga al menos uno activo.</p>
+        <p class="small">Esta categoría no tiene ítems: no se muestra hasta que tenga al menos uno activo.</p>
       } @else {
-        <ul class="rows">
+        <ul class="items">
           @for (item of category.items; track item.id) {
-            <li class="row" [class.row--off]="!item.activo">
-              @if (isEditing('item', item.id)) {
-                <form class="inline" [formGroup]="edit" (submit)="saveItem($event, item)" novalidate>
+            @let offItem = 'apagar-item-' + item.id;
+            <li [class.is-off]="!item.activo">
+              @if (isOpen('item', item.id)) {
+                <form class="inline" (submit)="askSaveItem($event, item)" novalidate>
                   @if (item.respuestas > 0) {
-                    <p class="warning body-sm">
-                      <svg lucideTriangleAlert [size]="16" aria-hidden="true"></svg>
+                    <p class="warning">
+                      <svg lucideTriangleAlert [size]="18" aria-hidden="true"></svg>
                       <span>
-                        Este ítem ya tiene {{ answers(item.respuestas) }}. Corregí la redacción sin cambiar el sentido: para
-                        preguntar otra cosa, creá un ítem nuevo y desactivá este.
+                        Este ítem ya tiene {{ answers(item.respuestas) }}. Corregí la redacción sin cambiar el sentido: para preguntar otra cosa, creá un
+                        ítem nuevo y desactivá este.
                       </span>
                     </p>
                   }
-                  <div class="mb-field grow" [class.mb-field-error]="show(edit.controls.texto)">
-                    <label [for]="'item-edit-' + item.id">Texto del ítem {{ item.codigo }}</label>
-                    <textarea [id]="'item-edit-' + item.id" class="mb-input" rows="2" formControlName="texto" maxlength="300"></textarea>
+                  <div class="mb-field grow" [class.mb-field-error]="show(edit)">
+                    <label [for]="'editar-item-' + item.id">Texto del ítem {{ item.codigo }}</label>
+                    <textarea [id]="'editar-item-' + item.id" class="mb-input" rows="2" [formControl]="edit" maxlength="300"></textarea>
                   </div>
-                  <div class="mb-field order-field" [class.mb-field-error]="show(edit.controls.orden)">
-                    <label [for]="'item-orden-' + item.id">Orden</label>
-                    <input [id]="'item-orden-' + item.id" class="mb-input" type="number" min="0" formControlName="orden" />
-                  </div>
-                  <button type="submit" class="mb-btn mb-btn-primary mb-btn-sm" [disabled]="busy()">Guardar</button>
-                  <button type="button" class="mb-btn mb-btn-ghost mb-btn-sm" (click)="editing.set(null)">Cancelar</button>
+                  <button type="submit" class="mb-btn mb-btn-primary" [attr.data-accion]="'texto-' + item.id">Guardar</button>
+                  <button type="button" class="mb-btn mb-btn-texto" (click)="open.set(null)">Cancelar</button>
                 </form>
+                @if (actions.confirming() === 'texto-' + item.id) {
+                  <app-inline-confirm
+                    confirmLabel="Sí, es solo redacción"
+                    [message]="'Ya tiene ' + answers(item.respuestas) + ', que ' + (item.respuestas === 1 ? 'queda' : 'quedan') + ' bajo el texto nuevo. ¿Es solo una corrección de redacción, sin cambiar el sentido?'"
+                    (confirmed)="saveItem(item)"
+                    (cancelled)="actions.cancel()"
+                  />
+                }
               } @else {
-                <div class="row__main">
-                  <span class="row__title">{{ item.texto }}</span>
-                  <div class="meta">
-                    <span class="caption code">{{ item.codigo }} · orden {{ item.orden }} · {{ answers(item.respuestas) }}</span>
-                    @if (!item.activo) { <span class="mb-tag mb-tag-warning">Inactivo</span> }
+                <div class="row">
+                  <div class="move">
+                    <button type="button" [attr.data-mover]="'item-' + item.id + '--1'" [attr.aria-label]="'Subir: ' + item.texto" (click)="moveItem(category, item, -1)"><svg lucideArrowUp [size]="16" aria-hidden="true"></svg></button>
+                    <button type="button" [attr.data-mover]="'item-' + item.id + '-1'" [attr.aria-label]="'Bajar: ' + item.texto" (click)="moveItem(category, item, 1)"><svg lucideArrowDown [size]="16" aria-hidden="true"></svg></button>
+                  </div>
+                  <div class="row__main">
+                    <span class="item-text">{{ item.texto }}</span>
+                    <span class="small">{{ item.codigo }} · {{ answers(item.respuestas) }}@if (!item.activo) { · inactivo }</span>
+                  </div>
+                  <div class="row__actions">
+                    <app-switch [checked]="item.activo" [label]="'Ítem activo: ' + item.texto" [action]="offItem" (toggled)="toggleItem(item)" />
+                    <button type="button" class="mb-link-btn" (click)="startEdit('item', item.id, item.texto)">Editar<span class="visually-hidden">: {{ item.texto }}</span></button>
                   </div>
                 </div>
-                <div class="row__actions">
-                  <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm" [disabled]="busy()" (click)="startEditItem(item)">Editar</button>
-                  <button type="button" class="mb-btn mb-btn-ghost mb-btn-sm" [disabled]="busy()" (click)="toggleItem(item)">
-                    {{ item.activo ? 'Desactivar' : 'Activar' }}
-                  </button>
-                </div>
+              }
+              @if (actions.confirming() === offItem) {
+                <app-inline-confirm
+                  confirmLabel="Sí, desactivar"
+                  message="¿Desactivar este ítem? Deja de pedirse en las reseñas y de mostrarse; las respuestas se conservan."
+                  (confirmed)="setItem(item, false)"
+                  (cancelled)="actions.cancel()"
+                />
               }
             </li>
           }
         </ul>
       }
 
-      @if (addingTo() === category.id) {
-        <form class="inline" [formGroup]="newItem" (submit)="addItem($event, category)" novalidate>
-          <div class="mb-field code-field" [class.mb-field-error]="show(newItem.controls.codigo)">
-            <label [for]="'item-codigo-' + category.id">Código</label>
-            <input [id]="'item-codigo-' + category.id" class="mb-input" formControlName="codigo" maxlength="30" placeholder="Ej.: CP10" />
+      @if (isOpen('new-item', category.id)) {
+        <form [formGroup]="newItem" (submit)="addItem($event, category)" novalidate class="mb-entra">
+          <div class="inline">
+            <div class="mb-field code-field" [class.mb-field-error]="show(newItem.controls.codigo)">
+              <label [for]="'item-codigo-' + category.id">Código</label>
+              <input [id]="'item-codigo-' + category.id" class="mb-input" formControlName="codigo" maxlength="30" placeholder="Ej.: CP10" [attr.aria-invalid]="show(newItem.controls.codigo) ? true : null" />
+            </div>
+            <div class="mb-field grow" [class.mb-field-error]="show(newItem.controls.texto)">
+              <label [for]="'item-texto-' + category.id">Texto del ítem</label>
+              <textarea [id]="'item-texto-' + category.id" class="mb-input" rows="2" formControlName="texto" maxlength="300" placeholder="Se responde con Sí, En parte, No o No sé" [attr.aria-invalid]="show(newItem.controls.texto) ? true : null"></textarea>
+            </div>
+            <button type="submit" class="mb-btn mb-btn-primary">Agregar</button>
+            <button type="button" class="mb-btn mb-btn-texto" (click)="open.set(null)">Cancelar</button>
           </div>
-          <div class="mb-field grow" [class.mb-field-error]="show(newItem.controls.texto)">
-            <label [for]="'item-texto-' + category.id">Ítem nuevo</label>
-            <textarea [id]="'item-texto-' + category.id" class="mb-input" rows="2" formControlName="texto" maxlength="300"
-              placeholder="Una afirmación que se responde con Sí, En parte, No o No sé"></textarea>
-          </div>
-          <button type="submit" class="mb-btn mb-btn-primary mb-btn-sm" [disabled]="busy()">Agregar</button>
-          <button type="button" class="mb-btn mb-btn-ghost mb-btn-sm" (click)="addingTo.set(null)">Cancelar</button>
+          @if (show(newItem.controls.codigo)) {
+            <p class="mb-help error"><svg lucideCircleAlert [size]="16" aria-hidden="true"></svg>El código lleva de 2 a 30 letras sin tildes, números o guiones bajos.</p>
+          }
         </form>
-        @if (show(newItem.controls.codigo)) {
-          <span class="mb-help"><svg lucideCircleAlert [size]="16" aria-hidden="true"></svg>El código lleva de 2 a 30 letras sin tildes, números o guiones bajos.</span>
-        }
       } @else {
-        <button type="button" class="mb-btn mb-btn-ghost mb-btn-sm add-item" [disabled]="busy()" (click)="startAdding(category)">Agregar ítem</button>
+        <button type="button" class="mb-link-btn add" (click)="startNewItem(category)"><svg lucidePlus [size]="16" aria-hidden="true"></svg>Agregar ítem<span class="visually-hidden"> a {{ category.nombre }}</span></button>
       }
     </section>
+  } @empty {
+    <app-page-state kind="empty" title="Todavía no hay criterios" />
   }
 } @else {
   <app-page-state kind="loading" message="Cargando criterios…" />
