@@ -1,63 +1,97 @@
-<section class="page" aria-labelledby="titulo">
-  <a class="mb-link back" routerLink="/empresas">
-    <svg lucideArrowLeft [size]="16" aria-hidden="true"></svg>
-    Volver a empresas
-  </a>
-
-  @if (notFound()) {
+@if (notFound()) {
+  <section class="mb-wrap state" aria-labelledby="titulo">
     <h1 id="titulo" class="h1">No encontramos esta empresa</h1>
     <app-page-state
       kind="empty"
-      title="Puede que el enlace esté mal o que la empresa todavía esté en revisión."
+      illustration="13-carretilla"
+      title="Puede que el enlace esté mal o que la empresa todavía esté en revisión"
       message="Buscala en el directorio."
     >
-      <a class="mb-btn mb-btn-secondary mb-btn-sm" routerLink="/empresas">Ir a empresas</a>
+      <a class="mb-btn mb-btn-primary" routerLink="/empresas">Ir a empresas</a>
     </app-page-state>
-  } @else if (company.error()) {
+  </section>
+} @else if (company.error()) {
+  <section class="mb-wrap state" aria-labelledby="titulo">
     <h1 id="titulo" class="h1">Perfil de la empresa</h1>
-    <app-page-state kind="error" title="No pudimos cargar esta empresa." (retry)="company.reload()" />
-  } @else if (company.hasValue()) {
-    @let data = company.value();
-    <header class="profile-head">
-      <h1 id="titulo" class="h1">{{ data.nombre }}</h1>
-      @if (data.rubro.nombre; as rubro) {
-        <div class="mb-meta"><span>{{ rubro }}</span></div>
-      }
-      <a class="mb-link body-sm" routerLink="/solicitud-revision" [queryParams]="{ tipo: 'correccion_datos', empresa: data.id }">
-        ¿Sos de esta empresa? Pedí corregir sus datos
+    <app-page-state kind="error" title="No pudimos cargar esta empresa" (retry)="company.reload()" />
+  </section>
+} @else if (company.hasValue()) {
+  @let data = company.value();
+  <div class="mb-wrap head">
+    <nav class="path" aria-label="Ruta">
+      <a routerLink="/empresas">Empresas</a><span aria-hidden="true">›</span>
+      <a routerLink="/empresas" [queryParams]="{ grupo: data.rubro.grupo }">{{ groups[data.rubro.grupo].nombre }}</a><span aria-hidden="true">›</span>
+      <span aria-current="page">{{ data.nombre }}</span>
+    </nav>
+    <div class="company">
+      <app-company-seal [name]="data.nombre" [group]="data.rubro.grupo" [size]="72" [logoUrl]="data.logoUrl" />
+      <div class="company__text">
+        <h1>{{ data.nombre }}</h1>
+        <p>{{ data.rubro.nombre }}@if (officesText(data); as offices) { · {{ offices }} }</p>
+      </div>
+      <a class="mb-btn mb-btn-secondary" routerLink="/publicar" [queryParams]="{ empresa: data.id }">
+        <svg lucidePencil [size]="18" aria-hidden="true"></svg>Contar mi experiencia acá
       </a>
-    </header>
+    </div>
+  </div>
 
-    <section aria-labelledby="locales">
-      <h2 id="locales" class="h2">Locales</h2>
-      @if (data.locales.length === 0) {
-        <p class="body">Esta empresa todavía no tiene locales cargados.</p>
-      } @else {
-        @for (group of cityGroups(); track group.ciudad) {
-          <h3 class="h3 city">{{ group.ciudad }}</h3>
-          <ul class="offices">
-            @for (office of group.locales; track office.id) {
-              <li class="office">
-                <svg lucideMapPin [size]="20" aria-hidden="true"></svg>
-                <div>
-                  <span class="body">{{ office.nombre }}</span>
-                  @if (office.direccionReferencia) {
-                    <span class="body-sm office__ref">{{ office.direccionReferencia }}</span>
-                  }
-                </div>
-              </li>
-            }
-          </ul>
-        }
-      }
-    </section>
+  <app-company-summary [company]="data" [words]="words()" />
 
-    <section aria-labelledby="resenas">
-      <h2 id="resenas" class="h2">Reseñas</h2>
-      <app-company-reviews [company]="data" [filters]="reviewFilters()" />
+  @if (data.cantidadResenas > 0) {
+    <section id="resenas" class="mb-wrap reviews" aria-labelledby="resenas-titulo">
+      <app-company-reviews [company]="data" [filters]="reviewFilters()" [config]="config" />
     </section>
-  } @else {
-    <h1 id="titulo" class="h1 visually-hidden">Perfil de la empresa</h1>
-    <app-page-state kind="loading" message="Cargando la empresa…" />
   }
-</section>
+
+  @if (data.locales.length) {
+    <section class="offices" aria-labelledby="locales">
+      <div class="mb-wrap">
+        <h2 id="locales" class="h2">Locales</h2>
+        <div class="cities">
+          @for (group of cityGroups(); track group.ciudad) {
+            <div>
+              <h3 class="sobretitulo">{{ group.ciudad }}</h3>
+              <ul>
+                @for (office of group.locales; track office.id) {
+                  <li>
+                    @if (office.cantidadResenas > 0) {
+                      <button type="button" class="office" [attr.aria-pressed]="local() === office.id" (click)="toggleOffice(office)">
+                        <span class="office__text"><strong>{{ office.nombre }}</strong>@if (office.direccionReferencia) { <span>{{ office.direccionReferencia }}</span> }</span>
+                        <span class="office__count">{{ office.cantidadResenas }} {{ office.cantidadResenas === 1 ? 'reseña' : 'reseñas' }}</span>
+                      </button>
+                    } @else {
+                      <div class="office">
+                        <span class="office__text"><strong>{{ office.nombre }}</strong>@if (office.direccionReferencia) { <span>{{ office.direccionReferencia }}</span> }</span>
+                        <span class="office__count">Sin reseñas</span>
+                      </div>
+                    }
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  }
+
+  <section class="mb-franja" aria-labelledby="para-empresas">
+    <div class="mb-franja__in">
+      <span class="mb-disco mb-disco--crema"><img src="/marca/iconos/16-saludo-de-manos.svg" alt="" width="68" height="68" /></span>
+      <div class="mb-franja__text">
+        <h2 id="para-empresas" class="h2">¿Sos de la empresa?</h2>
+        <p>
+          Si un dato de este perfil está mal, pedí que lo corrijamos.
+          @if (data.cantidadResenas > 0) { Para una reseña, usá «Pedí una revisión» en esa reseña. }
+          No hace falta crear una cuenta; te respondemos por correo.
+        </p>
+      </div>
+      <a class="mb-btn mb-btn-secondary" routerLink="/solicitud-revision" [queryParams]="{ empresa: data.id }">Pedir una corrección</a>
+    </div>
+  </section>
+} @else {
+  <section class="mb-wrap state" aria-labelledby="titulo">
+    <h1 id="titulo" class="visually-hidden">Perfil de la empresa</h1>
+    <app-page-state kind="loading" skeleton="review" message="Cargando la empresa…" />
+  </section>
+}

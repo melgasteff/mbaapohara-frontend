@@ -1,54 +1,30 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input, LOCALE_ID } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
-import { LucideChevronLeft, LucideChevronRight } from '@lucide/angular';
-import { ContractTypesApi } from '../../../../core/api/contract-types-api';
-import { CriteriaApi } from '../../../../core/api/criteria-api';
-import { JobsApi } from '../../../../core/api/jobs-api';
+import { Router } from '@angular/router';
+import { CriteriaConfigResource } from '../../../../core/api/criteria-api';
 import { PublicReviewsApi } from '../../../../core/api/public-reviews-api';
-import { WorkModesApi } from '../../../../core/api/work-modes-api';
-import { CompanyDetail, Office } from '../../../../core/models/company';
-import { PublicReview, WorkSituation } from '../../../../core/models/review';
-import { toId } from '../../../../shared/route-params';
+import { CompanyDetail } from '../../../../core/models/company';
+import { Page } from '../../../../core/models/page';
+import { PublicReview, PublicReviewFacets } from '../../../../core/models/review';
+import { keepWhileLoading } from '../../../../shared/keep-while-loading';
+import { FilterChip } from '../../../../shared/ui/filter-chip/filter-chip';
 import { PageState } from '../../../../shared/ui/page-state/page-state';
+import { Pager } from '../../../../shared/ui/pager/pager';
 import { ReviewCard } from '../../../../shared/ui/review-card/review-card';
+import { SentenceFilter } from '../../../../shared/ui/sentence-filter/sentence-filter';
 import { ReviewActions } from './review-actions';
+import { focusReviews, hasReviewFilters, ReviewFilterName, ReviewFilters, reviewFilterOptions, toFacetFilters, toReviewOrder } from './review-filters';
 import { complianceGroups, publicationMonth, publicReviewMeta } from './review-view';
 
 const PAGE_SIZE = 10;
 
-/** Filtros de RF5 que se guardan en la URL del perfil. */
-export interface ReviewFilters {
-  local?: number;
-  cargo?: number;
-  tipoContrato?: number;
-  modalidad?: number;
-  situacion?: WorkSituation;
-  page: number;
-}
-
-type FilterName = Exclude<keyof ReviewFilters, 'page'>;
-
-/** Convierte el parámetro de la URL en una situación válida. */
-export function toSituation(value: unknown): WorkSituation | undefined {
-  return value === 'ACTUAL' || value === 'ANTERIOR' ? value : undefined;
-}
-
 /**
- * Reseñas publicadas de una empresa, con los filtros de RF5 (local, cargo, contrato, modalidad y situación).
+ * Reseñas publicadas de una empresa, con los filtros de RF5 (local, cargo, contrato, modalidad y situación) y sus conteos.
  * Los filtros viven en la URL del perfil, como en el directorio: «atrás» y los enlaces compartidos funcionan.
  */
 @Component({
   selector: 'app-company-reviews',
-  imports: [
-    DecimalPipe,
-    RouterLink,
-    PageState,
-    ReviewCard,
-    ReviewActions,
-    LucideChevronLeft,
-    LucideChevronRight,
-  ],
+  imports: [DecimalPipe, PageState, Pager, ReviewCard, ReviewActions, SentenceFilter, FilterChip],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './company-reviews.html',
   styleUrl: './company-reviews.css',
@@ -56,39 +32,27 @@ export function toSituation(value: unknown): WorkSituation | undefined {
 export class CompanyReviews {
   readonly company = input.required<CompanyDetail>();
   readonly filters = input.required<ReviewFilters>();
+  /** Forma de la reseña y criterios, para las palabras y el detalle de derechos. */
+  readonly config = input.required<CriteriaConfigResource>();
 
   private readonly router = inject(Router);
   private readonly locale = inject(LOCALE_ID);
+  private readonly api = inject(PublicReviewsApi);
 
-  protected readonly config = inject(CriteriaApi).configResource();
-  protected readonly jobs = inject(JobsApi).allResource();
-  protected readonly contractTypes = inject(ContractTypesApi).allResource();
-  protected readonly workModes = inject(WorkModesApi).allResource();
-  protected readonly reviews = inject(PublicReviewsApi).listResource(
+  protected readonly reviews = this.api.listResource(
     computed(() => ({ ...this.filters(), empresa: this.company().id, pageSize: PAGE_SIZE })),
   );
+  private readonly facetsResource = this.api.facetsResource(computed(() => toFacetFilters(this.company().id, this.filters())));
+  // Conteos de la empresa sin filtros: dan el nombre de una opción elegida que otro filtro deja en cero.
+  private readonly allFacets = this.api.facetsResource(computed(() => ({ empresa: this.company().id })));
 
-  /** Locales agrupados por ciudad, para el filtro de local. */
-  protected readonly officeGroups = computed(() => {
-    const groups = new Map<string, Office[]>();
-    for (const office of this.company().locales) {
-      const city = office.ciudad.nombre ?? 'Sin ciudad';
-      groups.set(city, [...(groups.get(city) ?? []), office]);
-    }
-    return [...groups.entries()].sort(([a], [b]) => a.localeCompare(b, 'es')).map(([ciudad, locales]) => ({ ciudad, locales }));
-  });
+  protected readonly result = keepWhileLoading<Page<PublicReview>>(this.reviews);
+  private readonly facets = keepWhileLoading<PublicReviewFacets>(this.facetsResource);
 
-  protected readonly hasFilters = computed(() => {
-    const { page: _page, ...rest } = this.filters();
-    return Object.values(rest).some((value) => value !== undefined);
-  });
-
-  protected readonly totalPages = computed(() => {
-    if (!this.reviews.hasValue()) return 1;
-    const { total, pageSize } = this.reviews.value();
-    return Math.max(1, Math.ceil(total / pageSize));
-  });
-
+  protected readonly options = computed(() =>
+    reviewFilterOptions(this.filters(), this.facets(), this.allFacets.hasValue() ? this.allFacets.value() : undefined),
+  );
+  protected readonly active = computed(() => hasReviewFilters(this.filters()));
   protected readonly meta = publicReviewMeta;
 
   protected month(review: PublicReview): string {
@@ -96,27 +60,37 @@ export class CompanyReviews {
   }
 
   protected word(review: PublicReview): string | undefined {
-    return this.config.hasValue() ? this.config.value().calificacionGeneral.palabras[review.calificacion] : undefined;
+    return this.config().hasValue() ? this.config().value().calificacionGeneral.palabras[review.calificacion] : undefined;
   }
 
   protected compliance(review: PublicReview) {
-    return this.config.hasValue() ? complianceGroups(review, this.config.value()) : [];
+    return this.config().hasValue() ? complianceGroups(review, this.config().value()) : [];
   }
 
-  protected select(name: FilterName, value: string): void {
-    const parsed = name === 'situacion' ? toSituation(value) : toId(value);
-    this.navigate({ [name]: parsed ?? null, page: null });
+  protected select(name: ReviewFilterName, value: string | number | null): void {
+    this.navigate({ [name]: value, page: null });
+  }
+
+  protected selectOrder(value: string): void {
+    const orden = toReviewOrder(value);
+    this.navigate({ orden: orden === 'recientes' ? null : orden, page: null });
   }
 
   protected goToPage(page: number): void {
-    this.navigate({ page: page > 1 ? page : null });
+    this.navigate({ page: page > 1 ? page : null }).then(focusReviews);
   }
 
   protected clearFilters(): void {
     this.navigate({ local: null, cargo: null, tipoContrato: null, modalidad: null, situacion: null, page: null });
   }
 
-  private navigate(queryParams: Record<string, string | number | null>): void {
-    this.router.navigate([], { queryParams, queryParamsHandling: 'merge', preserveFragment: false, fragment: 'resenas' });
+  /** Reintenta la lista y, si también fallaron, los conteos. */
+  protected reload(): void {
+    this.reviews.reload();
+    for (const resource of [this.facetsResource, this.allFacets]) if (resource.error()) resource.reload();
+  }
+
+  private navigate(queryParams: Record<string, string | number | null>): Promise<boolean> {
+    return this.router.navigate([], { queryParams, queryParamsHandling: 'merge', fragment: 'resenas' });
   }
 }

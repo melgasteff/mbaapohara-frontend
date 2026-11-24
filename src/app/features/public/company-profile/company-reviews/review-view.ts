@@ -13,8 +13,8 @@ export function publicReviewMeta(review: PublicReview): string[] {
 }
 
 /** «2026-11» → «Noviembre de 2026». La API da solo el mes, nunca el día. */
-export function publicationMonth(month: string, locale: string): string {
-  const [year, monthNumber] = month.split('-').map(Number);
+export function publicationMonth(month: string | null, locale: string): string {
+  const [year, monthNumber] = (month ?? '').split('-').map(Number);
   if (!year || !monthNumber) return '';
   const text = formatDate(new Date(year, monthNumber - 1, 1), "MMMM 'de' y", locale);
   return text.charAt(0).toLocaleUpperCase('es') + text.slice(1);

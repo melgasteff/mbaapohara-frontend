@@ -1,0 +1,71 @@
+<section class="band" aria-label="Resumen">
+  @if (total() === 0) {
+    <div class="mb-wrap empty">
+      <span class="mb-disco mb-disco--crema empty__disc"><img src="/marca/iconos/20-resena.svg" alt="" width="112" height="112" /></span>
+      <div class="empty__text">
+        <h2>Nadie contó todavía cómo es trabajar en {{ company().nombre }}</h2>
+        <p>Si trabajaste en alguno de sus locales, tu experiencia puede ser la primera. Lleva unos minutos y tu nombre nunca se muestra.</p>
+        <a class="mb-btn mb-btn-primary mb-btn-lg" routerLink="/publicar" [queryParams]="{ empresa: company().id }">
+          Contar la primera experiencia<svg lucideArrowRight [size]="20" aria-hidden="true"></svg>
+        </a>
+      </div>
+    </div>
+  } @else {
+    <div class="mb-wrap summary" [class.summary--few]="missing() > 0">
+      <div class="rating">
+        <h2 class="sobretitulo">Calificación</h2>
+        <p class="rating__value">{{ company().promedio | number: '1.1-1' }}<span class="visually-hidden"> de 5 estrellas</span></p>
+        <app-stars [value]="company().promedio ?? 0" [large]="true" />
+        <p class="muted">{{ total() | number }} {{ total() === 1 ? 'reseña publicada' : 'reseñas publicadas' }}</p>
+      </div>
+
+      @if (missing() > 0) {
+        <div class="few">
+          <div class="few__steps">
+            @for (step of steps; track step) { <span class="few__step" [class.is-done]="step <= total()" aria-hidden="true"></span> }
+            <span class="few__count">{{ total() }} de {{ needed }} reseñas</span>
+          </div>
+          <h2>{{ missing() === 1 ? 'Falta una reseña' : 'Faltan ' + missing() + ' reseñas' }} para ver cómo cumple cada tema</h2>
+          <p>Mostramos la distribución y los porcentajes por tema desde {{ needed }} reseñas, para que una sola opinión no parezca la regla. Si trabajaste acá, la tuya suma al resumen.</p>
+        </div>
+      } @else {
+        <div>
+          <h2 class="sobretitulo">Distribución</h2>
+          <ul class="bars">
+            @for (row of distribution(); track row.estrellas) {
+              <li class="bar bar--stars">
+                <span>{{ row.estrellas }}@if (words()[row.estrellas]; as word) { · {{ word }} }<span class="visually-hidden"> estrellas</span></span>
+                <span class="track" aria-hidden="true"><span [style.width.%]="row.percent"></span></span>
+                <strong>{{ row.cantidad | number }}<span class="visually-hidden"> {{ row.cantidad === 1 ? 'reseña' : 'reseñas' }}</span></strong>
+              </li>
+            }
+          </ul>
+        </div>
+        <div>
+          <div class="topics__head">
+            <h2 class="sobretitulo">Cómo cumple sus derechos</h2>
+            @if (hiddenTopics()) {
+              <button type="button" class="mb-link-btn" [attr.aria-expanded]="allTopics()" (click)="allTopics.set(!allTopics())">
+                {{ allTopics() ? 'Ver menos' : 'Ver los ' + company().temas.length + ' temas' }}
+              </button>
+            }
+          </div>
+          @if (topics().length) {
+            <ul class="bars">
+              @for (topic of topics(); track topic.codigo) {
+                <li class="bar bar--topic">
+                  <span>{{ topic.nombre }}</span>
+                  <span class="track track--topic" aria-hidden="true"><span [style.width.%]="topic.porcentajeSi"></span></span>
+                  <strong>{{ topic.porcentajeSi }} %<span class="visually-hidden"> de «Sí»</span></strong>
+                </li>
+              }
+            </ul>
+            <p class="note">Porcentaje de «Sí» entre las respuestas de cada tema; no cuenta «No sé o no aplica». Un tema aparece desde {{ needed }} reseñas que lo respondieron.</p>
+          } @else {
+            <p class="note">Todavía no hay temas para mostrar: cada uno aparece cuando lo respondieron al menos {{ needed }} reseñas, sin contar «No sé o no aplica».</p>
+          }
+        </div>
+      }
+    </div>
+  }
+</section>

@@ -40,6 +40,12 @@ Si algo de este archivo choca con ellas, gana este archivo.
 - Directorio: sin «Proponer una empresa» ni «¿No está la empresa donde trabajaste?». Suma «Buscaste «…»» con «Quitar»,
   porque el encabezado y el inicio mandan una palabra. Con una ciudad elegida, la frase muestra la ciudad.
 - Paginación: botones de 44px (40 en la lámina) y sin botones deshabilitados: en la primera página no hay «anterior».
+- Perfil: las palabras de la distribución son las del JSON. Sin «Temas provisionales hasta el 26/11», que es una nota
+  interna. Con 3 reseñas o más y ningún tema, una línea explica por qué faltan. Los locales sin reseñas se muestran pero
+  no filtran. Sin «¿Falta un local? Proponelo…», porque ese flujo no existe.
+- Perfil, franja «¿Sos de la empresa?»: explica los dos caminos y el botón es «Pedir una corrección». El pedido sobre una
+  reseña exige elegirla, y desde el perfil el formulario solo corrige datos de la empresa.
+- En móvil los chips miden 44px de alto (40 en la lámina).
 - Moderación: no se resalta el fragmento marcado, porque la API no lo devuelve.
 - Asistente: sin «¿No está la empresa? Proponela», porque ese flujo no existe.
 

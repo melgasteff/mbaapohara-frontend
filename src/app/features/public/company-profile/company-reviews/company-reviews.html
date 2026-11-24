@@ -1,84 +1,46 @@
-<div class="filters" role="group" aria-label="Filtrar reseñas">
-  <div class="mb-field">
-    <label for="f-local">Local</label>
-    <select id="f-local" class="mb-input" #local (change)="select('local', local.value)">
-      <option value="" [selected]="!filters().local">Todos</option>
-      @for (group of officeGroups(); track group.ciudad) {
-        <optgroup [label]="group.ciudad">
-          @for (office of group.locales; track office.id) {
-            <option [value]="office.id" [selected]="office.id === filters().local">{{ office.nombre }}</option>
-          }
-        </optgroup>
-      }
-    </select>
-  </div>
-  <div class="mb-field">
-    <label for="f-cargo">Cargo</label>
-    <select id="f-cargo" class="mb-input" #cargo (change)="select('cargo', cargo.value)">
-      <option value="" [selected]="!filters().cargo">Todos</option>
-      @if (jobs.hasValue()) {
-        @for (job of jobs.value().data; track job.id) {
-          <option [value]="job.id" [selected]="job.id === filters().cargo">{{ job.descripcion }}</option>
-        }
-      }
-    </select>
-  </div>
-  <div class="mb-field">
-    <label for="f-contrato">Tipo de contrato</label>
-    <select id="f-contrato" class="mb-input" #contrato (change)="select('tipoContrato', contrato.value)">
-      <option value="" [selected]="!filters().tipoContrato">Todos</option>
-      @if (contractTypes.hasValue()) {
-        @for (item of contractTypes.value().data; track item.id) {
-          <option [value]="item.id" [selected]="item.id === filters().tipoContrato">{{ item.nombre }}</option>
-        }
-      }
-    </select>
-  </div>
-  <div class="mb-field">
-    <label for="f-modalidad">Modalidad</label>
-    <select id="f-modalidad" class="mb-input" #modalidad (change)="select('modalidad', modalidad.value)">
-      <option value="" [selected]="!filters().modalidad">Todas</option>
-      @if (workModes.hasValue()) {
-        @for (item of workModes.value().data; track item.id) {
-          <option [value]="item.id" [selected]="item.id === filters().modalidad">{{ item.nombre }}</option>
-        }
-      }
-    </select>
-  </div>
-  <div class="mb-field">
-    <label for="f-situacion">Situación</label>
-    <select id="f-situacion" class="mb-input" #situacion (change)="select('situacion', situacion.value)">
-      <option value="" [selected]="!filters().situacion">Todas</option>
-      <option value="ACTUAL" [selected]="filters().situacion === 'ACTUAL'">Trabaja ahí</option>
-      <option value="ANTERIOR" [selected]="filters().situacion === 'ANTERIOR'">Trabajó ahí</option>
-    </select>
+<div class="filters">
+  <h2 id="resenas-titulo" class="mb-frase mb-frase--h2" tabindex="-1">
+    Reseñas de
+    <app-sentence-filter label="Local" [options]="options().local" [value]="filters().local ?? null" (valueChange)="select('local', $event)" />
+    sobre
+    <app-sentence-filter label="Cargo" [options]="options().cargo" [value]="filters().cargo ?? null" (valueChange)="select('cargo', $event)" />
+  </h2>
+  <div class="chips">
+    <app-filter-chip label="Contrato" [options]="options().tipoContrato" [value]="filters().tipoContrato ?? null" (valueChange)="select('tipoContrato', $event)" />
+    <app-filter-chip label="Modalidad" [options]="options().modalidad" [value]="filters().modalidad ?? null" (valueChange)="select('modalidad', $event)" />
+    <app-filter-chip label="Situación" [options]="options().situacion" [value]="filters().situacion ?? null" (valueChange)="select('situacion', $event)" />
   </div>
 </div>
 
+<div class="bar">
+  <span class="bar__count" aria-live="polite">
+    @if (result(); as data) { {{ data.total | number }} {{ data.total === 1 ? 'reseña' : 'reseñas' }} }
+  </span>
+  @if (active()) { <button type="button" class="mb-link-btn" (click)="clearFilters()">Limpiar filtros</button> }
+  <label class="bar__order">
+    Ordenar por
+    <select #order class="mb-input" (change)="selectOrder(order.value)">
+      <option value="recientes" [selected]="filters().orden === 'recientes'">Más recientes</option>
+      <option value="mejor" [selected]="filters().orden === 'mejor'">Mejor calificación</option>
+      <option value="peor" [selected]="filters().orden === 'peor'">Peor calificación</option>
+    </select>
+  </label>
+</div>
+
 @if (reviews.error()) {
-  <app-page-state kind="error" title="No pudimos cargar las reseñas" (retry)="reviews.reload()" />
-} @else if (reviews.hasValue()) {
-  @let result = reviews.value();
-  @if (result.total === 0 && hasFilters()) {
-    <app-page-state kind="empty" illustration="20-resena" title="No hay reseñas con estos filtros" message="Probá con otros o quitalos.">
-      <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm" (click)="clearFilters()">Quitar filtros</button>
+  <app-page-state kind="error" title="No pudimos cargar las reseñas" message="Revisá tu conexión y volvé a intentar. Tus filtros siguen guardados." (retry)="reload()" />
+} @else if (result(); as data) {
+  @if (data.total === 0) {
+    <app-page-state kind="empty" illustration="20-resena" title="No hay reseñas con esos filtros" message="Probá con otro local o cargo.">
+      <button type="button" class="mb-btn mb-btn-primary" (click)="clearFilters()">Limpiar filtros</button>
     </app-page-state>
-  } @else if (result.total === 0) {
-    <app-page-state kind="empty" illustration="20-resena" title="Todavía no hay reseñas. Sé la primera persona en contar.">
-      <a class="mb-btn mb-btn-primary" routerLink="/publicar">Escribí tu reseña</a>
+  } @else if (data.data.length === 0) {
+    <app-page-state kind="empty" title="Esa página no existe">
+      <button type="button" class="mb-btn mb-btn-primary" (click)="goToPage(1)">Ir a la primera página</button>
     </app-page-state>
   } @else {
-    <div class="count">
-      <p class="body-sm" aria-live="polite">
-        {{ result.total | number }} {{ result.total === 1 ? 'reseña' : 'reseñas' }}{{ hasFilters() ? ' con estos filtros' : '' }}
-      </p>
-      @if (hasFilters()) {
-        <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm" (click)="clearFilters()">Quitar filtros</button>
-      }
-    </div>
-
-    <ul class="list" [class.is-reloading]="reviews.isLoading()">
-      @for (review of result.data; track review.id) {
+    <ul class="list" [class.is-reloading]="reviews.isLoading()" [attr.aria-busy]="reviews.isLoading()">
+      @for (review of data.data; track review.id) {
         <li>
           <app-review-card
             [rating]="review.calificacion"
@@ -95,18 +57,7 @@
         </li>
       }
     </ul>
-
-    @if (totalPages() > 1) {
-      <nav class="pager" aria-label="Páginas de reseñas">
-        <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm" [disabled]="filters().page <= 1" (click)="goToPage(filters().page - 1)">
-          <svg lucideChevronLeft [size]="16" aria-hidden="true"></svg>Anterior
-        </button>
-        <span class="body-sm">Página {{ filters().page }} de {{ totalPages() }}</span>
-        <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm" [disabled]="filters().page >= totalPages()" (click)="goToPage(filters().page + 1)">
-          Siguiente<svg lucideChevronRight [size]="16" aria-hidden="true"></svg>
-        </button>
-      </nav>
-    }
+    <app-pager label="Páginas de reseñas" [page]="data.page" [pageSize]="data.pageSize" [total]="data.total" (pageChange)="goToPage($event)" />
   }
 } @else {
   <app-page-state kind="loading" skeleton="review" message="Cargando reseñas…" />

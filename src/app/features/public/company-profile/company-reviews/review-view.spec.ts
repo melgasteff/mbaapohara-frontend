@@ -39,6 +39,7 @@ describe('Vista de una reseña pública', () => {
   it('muestra solo el mes de publicación', () => {
     expect(publicationMonth('2026-11', 'es-PY')).toBe('Noviembre de 2026');
     expect(publicationMonth('', 'es-PY')).toBe('');
+    expect(publicationMonth(null, 'es-PY')).toBe('');
   });
 
   it('agrupa las respuestas por categoría en el orden del JSON y omite criterios retirados', () => {
