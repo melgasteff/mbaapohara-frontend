@@ -3,7 +3,7 @@
     <h1 class="title" tabindex="-1">Mis reseñas</h1>
     <p class="lead">Solo vos ves esta lista. En el perfil de cada empresa tus reseñas aparecen sin tu nombre.</p>
   </header>
-  <p class="notice" role="status" [class.is-empty]="!notice()">{{ notice() }}</p>
+  <p class="mb-aviso notice" role="status" [class.is-empty]="!notice()">{{ notice() }}</p>
 
   @if (resource.error()) {
     <app-page-state kind="error" title="No pudimos cargar tus reseñas." (retry)="resource.reload()" />

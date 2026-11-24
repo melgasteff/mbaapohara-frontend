@@ -5,7 +5,6 @@ header { display: flex; flex-direction: column; gap: 6px; }
 .title { font-size: 30px; line-height: 36px; font-weight: 700; letter-spacing: -.02em; }
 .title:focus { outline: none; }
 .lead { font-size: 16px; line-height: 24px; color: var(--noche-suave); }
-.notice { padding: var(--space-3) 14px; border-radius: var(--radio-sm); background: var(--azul-suave); color: var(--azul-texto); font-size: 15px; line-height: 22px; font-weight: 600; }
 /* Vacío no ocupa lugar, pero sigue en la página para que se anuncie al llenarse. */
 .notice.is-empty { padding: 0; margin-top: calc(-1 * var(--space-5)); background: none; }
 .panel { display: flex; flex-direction: column; gap: var(--space-5); }

@@ -158,3 +158,6 @@ input:checked ~ .mb-radio { border: 7px solid var(--azul-texto); }
 
 /* Pantalla con barra fija al pie: lo enfocado no queda debajo */
 .mb-con-barra :is(input, textarea, select, button, a, label, h2) { scroll-margin-bottom: 120px; }
+
+/* Aviso de que algo salió bien */
+.mb-aviso { padding: var(--space-3) 14px; border-radius: var(--radio-sm); background: var(--azul-suave); color: var(--azul-texto); font-size: 15px; line-height: 22px; font-weight: 600; }

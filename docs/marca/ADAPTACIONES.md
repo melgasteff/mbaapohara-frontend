@@ -57,6 +57,13 @@ Si algo de este archivo choca con ellas, gana este archivo.
 - Perfil, franja «¿Sos de la empresa?»: explica los dos caminos y el botón es «Pedir una corrección». El pedido sobre una
   reseña exige elegirla, y desde el perfil el formulario solo corrige datos de la empresa.
 - En móvil los chips miden 44px de alto (40 en la lámina).
+- Ingresar y registro: 5 reglas de contraseña y los mensajes de la API. Sin avisos de «Ingresaste» ni «Cuenta creada»: al
+  terminar se va a la página pedida. La casilla de 18 años se valida solo en la pantalla: la API recibe una sola aceptación.
+- Mis reseñas: las pestañas usan el estado de la última versión, y se conserva «Mientras tanto, se sigue viendo tu versión
+  anterior». La fecha dice siempre «enviada en»: la API no da el mes de publicación de las reseñas propias. «Ver» usa la
+  tarjeta de reseña y, si está publicada, suma «Ver en el perfil».
+- Mi cuenta: sin «Reseñas escritas», que `/users/me` no devuelve. Se conservan la fecha de aceptación de los términos y el enlace
+  a Mis reseñas. Las fechas van completas, porque solo las ve su dueño.
 - Moderación: no se resalta el fragmento marcado, porque la API no lo devuelve.
 - Asistente: sin «¿No está la empresa? Proponela», porque ese flujo no existe.
 

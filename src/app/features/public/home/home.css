@@ -1,6 +1,7 @@
 .wrap { max-width: var(--ancho-pagina); margin: 0 auto; padding: 0 var(--space-4); box-sizing: border-box; }
 h1, h2, h3, p { margin: 0; }
 
+.deleted { margin-top: var(--space-5); }
 .hero { display: flex; flex-wrap: wrap; gap: var(--space-7) var(--space-8); align-items: flex-start; padding-top: var(--space-6); padding-bottom: var(--space-7); }
 .search { flex: 999 1 620px; min-width: 0; display: flex; flex-direction: column; gap: var(--space-6); }
 .search__input {

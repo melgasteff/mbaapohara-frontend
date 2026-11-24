@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { afterNextRender, ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { LucideArrowRight, LucideLock, LucideMinus, LucidePlus, LucideShieldCheck } from '@lucide/angular';
@@ -22,6 +23,9 @@ export class Home {
   private readonly router = inject(Router);
   private readonly facets = inject(CompaniesApi).facetsResource(signal({}));
 
+  /** Se acaba de eliminar la cuenta. El navegador guarda el estado en el historial: se borra al mostrarlo, para que no vuelva. */
+  protected readonly accountDeleted = this.router.currentNavigation()?.extras.state?.['cuentaEliminada'] === true;
+
   protected readonly term = signal('');
   protected readonly focused = signal(false);
   private readonly exampleIndex = signal(0);
@@ -42,6 +46,8 @@ export class Home {
 
   constructor() {
     const destroyRef = inject(DestroyRef);
+    const location = inject(Location);
+    if (this.accountDeleted) afterNextRender(() => location.replaceState(location.path(true)));
     afterNextRender(() => {
       if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
       const timer = setInterval(() => this.rotateExample(), ROTATION_MS);

@@ -1,7 +1,9 @@
+import { Location } from '@angular/common';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
+import { RouterTestingHarness } from '@angular/router/testing';
 import { Home, SEARCH_EXAMPLES } from './home';
 
 describe('Inicio', () => {
@@ -66,5 +68,19 @@ describe('Inicio', () => {
     TestBed.inject(HttpTestingController).expectOne((r) => r.url.endsWith('/companies/facets')).error(new ProgressEvent('error'));
     await fixture.whenStable();
     expect(el.querySelector('.mb-frase-lugar')?.textContent).toContain('cualquier ciudad');
+  });
+
+  it('avisa que la cuenta se eliminó solo si se llega desde ahí', async () => {
+    await ready();
+    expect(el.querySelector('.deleted')).toBeNull();
+
+    const router = TestBed.inject(Router);
+    router.resetConfig([{ path: 'inicio', component: Home }]);
+    const harness = await RouterTestingHarness.create();
+    await router.navigate(['/inicio'], { state: { cuentaEliminada: true } });
+    harness.detectChanges();
+    expect(harness.routeNativeElement?.querySelector('.deleted')?.textContent).toContain('Eliminamos tu cuenta');
+    // Al recargar, el estado ya no está.
+    expect(TestBed.inject(Location).getState()).toBeNull();
   });
 });
