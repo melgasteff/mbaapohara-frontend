@@ -34,6 +34,12 @@ Si algo de este archivo choca con ellas, gana este archivo.
 - Fila de empresa: «Muy comentada» desde 50 reseñas (TODO(decision) en el código). El tema principal es la primera
   categoría de criterios, la misma para todas; con 3 reseñas o más puede no aparecer, si menos de 3 la respondieron.
 - Temas: son las **categorías** de criterios, no los ítems cortos de las láminas (provisional hasta el 26/11).
+- Inicio: «Quitamos datos personales e insultos» pasa a «Buscamos…», porque nunca cambiamos el texto de una reseña. El
+  ejemplo del buscador rota entre rubros que la búsqueda encuentra. Los temas de «Conocé tus derechos» son una
+  propuesta (TODO(decision) en el código). El título de la página (h1) es el sobretítulo.
+- Directorio: sin «Proponer una empresa» ni «¿No está la empresa donde trabajaste?». Suma «Buscaste «…»» con «Quitar»,
+  porque el encabezado y el inicio mandan una palabra. Con una ciudad elegida, la frase muestra la ciudad.
+- Paginación: botones de 44px (40 en la lámina) y sin botones deshabilitados: en la primera página no hay «anterior».
 - Moderación: no se resalta el fragmento marcado, porque la API no lo devuelve.
 - Asistente: sin «¿No está la empresa? Proponela», porque ese flujo no existe.
 

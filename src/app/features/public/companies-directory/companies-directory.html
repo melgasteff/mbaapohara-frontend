@@ -1,98 +1,124 @@
-<section class="page" aria-labelledby="titulo">
-  <h1 id="titulo" class="h1">Empresas</h1>
-  <p class="body">Buscá una empresa y mirá qué cuentan quienes trabajan ahí.</p>
+<section class="head" aria-labelledby="titulo">
+  <div class="wrap">
+    <h1 id="titulo" class="mb-frase">
+      Mostrame empresas de
+      <app-sentence-filter label="Rubro" [options]="groupOptions()" [value]="grupo() ?? null" (valueChange)="selectGroup($event)" />
+      en
+      <span class="mb-frase-junto"><app-sentence-filter label="Lugar" [place]="true" [options]="placeOptions()" [value]="place()" (valueChange)="selectPlace($event)" />,</span>&ngsp;
+      <span class="mb-frase-junto"><app-sentence-filter label="Reseñas" [options]="reviewOptions()" [value]="resenas() ?? null" (valueChange)="selectReviews($event)" />.</span>
+    </h1>
 
-  <div class="filters">
-    <form class="filters__search" role="search" (submit)="search($event, term.value)">
-      <label class="mb-search">
-        <svg lucideSearch [size]="20"></svg>
-        <span class="visually-hidden">Nombre de la empresa</span>
-        <input #term type="search" name="q" [value]="q() ?? ''" placeholder="Buscá por nombre" autocomplete="off" />
-      </label>
-      <button type="submit" class="mb-btn mb-btn-primary">Buscar</button>
-    </form>
-
-    <div class="mb-field">
-      <label for="departamento">Departamento</label>
-      <select id="departamento" class="mb-input" (change)="selectDepartment(dep.value)" #dep>
-        <option value="" [selected]="!departamento()">Todos</option>
-        @for (item of departments.hasValue() ? departments.value().data : []; track item.id) {
-          <option [value]="item.id" [selected]="item.id === departamento()">{{ item.nombre }}</option>
-        }
-      </select>
+    <div class="tiles" role="group" aria-label="Rubros">
+      <button type="button" class="tile" [attr.aria-pressed]="!grupo()" (click)="selectGroup(null)">
+        <span class="tile__total">{{ facets()?.grupos?.total | number }}</span>
+        <span class="tile__name">Todos los rubros</span>
+        @if (facets(); as counts) { <span class="tile__count">{{ counts.grupos.total === 1 ? 'empresa' : 'empresas' }}</span> }
+      </button>
+      @for (tile of tiles(); track tile.group) {
+        <button type="button" class="tile" [attr.aria-pressed]="grupo() === tile.group" (click)="selectGroup(tile.group)">
+          <img [src]="'/marca/iconos/' + tile.ilustracion + '.svg'" alt="" width="64" height="64" />
+          <span class="tile__name">{{ tile.nombre }}</span>
+          @if (tile.count !== undefined) { <span class="tile__count">{{ tile.count | number }} {{ tile.count === 1 ? 'empresa' : 'empresas' }}</span> }
+        </button>
+      }
     </div>
 
-    <div class="mb-field">
-      <label for="ciudad">Ciudad</label>
-      <select
-        id="ciudad"
-        class="mb-input"
-        [disabled]="!departamento()"
-        aria-describedby="ciudad-ayuda"
-        (change)="selectCity(city.value)"
-        #city
-      >
-        <option value="" [selected]="!ciudad()">Todas</option>
-        @for (item of cities.hasValue() ? cities.value().data : []; track item.id) {
-          <option [value]="item.id" [selected]="item.id === ciudad()">{{ item.nombre }}</option>
-        }
-      </select>
-      <span class="mb-help" id="ciudad-ayuda">
-        @if (departamento()) { Empresas con al menos un local en la ciudad. } @else { Elegí primero el departamento. }
+    <div class="bar">
+      <span class="bar__count" aria-live="polite">
+        @if (result(); as data) { {{ data.total | number }} {{ data.total === 1 ? 'empresa' : 'empresas' }} }
       </span>
+      @if (state().q; as term) {
+        <span class="bar__search">
+          Buscaste «{{ term }}»
+          <button type="button" class="link" (click)="clearSearch()"><svg lucideX [size]="16" aria-hidden="true"></svg>Quitar</button>
+        </span>
+      }
+      @if (active()) { <button type="button" class="link" (click)="clearFilters()">Limpiar filtros</button> }
+      <label class="bar__order">
+        Ordenar por
+        <select #order class="mb-input" (change)="selectOrder(order.value)">
+          <option value="resenas" [selected]="orden() === 'resenas'">Más reseñas</option>
+          <option value="calificacion" [selected]="orden() === 'calificacion'">Mejor calificación</option>
+          <option value="nombre" [selected]="orden() === 'nombre'">Nombre (A a Z)</option>
+        </select>
+      </label>
     </div>
   </div>
+</section>
 
-  @if (companies.error()) {
-    <app-page-state kind="error" title="No pudimos cargar las empresas" (retry)="companies.reload()" />
-  } @else if (companies.hasValue()) {
-    @let result = companies.value();
-    @if (result.total === 0) {
-      <app-page-state
-        kind="empty"
-        illustration="13-carretilla"
-        title="No encontramos empresas con esa búsqueda"
-        message="Probá con otro nombre o quitá el filtro de ciudad."
-      >
-        @if (hasFilters()) {
-          <button type="button" class="mb-btn mb-btn-secondary mb-btn-sm" (click)="clearFilters()">Quitar filtros</button>
-        }
-      </app-page-state>
+<div class="wrap body">
+  <section class="results" aria-label="Resultados">
+    @if (companies.error()) {
+      <app-page-state kind="error" title="No pudimos cargar las empresas" message="Revisá tu conexión y volvé a intentar. Tus filtros siguen guardados." (retry)="reload()" />
+    } @else if (result(); as data) {
+      @if (data.total === 0) {
+        <app-page-state
+          kind="empty"
+          illustration="13-carretilla"
+          title="No hay empresas con esos filtros"
+          [message]="state().q ? 'Probá con otra palabra, otro rubro u otro lugar.' : 'Probá con otro rubro u otro lugar.'"
+        >
+          @if (active()) { <button type="button" class="mb-btn mb-btn-primary" (click)="clearFilters()">Limpiar filtros</button> }
+        </app-page-state>
+      } @else if (data.data.length === 0) {
+        <app-page-state kind="empty" title="Esa página no existe">
+          <button type="button" class="mb-btn mb-btn-primary" (click)="goToPage(1)">Ir a la primera página</button>
+        </app-page-state>
+      } @else {
+        <ul class="rows" [class.is-reloading]="companies.isLoading()" [attr.aria-busy]="companies.isLoading()">
+          @for (company of data.data; track company.id) {
+            <li><app-company-row [company]="company" /></li>
+          }
+        </ul>
+        <app-pager label="Páginas de empresas" [page]="data.page" [pageSize]="data.pageSize" [total]="data.total" (pageChange)="goToPage($event)" />
+      }
     } @else {
-      <p class="body-sm results-count" aria-live="polite">
-        {{ result.total | number }} {{ result.total === 1 ? 'empresa' : 'empresas' }}
-      </p>
-      <ul class="rows" [class.is-reloading]="companies.isLoading()">
-        @for (company of result.data; track company.id) {
-          <li><app-company-row [company]="company" /></li>
-        }
-      </ul>
+      <app-page-state kind="loading" skeleton="row" message="Cargando empresas…" />
+    }
+  </section>
 
-      @if (totalPages() > 1) {
-        <nav class="pager" aria-label="Páginas">
-          <button
-            type="button"
-            class="mb-btn mb-btn-secondary mb-btn-sm"
-            [disabled]="page() <= 1"
-            (click)="goToPage(page() - 1)"
-          >
-            <svg lucideChevronLeft [size]="16" aria-hidden="true"></svg>
-            Anterior
-          </button>
-          <span class="body-sm">Página {{ page() }} de {{ totalPages() }}</span>
-          <button
-            type="button"
-            class="mb-btn mb-btn-secondary mb-btn-sm"
-            [disabled]="page() >= totalPages()"
-            (click)="goToPage(page() + 1)"
-          >
-            Siguiente
-            <svg lucideChevronRight [size]="16" aria-hidden="true"></svg>
-          </button>
-        </nav>
+  <aside class="side" aria-label="Sobre esta búsqueda">
+    @if (facets(); as counts) {
+      <div>
+        <h2 class="sobretitulo">En {{ placeText() }}</h2>
+        <div class="figures">
+          <p class="figure"><strong>{{ counts.total | number }}</strong>{{ counts.total === 1 ? 'empresa' : 'empresas' }}</p>
+          <p class="figure"><strong>{{ counts.experiencias | number }}</strong>{{ counts.experiencias === 1 ? 'experiencia contada' : 'experiencias contadas' }}</p>
+        </div>
+      </div>
+      @if (cities().length) {
+        <div class="side__block">
+          <h2 class="sobretitulo">Ciudades</h2>
+          <ul class="cities">
+            @for (item of cities(); track item.id) {
+              <li>
+                <a
+                  [routerLink]="[]"
+                  [queryParams]="{ ciudad: item.id, departamento: item.idDepartamento, page: null }"
+                  queryParamsHandling="merge"
+                  [attr.aria-current]="item.id === ciudad() ? 'true' : null"
+                >{{ item.nombre }}</a>
+                <span>{{ item.cantidad | number }}</span>
+              </li>
+            }
+          </ul>
+        </div>
       }
     }
-  } @else {
-    <app-page-state kind="loading" skeleton="row" message="Cargando empresas…" />
-  }
+    <div class="side__block">
+      <h2 class="side__title">Cómo leer las calificaciones</h2>
+      <p class="body-sm">Las estrellas son el promedio de las reseñas publicadas. Los porcentajes por tema aparecen desde 3 reseñas y no cuentan las respuestas «No sé».</p>
+    </div>
+  </aside>
+</div>
+
+<section class="mb-franja" aria-labelledby="invitacion">
+  <div class="mb-franja__in">
+    <span class="mb-disco mb-disco--crema"><img src="/marca/iconos/20-resena.svg" alt="" width="72" height="72" /></span>
+    <div class="mb-franja__text">
+      <h2 id="invitacion" class="h2">¿Trabajaste en alguna de estas empresas?</h2>
+      <p>Tu experiencia ayuda a quien busca trabajo en {{ placeText() }}. Tu nombre nunca se muestra.</p>
+    </div>
+    <a class="mb-btn mb-btn-secondary" routerLink="/publicar">Contar mi experiencia<svg lucideArrowRight [size]="18" aria-hidden="true"></svg></a>
+  </div>
 </section>

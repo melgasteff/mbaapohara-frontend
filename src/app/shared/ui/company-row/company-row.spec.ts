@@ -41,7 +41,7 @@ describe('Fila de empresa', () => {
   it('sin reseñas invita a contar la primera', () => {
     const el = render({ cantidadResenas: 0, promedio: null });
     expect(text(el)).toContain('Nadie contó todavía');
-    expect(el.querySelector('.cta')?.getAttribute('href')).toBe('/publicar');
+    expect(el.querySelector('.cta')?.getAttribute('href')).toBe('/publicar?empresa=7');
   });
 
   it('con 1 o 2 muestra el promedio con coma y avisa desde cuándo hay temas', () => {

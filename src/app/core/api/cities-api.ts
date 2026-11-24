@@ -18,6 +18,14 @@ export class CitiesApi {
     });
   }
 
+  /** Una ciudad, para mostrar su nombre; `undefined` no hace ninguna petición. */
+  detailResource(id: Signal<number | undefined>) {
+    return httpResource<City>(() => {
+      const value = id();
+      return value ? `${this.url}/${value}` : undefined;
+    });
+  }
+
   /** Una ciudad, para saber a qué departamento pertenece. */
   get(id: number) {
     return this.http.get<City>(`${this.url}/${id}`);

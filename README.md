@@ -49,8 +49,8 @@ Para comprobar que se hablan: `http://localhost:4200/empresas` debe listar las e
 
 | Pantalla | Ruta | Datos |
 | --- | --- | --- |
-| Inicio | `/` | Buscador y accesos. «Conocé tus derechos» figura como «Próximamente» (tarea 3.7) |
-| Directorio de empresas | `/empresas` | **Reales:** búsqueda por nombre, filtro por departamento y ciudad, paginación |
+| Inicio | `/` | **Reales:** frase-buscador (empresa, local o rubro) y ciudades con empresas. La reseña de muestra es ficticia y dice «Ejemplo». «Conocé tus derechos» figura como «Próximamente» (tarea 3.7) |
+| Directorio de empresas | `/empresas` | **Reales:** búsqueda por empresa, local o rubro; filtros por grupo de rubro, departamento, ciudad y con o sin reseñas, con conteos; orden y paginación. Todo en la URL |
 | Perfil de empresa | `/empresas/:id` | **Reales:** empresa, rubro, locales y reseñas publicadas, con filtros de RF5 en la URL (local, cargo, contrato, modalidad, situación) y el cumplimiento de derechos de cada reseña |
 | Escribí tu reseña | `/publicar`, `/publicar/:id/editar` | Exige sesión. **Real:** publica y edita con la API y muestra el resultado de la moderación. Criterios del JSON provisional. Al editar, el local no cambia |
 | Mis reseñas | `/mis-resenas` | **Real:** la última versión de cada reseña propia con su estado y el motivo; editar, corregir y borrar (exige sesión) |

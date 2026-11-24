@@ -14,7 +14,8 @@ p { margin: 0; }
 .name a::after { content: ""; position: absolute; inset: 0; }
 .name a:focus-visible { outline: none; }
 .name a:focus-visible::after { outline: 2px solid var(--azul-texto); outline-offset: -2px; }
-.cta { position: relative; z-index: 1; }
+/* 44 px de área táctil sin agrandar la fila */
+.cta { position: relative; z-index: 1; display: inline-flex; align-items: center; min-height: 44px; margin: -10px 0; }
 .side { grid-column: 2; display: grid; gap: var(--space-1); justify-items: start; }
 .rating { color: var(--noche); display: inline-flex; align-items: center; gap: 6px; font-size: 15px; line-height: 20px; }
 .star { width: 18px; height: 18px; }

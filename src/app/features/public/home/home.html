@@ -1,29 +1,86 @@
-<section class="page" aria-labelledby="titulo">
-  <div class="hero">
-    <h1 id="titulo" class="h1">Tu experiencia vale</h1>
-    <p class="body-lg">Contá cómo es trabajar en tu empresa y buscá información real antes de postularte.</p>
-
-    <form class="hero__search" role="search" (submit)="search($event, term.value)">
-      <label class="mb-search">
-        <svg lucideSearch [size]="20"></svg>
-        <span class="visually-hidden">Nombre de la empresa</span>
-        <input #term type="search" name="q" placeholder="Buscá una empresa" autocomplete="off" />
-      </label>
-      <button type="submit" class="mb-btn mb-btn-primary">Buscar</button>
-    </form>
-
-    <div class="hero__actions">
-      <a class="mb-link" routerLink="/empresas">Ver todas las empresas <svg lucideArrowRight [size]="16" aria-hidden="true"></svg></a>
+<section class="wrap hero" aria-labelledby="titulo">
+  <form class="search" role="search" (submit)="search($event)">
+    <h1 id="titulo" class="sobretitulo">Tu experiencia vale · Mbaapohara</h1>
+    <div class="mb-frase mb-frase--portada">
+      <span>Quiero saber cómo es trabajar en </span>
+      <label class="visually-hidden" for="buscar">Empresa, local o rubro</label>
+      <input
+        #field
+        id="buscar"
+        class="search__input"
+        type="search"
+        autocomplete="off"
+        maxlength="100"
+        [placeholder]="example()"
+        (input)="term.set(field.value)"
+        (focus)="focused.set(true)"
+        (blur)="focused.set(false)"
+      />
+      <span> en </span>
+      <span class="mb-frase-junto"><app-sentence-filter label="Ciudad" [place]="true" [options]="cities()" [value]="city()" (valueChange)="city.set($event)" />.</span>
     </div>
-    <p class="mb-help anon"><svg lucideLock [size]="16" aria-hidden="true"></svg>Tu nombre nunca se muestra.</p>
-  </div>
-
-  <aside class="rights" aria-labelledby="derechos">
-    <svg lucideScale [size]="28" aria-hidden="true"></svg>
-    <div>
-      <h2 id="derechos" class="h3">Conocé tus derechos</h2>
-      <p class="body-sm">Qué dice la ley sobre el contrato, el IPS, la jornada, las horas extra y el aguinaldo.</p>
+    <div class="search__actions">
+      <button type="submit" class="mb-btn mb-btn-primary mb-btn-lg">Ver experiencias<svg lucideArrowRight [size]="20" aria-hidden="true"></svg></button>
+      <a class="mb-enlace" routerLink="/empresas">O mirá todas las empresas</a>
     </div>
-    <span class="sobretitulo">Próximamente</span>
+  </form>
+
+  <aside class="sample" aria-labelledby="ejemplo">
+    <div class="sample__title">
+      <img src="/marca/iconos/19-la-voz.svg" alt="" width="96" height="96" />
+      <h2 id="ejemplo" class="h3">Así se ve una experiencia</h2>
+    </div>
+    <article class="mb-review sample__card">
+      <div class="sample__head">
+        <span class="mb-rating"><app-stars [value]="4" /><span class="mb-rating-value">4 · Bueno</span></span>
+        <span class="sobretitulo">Ejemplo</span>
+      </div>
+      <p class="body-sm">Trabajó aquí · Reposición · hasta 2025</p>
+      <p class="sample__line"><svg lucidePlus class="mb-pro" [size]="18" aria-hidden="true"></svg><span><span class="visually-hidden">Lo bueno: </span>Pagan el aguinaldo completo y a tiempo.</span></p>
+      <p class="sample__line"><svg lucideMinus class="mb-con" [size]="18" aria-hidden="true"></svg><span><span class="visually-hidden">A mejorar: </span>Los turnos de fin de semana se avisan con poco tiempo.</span></p>
+    </article>
+    <ul class="promises">
+      <li><svg lucideLock [size]="20" aria-hidden="true"></svg>Sin nombre ni fecha exacta: solo el mes de publicación.</li>
+      <li><svg lucideShieldCheck [size]="20" aria-hidden="true"></svg>Cada reseña se revisa antes de publicarse.</li>
+    </ul>
   </aside>
+</section>
+
+<section class="how" aria-labelledby="como">
+  <div class="wrap">
+    <div class="how__head">
+      <h2 id="como" class="h2">Contar tu experiencia lleva unos minutos</h2>
+      <a class="mb-enlace" routerLink="/como-moderamos">Cómo moderamos</a>
+    </div>
+    <ol class="steps">
+      <li>
+        <img src="/marca/iconos/20-resena.svg" alt="" width="80" height="80" />
+        <div><span class="steps__num" aria-hidden="true">1</span><h3>Contás cómo te fue</h3><p>Unas preguntas sobre derechos y dos textos: lo bueno y lo que hay que mejorar.</p></div>
+      </li>
+      <li>
+        <img src="/marca/iconos/16-saludo-de-manos.svg" alt="" width="80" height="80" />
+        <div><span class="steps__num steps__num--2" aria-hidden="true">2</span><h3>La revisamos</h3><p>Buscamos datos personales e insultos. Si hay que corregir algo, te avisamos.</p></div>
+      </li>
+      <li>
+        <img src="/marca/iconos/17-cargar-juntos.svg" alt="" width="80" height="80" />
+        <div><span class="steps__num steps__num--3" aria-hidden="true">3</span><h3>Ayudás a quien viene</h3><p>Otras personas deciden mejor dónde trabajar con lo que contaste.</p></div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="mb-franja rights" aria-labelledby="derechos">
+  <div class="wrap rights__in">
+    <span class="mb-disco mb-disco--crema mb-disco--xl"><img src="/marca/iconos/11-obrero.svg" alt="" width="128" height="128" /></span>
+    <div class="rights__text">
+      <p class="sobretitulo">Próximamente</p>
+      <h2 id="derechos">Conocé tus derechos</h2>
+      <p>Guías cortas, en palabras simples, sobre lo que la ley laboral paraguaya te garantiza. Para que sepas qué preguntar antes de aceptar un trabajo.</p>
+    </div>
+    <ol class="rights__list">
+      @for (topic of rights; track topic; let i = $index) {
+        <li><span aria-hidden="true">{{ i + 1 }}</span>{{ topic }}</li>
+      }
+    </ol>
+  </div>
 </section>

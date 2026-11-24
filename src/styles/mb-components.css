@@ -100,3 +100,31 @@ textarea.mb-input { min-height: 96px; resize: vertical; }
 .mb-frase-parte svg { flex: none; width: .6em; height: .6em; }
 .mb-frase-lugar { color: var(--naranja-texto); border-bottom: 3px dashed var(--naranja); }
 @media (min-width: 760px) { .mb-frase { font-size: 40px; line-height: 56px; } }
+/* La puntuación no se separa de la parte elegible */
+.mb-frase-junto { display: inline-block; max-width: 100%; }
+
+/* Frase-buscador del inicio: más grande y con subrayado de 4 px */
+.mb-frase--portada { font-size: 34px; line-height: 46px; letter-spacing: -0.025em; }
+.mb-frase--portada .mb-frase-parte { border-bottom-width: 4px; }
+@media (min-width: 760px) { .mb-frase--portada { font-size: 54px; line-height: 72px; } }
+
+/* Botón de acción principal */
+.mb-btn-lg { height: 56px; padding: 0 28px; font-size: 17px; }
+
+/* Franja editorial: blanca, con línea superior amarilla */
+.mb-franja { background: var(--blanco); border-top: 6px solid var(--amarillo); }
+.mb-franja__in { max-width: var(--ancho-pagina); margin: 0 auto; padding: 36px var(--space-4); box-sizing: border-box; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-4) 28px; }
+.mb-franja__text { flex: 1; min-width: 0; }
+.mb-franja__text h2, .mb-franja__text p { margin: 0; }
+.mb-franja__text p { margin-top: var(--space-1); font-size: 16px; line-height: 24px; color: var(--noche-suave); }
+@media (min-width: 760px) { .mb-franja__in { flex-direction: row; align-items: center; } }
+@media (min-width: 1024px) { .mb-franja__in { padding-left: var(--space-7); padding-right: var(--space-7); } }
+
+/* Círculo para ilustraciones */
+.mb-disco { flex: none; width: 104px; height: 104px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--blanco); }
+.mb-disco--crema { background: var(--crema); }
+.mb-disco--xl { width: 200px; height: 200px; }
+
+/* Enlace suelto, con área táctil de 44 px */
+.mb-enlace { display: inline-flex; align-items: center; min-height: 44px; font-size: 16px; font-weight: 600; text-underline-offset: 4px; }
+.mb-enlace:focus-visible { outline: 2px solid var(--azul-texto); outline-offset: 2px; }

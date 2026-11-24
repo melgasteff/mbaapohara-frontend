@@ -37,7 +37,7 @@ export function companyRowState(count: number): CompanyRowState {
       @case ('ninguna') {
         <div class="side">
           <p class="body-sm muted">Nadie contó todavía cómo es trabajar acá.</p>
-          <a class="mb-link cta" routerLink="/publicar">Contá la primera<span class="visually-hidden"> sobre {{ company().nombre }}</span></a>
+          <a class="mb-link cta" routerLink="/publicar" [queryParams]="{ empresa: company().id }">Contá la primera<span class="visually-hidden"> sobre {{ company().nombre }}</span></a>
         </div>
       }
       @default {
