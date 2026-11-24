@@ -24,7 +24,7 @@ Hablamos como una compañera de trabajo que ya pasó por ahí: clara, cálida y 
 | «Contá cómo te fue en Supermercado Central.» | «¡¡Denunciá a tu empresa!!» |
 | «A mejorar: las horas extra se pagan tarde.» | «Lo peor: te explotan.» |
 | «Todavía no hay reseñas. Sé la primera persona en contar.» | «No hay datos.» |
-| «Tu reseña está en revisión. Te avisamos en 48 horas.» | «Pendiente.» |
+| «Tu reseña está en revisión.» | «Pendiente.» |
 
 ## Logotipo
 

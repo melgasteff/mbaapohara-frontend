@@ -77,5 +77,5 @@ export class PublishResult {
   /** Volver al paso 4 con lo escrito, para corregir una reseña rechazada. */
   readonly edit = output<void>();
 
-  protected readonly reviewMessage = computed(() => this.result().motivo || 'Tu reseña está en revisión. Te avisamos en 48 horas.');
+  protected readonly reviewMessage = computed(() => this.result().motivo || 'Tu reseña está en revisión.');
 }

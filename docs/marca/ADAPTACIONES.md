@@ -91,7 +91,7 @@ Si algo de este archivo choca con ellas, gana este archivo.
 
 ## Estados de moderación (etiquetas)
 - Publicada: `.mb-tag-success`.
-- En revisión: `.mb-tag-warning`, con el texto del manual: «Tu reseña está en revisión. Te avisamos en 48 horas.»
+- En revisión: `.mb-tag-warning`, con el texto «Tu reseña está en revisión.» (el sistema no envía avisos).
 - Rechazada: `.mb-tag-naranja` con el texto «Necesita un cambio», visible solo para quien la escribió, junto con el motivo.
 
 ## Datos de ejemplo
