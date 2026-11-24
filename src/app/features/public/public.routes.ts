@@ -22,6 +22,7 @@ export const PUBLIC_ROUTES: Routes = [
   {
     path: 'ingresar',
     title: 'Ingresar · Mbaapohara',
+    data: { encabezado: 'ninguno' },
     loadComponent: () => import('./auth/sign-in/sign-in').then((m) => m.SignIn),
   },
   {
@@ -47,6 +48,7 @@ export const PUBLIC_ROUTES: Routes = [
   {
     path: 'registro',
     title: 'Crear cuenta · Mbaapohara',
+    data: { encabezado: 'ninguno' },
     loadComponent: () => import('./auth/sign-up/sign-up').then((m) => m.SignUp),
   },
 ];

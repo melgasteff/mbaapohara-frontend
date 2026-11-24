@@ -16,7 +16,7 @@ import { SiteHeader } from './core/layout/site-header/site-header';
   `,
   template: `
     <a class="skip-link mb-btn mb-btn-secondary" href="#contenido">Saltar al contenido</a>
-    <app-site-header [variant]="variant()" [task]="task()" />
+    @if (variant() !== 'ninguno') { <app-site-header [variant]="variant()" [task]="task()" /> }
     <main id="contenido" tabindex="-1">
       <router-outlet />
     </main>

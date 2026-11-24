@@ -15,6 +15,7 @@ describe('Versión del encabezado', () => {
           { path: 'empresas', component: Empty },
           { path: 'inicio', component: Empty, data: { encabezado: 'inicio' } },
           { path: 'publicar', children: [{ path: '', component: Empty, data: { encabezado: 'foco', tarea: 'Escribir una reseña' } }] },
+          { path: 'ingresar', component: Empty, data: { encabezado: 'ninguno' } },
           { path: 'admin', data: { encabezado: 'admin' }, children: [{ path: 'cargos', component: Empty }] },
         ]),
       ],
@@ -59,5 +60,11 @@ describe('Versión del encabezado', () => {
     expect(el.querySelector('.admin-label')?.textContent).toBe('Administración');
     expect(el.querySelector('header .mb-btn-accent')).toBeNull();
     expect(el.querySelector('footer')).toBeNull();
+  });
+
+  it('ninguno: sin encabezado ni pie, con el enlace para saltar al contenido', async () => {
+    const el = await open('/ingresar');
+    expect(el.querySelector('header, footer')).toBeNull();
+    expect(el.querySelector('.skip-link')).not.toBeNull();
   });
 });

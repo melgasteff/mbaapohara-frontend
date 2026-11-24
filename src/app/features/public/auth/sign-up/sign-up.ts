@@ -1,11 +1,15 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, Injector, input, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { LucideCircle, LucideCircleAlert, LucideCircleCheck, LucideLock } from '@lucide/angular';
+import { LucideCircle, LucideCircleAlert, LucideCircleCheck, LucideEyeOff } from '@lucide/angular';
 import { AuthApi } from '../../../../core/api/auth-api';
 import { safeReturnUrl } from '../../../../core/auth/guards';
-import { authErrorMessage } from '../auth-errors';
+import { Logo } from '../../../../shared/brand/logo/logo';
+import { focusFirstInvalid } from '../../../../shared/focus-first-invalid';
+import { PasswordField } from '../../../../shared/ui/password-field/password-field';
+import { authErrorMessage, emailMessage } from '../auth-errors';
+import { AuthPanel } from '../auth-panel/auth-panel';
 
 /** Reglas de contraseña de la API (RegisterDTO): se muestran y se validan antes de enviar. */
 // Mismos criterios que IsStrongPassword (validator.js): letras sin tilde ni ñ y su lista de símbolos.
@@ -18,10 +22,13 @@ const PASSWORD_RULES = [
   { text: 'Un símbolo, como ! ? # @ o -', test: (v: string) => SYMBOLS.test(v) },
 ];
 
-/** Crear cuenta: correo, contraseña y aceptación de términos (D9). Al terminar inicia la sesión. */
+/**
+ * Crear cuenta: correo, contraseña, mayoría de edad y términos (D9). Al terminar inicia la sesión. La edad es una declaración:
+ * se exige acá y no se envía, porque la API recibe una sola aceptación.
+ */
 @Component({
   selector: 'app-sign-up',
-  imports: [ReactiveFormsModule, RouterLink, LucideCircleAlert, LucideCircleCheck, LucideCircle, LucideLock],
+  imports: [ReactiveFormsModule, RouterLink, AuthPanel, Logo, PasswordField, LucideCircleAlert, LucideCircleCheck, LucideCircle, LucideEyeOff],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: '../auth-form.css',
   templateUrl: './sign-up.html',
@@ -29,6 +36,8 @@ const PASSWORD_RULES = [
 export class SignUp {
   private readonly auth = inject(AuthApi);
   private readonly router = inject(Router);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly injector = inject(Injector);
 
   readonly volver = input<string>();
 
@@ -42,6 +51,7 @@ export class SignUp {
         (control) => (PASSWORD_RULES.every((rule) => rule.test(control.value ?? '')) ? null : { weak: true }),
       ],
     }),
+    mayorDeEdad: new FormControl(false, { nonNullable: true, validators: Validators.requiredTrue }),
     aceptaTerminos: new FormControl(false, { nonNullable: true, validators: Validators.requiredTrue }),
   });
   protected readonly sending = signal(false);
@@ -53,15 +63,30 @@ export class SignUp {
     PASSWORD_RULES.map((rule) => ({ text: rule.text, ok: rule.test(this.password()) })),
   );
 
-  protected show(name: 'email' | 'password' | 'aceptaTerminos'): boolean {
+  protected show(name: 'email' | 'password' | 'mayorDeEdad' | 'aceptaTerminos'): boolean {
     const control = this.form.controls[name];
     return control.invalid && (control.touched || this.submitted());
   }
 
+  protected emailError(): string {
+    return emailMessage(this.form.controls.email);
+  }
+
+  protected passwordError(): string {
+    const { password } = this.form.controls;
+    if (!password.value) return 'Escribí una contraseña.';
+    return password.hasError('maxlength') ? 'La contraseña puede tener hasta 72 caracteres.' : 'La contraseña todavía no cumple todas las reglas.';
+  }
+
   protected submit(): void {
+    // Un doble clic no envía dos veces; el botón no se deshabilita.
+    if (this.sending()) return;
     this.submitted.set(true);
     this.error.set(null);
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      focusFirstInvalid(this.host, this.injector);
+      return;
+    }
     this.sending.set(true);
     const { email, password } = this.form.getRawValue();
     this.auth.register({ email, password, aceptaTerminos: true }).subscribe({

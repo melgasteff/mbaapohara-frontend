@@ -1,4 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
+import { AbstractControl } from '@angular/forms';
 
 /** Mensaje para la persona según la respuesta de /auth (ver AuthExceptionFilter del backend). */
 export function authErrorMessage(error: unknown, context: 'ingresar' | 'registro'): string {
@@ -19,4 +20,10 @@ export function authErrorMessage(error: unknown, context: 'ingresar' | 'registro
     default:
       return 'Algo salió mal. Intentá de nuevo en unos minutos.';
   }
+}
+
+/** Qué le falta al correo. */
+export function emailMessage(control: AbstractControl<string>): string {
+  if (!control.value.trim()) return 'Escribí tu correo.';
+  return control.hasError('maxlength') ? 'El correo es demasiado largo.' : 'Revisá el correo: falta algo, como la @.';
 }
