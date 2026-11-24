@@ -101,7 +101,7 @@ type Opinion = ReviewForm['controls']['texto'];
           />
           <span>
             Leí y acepto las
-            <a routerLink="/como-moderamos" fragment="reglas" target="_blank" rel="noopener">reglas de publicación<span class="visually-hidden"> (se abren en otra pestaña)</span></a>.
+            <a routerLink="/terminos" fragment="reglas" target="_blank" rel="noopener">reglas de publicación<span class="visually-hidden"> (se abren en otra pestaña)</span></a>.
             Lo que cuento es mi experiencia real.
           </span>
         </label>

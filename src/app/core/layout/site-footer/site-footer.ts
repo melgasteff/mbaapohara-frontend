@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Logo } from '../../../shared/brand/logo/logo';
 
-/** Pie en azul noche. «Responsabilidad por las reseñas» se suma con su página (fase 6). */
+/** Pie en azul noche. */
 @Component({
   selector: 'app-site-footer',
   imports: [RouterLink, Logo],
@@ -40,6 +40,7 @@ import { Logo } from '../../../shared/brand/logo/logo';
           <h2 id="pie-legal">Legal</h2>
           <a routerLink="/privacidad">Privacidad</a>
           <a routerLink="/terminos">Términos de uso</a>
+          <a routerLink="/responsabilidad">Responsabilidad por las reseñas</a>
         </nav>
         <p class="project">Proyecto Final de Grado · Ingeniería en Informática · FCyT-UNCA · 2026</p>
       </div>

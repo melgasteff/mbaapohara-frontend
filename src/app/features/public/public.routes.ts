@@ -32,13 +32,18 @@ export const PUBLIC_ROUTES: Routes = [
   },
   {
     path: 'privacidad',
-    title: 'Política de privacidad · Mbaapohara',
+    title: 'Privacidad · Mbaapohara',
     loadComponent: () => import('./legal/privacy').then((m) => m.Privacy),
   },
   {
     path: 'terminos',
     title: 'Términos de uso · Mbaapohara',
     loadComponent: () => import('./legal/terms').then((m) => m.Terms),
+  },
+  {
+    path: 'responsabilidad',
+    title: 'Responsabilidad por las reseñas · Mbaapohara',
+    loadComponent: () => import('./legal/responsibility').then((m) => m.Responsibility),
   },
   {
     path: 'solicitud-revision',
