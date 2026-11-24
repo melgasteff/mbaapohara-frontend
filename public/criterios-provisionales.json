@@ -1,6 +1,6 @@
 {
   "version": "provisional-2026-11-19b",
-  "nota": "Forma de la reseña (R2 a R7): opciones de respuesta, situaciones, contratos, modalidades, calificación y textos. Las categorías e ítems ya no están acá: los da la API (GET /criteria) y se administran en /admin/criterios (tarea 3.8). La primera carga sale de docs/datos/criterios-provisionales.json del backend.",
+  "nota": "Forma de la reseña (R2 a R7): opciones de respuesta, situaciones, calificación y textos. Los contratos y modalidades vienen de los catálogos de la API. Las categorías e ítems ya no están acá: los da la API (GET /criteria) y se administran en /admin/criterios (tarea 3.8). La primera carga sale de docs/datos/criterios-provisionales.json del backend.",
   "opcionesRespuesta": [
     {
       "valor": "SI",
@@ -27,42 +27,6 @@
     {
       "valor": "ANTERIOR",
       "etiqueta": "Trabajé aquí antes"
-    }
-  ],
-  "tiposContrato": [
-    {
-      "valor": "INDEFINIDO",
-      "etiqueta": "Por tiempo indefinido"
-    },
-    {
-      "valor": "PLAZO_FIJO",
-      "etiqueta": "A plazo fijo"
-    },
-    {
-      "valor": "OBRA_SERVICIO",
-      "etiqueta": "Por obra o servicio"
-    },
-    {
-      "valor": "SIN_CONTRATO_ESCRITO",
-      "etiqueta": "Sin contrato escrito"
-    },
-    {
-      "valor": "NO_SABE",
-      "etiqueta": "No sé"
-    }
-  ],
-  "modalidades": [
-    {
-      "valor": "PRESENCIAL",
-      "etiqueta": "Presencial"
-    },
-    {
-      "valor": "REMOTA",
-      "etiqueta": "Remota"
-    },
-    {
-      "valor": "HIBRIDA",
-      "etiqueta": "Híbrida"
     }
   ],
   "calificacionGeneral": {

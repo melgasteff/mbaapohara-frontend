@@ -6,8 +6,7 @@
       @case ('foco') {
         <span class="task">{{ task() }}</span>
         <span class="anon body-sm"><svg lucideLock [size]="16" aria-hidden="true"></svg>Tu nombre nunca se muestra</span>
-        <!-- Fase 4: pasa a «Guardar y salir», con el borrador. -->
-        <a class="mb-btn mb-btn-secondary mb-btn-sm leave" routerLink="/">Salir sin guardar</a>
+        <a class="mb-btn mb-btn-secondary leave" routerLink="/">{{ exit.label() }}</a>
       }
       @case ('admin') {
         <span class="admin-label">Administración</span>

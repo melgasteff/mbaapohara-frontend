@@ -52,7 +52,7 @@ Para comprobar que se hablan: `http://localhost:4200/empresas` debe listar las e
 | Inicio | `/` | **Reales:** frase-buscador (empresa, local o rubro) y ciudades con empresas. La reseña de muestra es ficticia y dice «Ejemplo». «Conocé tus derechos» figura como «Próximamente» (tarea 3.7) |
 | Directorio de empresas | `/empresas` | **Reales:** búsqueda por empresa, local o rubro; filtros por grupo de rubro, departamento, ciudad y con o sin reseñas, con conteos; orden y paginación. Todo en la URL |
 | Perfil de empresa | `/empresas/:id` | **Reales:** resumen (promedio, distribución y temas desde 3 reseñas), reseñas publicadas con los filtros de RF5, conteos y orden en la URL, y locales con su cantidad de reseñas |
-| Escribí tu reseña | `/publicar`, `/publicar/:id/editar` | Exige sesión. **Real:** publica y edita con la API y muestra el resultado de la moderación. Criterios del JSON provisional. Al editar, el local no cambia |
+| Escribí tu reseña | `/publicar`, `/publicar/:id/editar` | Exige sesión. **Real:** publica y edita con la API y muestra el resultado de la moderación. Los criterios vienen de `GET /criteria`. Una reseña nueva se guarda sola como borrador en `localStorage`, por cuenta y solo en ese dispositivo, hasta enviarla. `?empresa=` la empieza con la empresa elegida. Al editar, el local no cambia y no hay borrador |
 | Mis reseñas | `/mis-resenas` | **Real:** la última versión de cada reseña propia con su estado y el motivo; editar, corregir y borrar (exige sesión) |
 | Cómo moderamos, privacidad, términos | `/como-moderamos`, `/privacidad`, `/terminos` | Borradores (tarea 1.9), con enlaces en el pie, el registro y el asistente |
 | Mi cuenta | `/mi-cuenta` | **Real:** ver los datos, descargarlos y eliminar la cuenta con sus reseñas (exige sesión) |
@@ -87,13 +87,14 @@ Una cuenta común se crea desde `/registro`.
 2. **Abrir una empresa** → perfil con sus locales agrupados por ciudad y el estado vacío de reseñas.
 3. **«Escribí tu reseña»** → pide ingresar; crear una cuenta en `/registro` (se ven las reglas de la
    contraseña) y vuelve solo al asistente. Recorrer los 4 pasos:
-   1. empresa y local (probar «Siguiente» vacío para mostrar la validación);
-   2. relación laboral (mostrar «Mi cargo no está en la lista» y que solo se pide el año);
-   3. los 23 criterios con Sí / En parte / No / No sé o no aplica;
+   1. empresa y local (probar «Seguir» vacío para mostrar la validación);
+   2. tu trabajo (escribir un cargo que no está en la lista y mostrar que solo se pide el año);
+   3. tus derechos: los criterios de a uno, con Sí / En parte / No / No sé o no aplica («Guardar y salir» y volver para
+      mostrar el borrador);
    4. estrellas y los dos textos, con contador y el recordatorio de anonimato.
-4. **Publicar** → «Publicada», con la vista previa de la tarjeta.
-5. **«Escribir otra reseña»** y poner un teléfono en «Lo bueno» (por ejemplo «llamá al 0981 123 456») →
-   «Rechazada», con qué corregir. «Editar y volver a enviar» vuelve al paso 4 con todo lo escrito; sacar el
+4. **Enviar reseña** → «Publicada», con el enlace a la reseña en el perfil.
+5. **Escribir otra reseña, de otro local,** y poner un teléfono en «Lo bueno» (por ejemplo «llamá al 0981 123 456») →
+   «Necesita un cambio», con qué corregir. «Corregir la reseña» vuelve al paso 4 con todo lo escrito; sacar el
    teléfono → «Publicada». Con una acusación («la supervisora acosa a las cajeras») → «En revisión».
    Explicar la política: la crítica a la empresa siempre se publica; se modera lo que identifica o acusa a
    personas y lo que rompe el anonimato (Fase 2).

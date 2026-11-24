@@ -26,7 +26,7 @@ nav a[aria-current='page'] { color: var(--azul-texto); }
 /* Variantes foco y admin */
 .task { padding-left: var(--space-4); border-left: 1px solid var(--linea); font-size: 16px; line-height: 24px; font-weight: 700; }
 .anon { display: none; align-items: center; gap: 6px; color: var(--noche-suave); }
-.leave { margin-left: auto; }
+.leave { margin-left: auto; padding: 0 14px; border-color: var(--borde-control); font-size: 14px; }
 .admin-label {
   padding: 3px 8px; border-radius: var(--radio-xs); background: var(--noche); color: var(--blanco);
   font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;

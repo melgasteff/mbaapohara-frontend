@@ -4,6 +4,7 @@ import { LucideLock, LucideMenu, LucidePencil, LucideSearch, LucideX } from '@lu
 import { Logo } from '../../../shared/brand/logo/logo';
 import { SessionService } from '../../auth/session.service';
 import { AdminNav } from '../admin-nav/admin-nav';
+import { FocusExit } from '../focus-exit';
 import { HeaderVariant } from '../header-variant';
 
 /**
@@ -25,6 +26,7 @@ export class SiteHeader {
 
   private readonly router = inject(Router);
   protected readonly session = inject(SessionService);
+  protected readonly exit = inject(FocusExit);
   protected readonly menuOpen = signal(false);
   private readonly toggle = viewChild<ElementRef<HTMLButtonElement>>('toggle');
 

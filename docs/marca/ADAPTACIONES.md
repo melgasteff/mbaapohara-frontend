@@ -27,7 +27,18 @@ Si algo de este archivo choca con ellas, gana este archivo.
 - Encabezado: el menú desplegable aparece por debajo de 1160px (no 760), porque con sesión la navegación no entra.
   Con sesión, «Cómo moderamos» queda solo en el pie, como en la lámina 07. En el asistente a 360px el logo baja a 22px.
 - Administración y asistente no llevan pie, como en sus láminas. La administración usa el contenedor de 1280px.
-- Asistente: «Salir sin guardar» hasta que exista el borrador (fase 4). Se evita «Salir», que cierra la sesión.
+- Asistente, salida del encabezado: «Guardar y salir» en una reseña nueva, «Salir sin guardar» al editar (no hay borrador y
+  parecería que guarda los cambios) o si el navegador no deja guardar, y «Volver al inicio» después de enviar. Se evita
+  «Salir», que cierra la sesión.
+- Asistente, paso 2: el cargo se busca en una lista al escribir; «Frecuentes» son los cargos con reseñas en esa empresa y no
+  aparece si no hay. La situación y los contratos usan las palabras de los datos, y el año va del actual a 50 años atrás.
+- Asistente, paso 3: el avance solo ocurre con clic, Enter o espacio; las flechas marcan y se sigue con «Seguir». El cierre dice
+  «Jornada: lista» para no depender del género de la categoría. Sin aclaración por pregunta: la API no la tiene.
+- Asistente, paso 4: la pregunta y las palabras de las estrellas son las del JSON.
+- Asistente, barra inferior: lo que falta se muestra en la barra, en lugar de al final del paso, para que siempre se vea.
+  Entre 760 y 1099px van dos columnas, con la barra de progreso en lugar de la lista de pasos.
+- Asistente, vista previa: un cargo que no está en la lista se ve «Otro cargo», como en el perfil, y «No sé o no aplica» no se cuenta.
+- Asistente, resultado: sin «Escribir otra reseña». El rechazo muestra el único motivo que devuelve la API.
 - Pie: sin «Responsabilidad por las reseñas» hasta que exista su página (fase 6).
 - Sello: las iniciales saltan artículos, preposiciones y tipos de sociedad («Supermercado La Amistad» es «SA»), como
   pide el documento; la lámina 00 dice «LA». «Agro y otros» usa la ilustración 12 (herramientas).

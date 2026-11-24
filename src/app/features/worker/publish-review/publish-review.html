@@ -1,109 +1,181 @@
-<section class="page" aria-labelledby="titulo">
-  <h1 id="titulo" class="h1">{{ editing() ? 'Editá tu reseña' : 'Escribí tu reseña' }}</h1>
-  <p class="mb-help anon"><svg lucideLock [size]="16" aria-hidden="true"></svg>Tu nombre nunca se muestra.</p>
-
-  @if (published(); as done) {
-    <h2 class="h2 step-title" tabindex="-1" #stepHeading>{{ done.result.estado === 'rechazada' ? 'Falta un ajuste' : 'Listo' }}</h2>
-    <app-publish-result [draft]="done.draft" [result]="done.result" [words]="words()" (restart)="restart()" (edit)="editRejected()" />
-  } @else if (loadError()) {
+@if (published(); as done) {
+  <div class="mb-wrap result">
+    <app-publish-result [draft]="done.draft" [result]="done.result" [editing]="editing()" (edit)="editRejected()" />
+  </div>
+} @else if (loadError()) {
+  <div class="mb-wrap result">
+    <h1 class="visually-hidden">Escribí tu reseña</h1>
     <app-page-state kind="error" title="No pudimos preparar el formulario." (retry)="reloadAll()" />
-  } @else if (cannotEdit() === 'not-found') {
-    <app-page-state kind="empty" title="No encontramos esa reseña." message="Solo podés editar tus propias reseñas.">
-      <a class="mb-btn mb-btn-secondary mb-btn-sm" routerLink="/mis-resenas">Ir a Mis reseñas</a>
-    </app-page-state>
-  } @else if (cannotEdit() === 'in-review') {
-    <app-page-state kind="empty" title="Tu reseña está en revisión." message="Vas a poder editarla cuando se decida.">
-      <a class="mb-btn mb-btn-secondary mb-btn-sm" routerLink="/mis-resenas">Ir a Mis reseñas</a>
-    </app-page-state>
-  } @else if (ready()) {
-    @if (editable(); as review) {
-      <p class="body editing-place">
-        Reseña de <strong>{{ review.empresa.nombre }}</strong> · {{ review.local.nombre }}, {{ review.local.ciudad }}.
-        El local no se puede cambiar.
-      </p>
+  </div>
+} @else if (cannotEdit(); as reason) {
+  <div class="mb-wrap result">
+    <h1 class="visually-hidden">Editar tu reseña</h1>
+    @if (reason === 'not-found') {
+      <app-page-state kind="empty" title="No encontramos esa reseña." message="Solo podés editar tus propias reseñas.">
+        <a class="mb-btn mb-btn-secondary" routerLink="/mis-resenas">Ir a mis reseñas</a>
+      </app-page-state>
+    } @else {
+      <app-page-state kind="empty" title="Tu reseña está en revisión." message="Vas a poder editarla cuando se decida.">
+        <a class="mb-btn mb-btn-secondary" routerLink="/mis-resenas">Ir a mis reseñas</a>
+      </app-page-state>
     }
-    <ol class="stepper" aria-label="Pasos">
-      @for (name of steps; track name; let i = $index) {
-        <li [class.is-current]="step() === i + 1" [class.is-done]="step() > i + 1" [attr.aria-current]="step() === i + 1 ? 'step' : null">
-          <span class="stepper__num" aria-hidden="true">{{ i + 1 }}</span>
-          <span class="stepper__name">{{ name }}</span>
-        </li>
-      }
-    </ol>
-
-    <h2 class="h2 step-title" tabindex="-1" #stepHeading>
-      <span class="caption step-count">Paso {{ step() }} de {{ steps.length }}</span>
-      {{ steps[step() - 1] }}
-    </h2>
-
-    @switch (step()) {
-      @case (1) {
-        <app-step-place [group]="form.controls.lugar" [showErrors]="showErrors(1)" />
-      }
-      @case (2) {
-        <app-step-relation
-          [group]="form.controls.relacion"
-          [showErrors]="showErrors(2)"
-          [jobs]="jobs.value()!.data"
-          [contractTypes]="contractTypes.value()!.data"
-          [workModes]="workModes.value()!.data"
-          [situations]="config.value()!.situaciones"
-        />
-      }
-      @case (3) {
-        <app-step-criteria
-          [group]="form.controls.criterios"
-          [showErrors]="showErrors(3)"
-          [categories]="config.value()!.categorias"
-          [options]="config.value()!.opcionesRespuesta"
-        />
-      }
-      @case (4) {
-        <app-step-rating
-          [group]="form.controls.texto"
-          [showErrors]="showErrors(4)"
-          [rating]="config.value()!.calificacionGeneral"
-          [texts]="config.value()!.textos"
-        />
-      }
-    }
-
-    @if (showErrors(step()) && currentGroup().invalid) {
-      <p class="mb-help summary" role="alert">
-        <svg lucideCircleAlert [size]="16" aria-hidden="true"></svg>Revisá los campos marcados para seguir.
-      </p>
-    }
-    @if (sendError(); as error) {
-      <div class="send-error body-sm" role="alert">
-        <p><svg lucideCircleAlert [size]="16" aria-hidden="true"></svg>{{ error.problems.length ? 'Falta corregir algunas cosas:' : error.message }}</p>
-        @if (error.problems.length) {
-          <ul>
-            @for (problem of error.problems; track problem) { <li>{{ problem }}</li> }
-          </ul>
-        }
-        @if (error.conflict) {
-          <a class="mb-link" routerLink="/mis-resenas">Ir a Mis reseñas</a>
-        }
+  </div>
+} @else if (choosing()) {
+  <div class="mb-wrap result">
+    <section class="choice" aria-labelledby="borrador-titulo">
+      <h1 class="h1" id="borrador-titulo">Tenés una reseña sin terminar</h1>
+      <p>Es sobre <strong>{{ saved()!.empresa.nombre }}</strong>. Si empezás otra, lo que habías escrito se borra.</p>
+      <div class="choice__actions">
+        <button type="button" class="mb-btn mb-btn-primary" (click)="keepDraft()">Seguir con la que tenía</button>
+        <button type="button" class="mb-btn mb-btn-borrar" (click)="discardDraft()">Borrarla y empezar otra</button>
       </div>
-    }
+    </section>
+  </div>
+} @else if (ready()) {
+  <div class="mobile-progress mb-wrap" aria-hidden="true">
+    <span class="sobretitulo">Paso {{ step() }} de {{ stepCount }} · {{ stepName() }}</span>
+    <span class="track"><span [style.width.%]="(step() / stepCount) * 100"></span></span>
+  </div>
 
-    <div class="actions">
+  <div class="body mb-wrap">
+    <app-wizard-nav
+      class="nav"
+      [steps]="navSteps()"
+      [current]="step()"
+      [categories]="categoryProgress()"
+      [currentCategory]="position().categoria"
+      [note]="note()"
+      (goStep)="goTo($event)"
+      (goCategory)="goToCategory($event)"
+    />
+
+    <section class="main mb-con-barra" aria-labelledby="titulo">
+      @if (resumed()) {
+        <div class="notice">
+          @if (confirmRestart()) {
+            <app-inline-confirm
+              message="Se borra lo que habías escrito."
+              confirmLabel="Sí, empezar de nuevo"
+              (confirmed)="restart()"
+              (cancelled)="cancelRestart()"
+            />
+          } @else {
+            <p>Retomamos la reseña que dejaste sin terminar. <button #restartButton type="button" class="mb-link-btn" (click)="confirmRestart.set(true)">Empezar de nuevo</button></p>
+          }
+        </div>
+      }
+      @if (companyGone()) {
+        <p class="notice" role="status">Esa empresa ya no está disponible. Elegí otra para seguir.</p>
+      }
+
+      <header class="head">
+        <div class="head__row">
+          <p class="sobretitulo kicker">
+            <span class="kicker__step">Paso {{ step() }} de {{ stepCount }}</span>@if (step() === 3) { <span> · Tus derechos</span> }
+          </p>
+          @if (step() === 3 && categoryProgress()[position().categoria]; as progress) {
+            <p class="head__count" aria-live="polite">{{ progress.respondidas }} de {{ progress.total }} respondidas</p>
+          }
+        </div>
+        <h1 class="title" id="titulo" tabindex="-1">{{ title() }}</h1>
+      </header>
+
+      @if (editable(); as review) {
+        @if (step() === 2) {
+          <p class="notice">
+            Estás editando tu reseña sobre <strong>{{ review.empresa.nombre }} · {{ review.local.nombre }}</strong>. La empresa y el local
+            no se pueden cambiar. Los cambios se revisan igual que una reseña nueva.
+          </p>
+        }
+      }
+
+      @switch (step()) {
+        @case (1) {
+          <app-step-place
+            class="mb-entra"
+            [group]="form.controls.lugar"
+            [company]="value().lugar.empresa"
+            [office]="value().lugar.local"
+            [showErrors]="showErrors(1)"
+          />
+        }
+        @case (2) {
+          <app-step-relation
+            class="mb-entra"
+            [group]="form.controls.relacion"
+            [relation]="value().relacion"
+            [companyId]="value().lugar.empresa!.id"
+            [showErrors]="showErrors(2)"
+            [jobs]="jobs.value()!.data"
+            [contractTypes]="contractTypes.value()!.data"
+            [workModes]="workModes.value()!.data"
+            [situations]="config.value()!.situaciones"
+          />
+        }
+        @case (3) {
+          <app-step-criteria
+            [group]="form.controls.criterios"
+            [answers]="value().criterios"
+            [categories]="config.value()!.categorias"
+            [options]="config.value()!.opcionesRespuesta"
+            [position]="position()"
+            (positionChange)="setPosition($event)"
+          />
+        }
+        @case (4) {
+          <app-step-rating
+            class="mb-entra"
+            [group]="form.controls.texto"
+            [value]="value().texto"
+            [showErrors]="showErrors(4)"
+            [rating]="config.value()!.calificacionGeneral"
+            [texts]="config.value()!.textos"
+          />
+        }
+      }
+
+      @if (sendError(); as error) {
+        <div class="send-error" role="alert">
+          <p><svg lucideCircleAlert [size]="18" aria-hidden="true"></svg>{{ error.problems.length ? 'Falta corregir algunas cosas:' : error.message }}</p>
+          @if (error.problems.length) {
+            <ul>
+              @for (problem of error.problems; track problem) { <li>{{ problem }}</li> }
+            </ul>
+          }
+          @if (error.conflict) { <a routerLink="/mis-resenas">Ir a mis reseñas</a> }
+        </div>
+      }
+    </section>
+
+    <app-review-preview
+      class="preview"
+      [company]="value().lugar.empresa?.nombre ?? ''"
+      [meta]="meta()"
+      [rating]="value().texto.calificacion"
+      [good]="value().texto.loBueno"
+      [toImprove]="value().texto.aMejorar"
+      [answers]="previewAnswers()"
+    />
+  </div>
+
+  <div class="bar">
+    <div class="bar__in mb-wrap">
       @if (step() > firstStep()) {
-        <button type="button" class="mb-btn mb-btn-secondary" (click)="back()" [disabled]="sending()">
-          <svg lucideArrowLeft [size]="16" aria-hidden="true"></svg>Anterior
+        <button type="button" class="mb-btn mb-btn-secondary" (click)="back()">
+          <svg lucideArrowLeft [size]="16" aria-hidden="true"></svg>Atrás
         </button>
       }
-      <button type="button" class="mb-btn mb-btn-primary" (click)="next()" [disabled]="sending()">
-        @if (step() < steps.length) {
-          Siguiente<svg lucideArrowRight [size]="16" aria-hidden="true"></svg>
-        } @else if (sending()) {
-          Publicando…
-        } @else {
-          {{ editing() ? 'Guardar cambios' : 'Publicar reseña' }}
-        }
-      </button>
+      @if (missing(); as message) {
+        <p class="bar__missing" role="alert"><svg lucideCircleAlert [size]="18" aria-hidden="true"></svg>{{ message }}</p>
+      } @else {
+        <p class="bar__hint">{{ hint() }}</p>
+      }
+      <button type="button" class="mb-btn mb-btn-primary bar__next" (click)="next()">{{ sending() ? 'Enviando…' : nextLabel() }}</button>
     </div>
-  } @else {
+  </div>
+} @else {
+  <div class="mb-wrap result">
+    <h1 class="visually-hidden">Escribí tu reseña</h1>
     <app-page-state kind="loading" message="Preparando el formulario…" />
-  }
-</section>
+  </div>
+}
