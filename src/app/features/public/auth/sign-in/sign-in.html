@@ -1,6 +1,6 @@
 <section class="page auth" aria-labelledby="titulo">
   <h1 id="titulo" class="h1">Ingresar</h1>
-  @if (volver() === '/publicar') {
+  @if (volver()?.startsWith('/publicar')) {
     <p class="body">Ingresá para escribir tu reseña.</p>
   }
   <p class="mb-help anon"><svg lucideLock [size]="16" aria-hidden="true"></svg>Tu nombre nunca se muestra en las reseñas.</p>

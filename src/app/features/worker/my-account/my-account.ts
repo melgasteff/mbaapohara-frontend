@@ -5,6 +5,8 @@ import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { LucideCircleAlert, LucideDownload, LucideLock, LucideTrash2 } from '@lucide/angular';
 import { AuthApi } from '../../../core/api/auth-api';
+import { SessionService } from '../../../core/auth/session.service';
+import { ReviewDraftStore } from '../../../core/drafts/review-draft-store';
 import { PageState } from '../../../shared/ui/page-state/page-state';
 
 /**
@@ -21,6 +23,8 @@ import { PageState } from '../../../shared/ui/page-state/page-state';
 export class MyAccount {
   private readonly auth = inject(AuthApi);
   private readonly router = inject(Router);
+  private readonly session = inject(SessionService);
+  private readonly drafts = inject(ReviewDraftStore);
 
   protected readonly account = this.auth.meResource();
 
@@ -58,8 +62,13 @@ export class MyAccount {
     if (this.password.invalid) return;
     this.deleting.set(true);
     this.deleteError.set(null);
+    // Al terminar ya no hay sesión: el id se toma antes, para borrar también el borrador de este dispositivo.
+    const accountId = this.session.account()?.id;
     this.auth.deleteAccount(this.password.value).subscribe({
-      next: () => this.router.navigate(['/'], { state: { cuentaEliminada: true } }),
+      next: () => {
+        if (accountId !== undefined) this.drafts.clear(accountId);
+        this.router.navigate(['/'], { state: { cuentaEliminada: true } });
+      },
       error: (error: unknown) => {
         this.deleting.set(false);
         this.deleteError.set(
