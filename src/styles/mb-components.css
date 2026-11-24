@@ -146,3 +146,15 @@ textarea.mb-input { min-height: 96px; resize: vertical; }
 /* Filtro en frase dentro de una sección */
 .mb-frase--h2 { font-size: 22px; line-height: 34px; letter-spacing: -0.015em; }
 @media (min-width: 760px) { .mb-frase--h2 { font-size: 28px; line-height: 40px; } }
+
+/* Radio propio: el <input> nativo va antes, con .visually-hidden */
+.mb-radio { flex: none; width: 22px; height: 22px; box-sizing: border-box; border: 2px solid var(--borde-control); border-radius: 50%; background: var(--blanco); }
+input:checked ~ .mb-radio { border: 7px solid var(--azul-texto); }
+
+/* Entrada de un bloque nuevo */
+.mb-entra { animation: mb-entra .22s ease-out; }
+@keyframes mb-entra { from { opacity: 0; transform: translateY(10px); } }
+@media (prefers-reduced-motion: reduce) { .mb-entra { animation: none; } }
+
+/* Pantalla con barra fija al pie: lo enfocado no queda debajo */
+.mb-con-barra :is(input, textarea, select, button, a, label, h2) { scroll-margin-bottom: 120px; }
