@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Page } from '../models/page';
 import { NewCompanyRequest, ReportCategory } from '../models/moderation';
-import { PublicReview, PublicReviewsQuery } from '../models/review';
+import { PublicReview, PublicReviewFacets, PublicReviewFilters, PublicReviewsQuery } from '../models/review';
 import { toParams } from './query-params';
 
 /** Reseñas publicadas (GET /reviews, público). Solo trae lo que la moderación publicó. */
@@ -37,5 +37,10 @@ export class PublicReviewsApi {
       const value = query();
       return value ? { url: this.url, params: toParams(value) } : undefined;
     });
+  }
+
+  /** Conteos por opción de cada filtro del perfil. */
+  facetsResource(filters: Signal<PublicReviewFilters>) {
+    return httpResource<PublicReviewFacets>(() => ({ url: `${this.url}/facets`, params: toParams(filters()) }));
   }
 }

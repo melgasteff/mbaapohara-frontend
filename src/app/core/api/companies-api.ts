@@ -1,7 +1,7 @@
 import { httpResource } from '@angular/common/http';
 import { Injectable, Signal } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { CompaniesQuery, Company, CompanyDetail } from '../models/company';
+import { CompaniesQuery, CompanyDetail, CompanyFacets, CompanyFilters, CompanySummary } from '../models/company';
 import { Page } from '../models/page';
 import { toParams } from './query-params';
 
@@ -12,10 +12,15 @@ export class CompaniesApi {
 
   /** Listado paginado que se vuelve a pedir cada vez que cambian los filtros. */
   listResource(query: Signal<CompaniesQuery>) {
-    return httpResource<Page<Company>>(() => ({ url: this.url, params: toParams(query()) }));
+    return httpResource<Page<CompanySummary>>(() => ({ url: this.url, params: toParams(query()) }));
   }
 
-  /** Empresa con sus locales; `undefined` no hace ninguna petición. */
+  /** Conteos por opción de cada filtro del directorio. */
+  facetsResource(filters: Signal<CompanyFilters>) {
+    return httpResource<CompanyFacets>(() => ({ url: `${this.url}/facets`, params: toParams(filters()) }));
+  }
+
+  /** Empresa con sus locales y el resumen de sus reseñas; `undefined` no hace ninguna petición. */
   detailResource(id: Signal<number | undefined>) {
     return httpResource<CompanyDetail>(() => {
       const value = id();

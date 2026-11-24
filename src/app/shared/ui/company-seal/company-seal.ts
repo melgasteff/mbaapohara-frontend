@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { sectorGroup } from '../../sector-group';
+import { SectorGroup } from '../../../core/models/sector-group';
 
 /** Palabras sin significado para las iniciales: artículos, preposiciones y tipos de sociedad. */
 const SKIPPED = new Set(['de', 'del', 'la', 'las', 'el', 'los', 'y', 'e', 'en', 'sa', 'saeca', 'saci', 'srl', 'eas', 'cia', 'ltda']);
@@ -53,14 +53,13 @@ export function companyInitials(name: string): string {
 })
 export class CompanySeal {
   readonly name = input.required<string>();
-  /** Sección CIIU del rubro. */
-  readonly ciiu = input<string | null>();
+  /** Grupo de rubro de la empresa. */
+  readonly group = input<SectorGroup>('agro-otros');
   /** 72 en el perfil, 48 en listados, 36 en filas compactas. */
   readonly size = input<72 | 48 | 36>(48);
-  /** Logo con permiso de la empresa. La API todavía no lo devuelve. */
+  /** Logo con permiso de la empresa. */
   readonly logoUrl = input<string | null>();
 
-  protected readonly group = computed(() => sectorGroup(this.ciiu()));
   protected readonly initials = computed(() => companyInitials(this.name()));
   protected readonly height = computed(() => Math.round((this.size() * 7) / 6));
 }

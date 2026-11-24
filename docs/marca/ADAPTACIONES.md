@@ -31,8 +31,9 @@ Si algo de este archivo choca con ellas, gana este archivo.
 - Pie: sin «Responsabilidad por las reseñas» hasta que exista su página (fase 6).
 - Sello: las iniciales saltan artículos, preposiciones y tipos de sociedad («Supermercado La Amistad» es «SA»), como
   pide el documento; la lámina 00 dice «LA». «Agro y otros» usa la ilustración 12 (herramientas).
-- Fila de empresa: si la API no trae la cantidad de reseñas, no se muestra la columna derecha. «Muy comentada» desde
-  50 reseñas (TODO(decision) en el código).
+- Fila de empresa: «Muy comentada» desde 50 reseñas (TODO(decision) en el código). El tema principal es la primera
+  categoría de criterios, la misma para todas; con 3 reseñas o más puede no aparecer, si menos de 3 la respondieron.
+- Temas: son las **categorías** de criterios, no los ítems cortos de las láminas (provisional hasta el 26/11).
 - Moderación: no se resalta el fragmento marcado, porque la API no lo devuelve.
 - Asistente: sin «¿No está la empresa? Proponela», porque ese flujo no existe.
 

@@ -1,5 +1,7 @@
 // Modelos que siguen los DTOs del backend (src/companies/dto y src/companies/offices/dto).
 
+import { SectorGroup } from './sector-group';
+
 /** Estado de una empresa o un local propuesto (D10). */
 export type ProposalStatus = 'pendiente' | 'aprobada' | 'rechazada';
 
@@ -8,6 +10,8 @@ export interface Sector {
   id: number;
   codigoCiiu: string | null;
   nombre: string | null;
+  /** Grupo de rubro; define el color del sello. */
+  grupo: SectorGroup;
 }
 
 export interface Company {
@@ -15,14 +19,27 @@ export interface Company {
   nombre: string;
   rubro: Sector;
   estado: ProposalStatus;
-  // Resumen de reseñas publicadas. Opcional hasta que la API lo devuelva (fase 2 del rediseño).
-  cantidadResenas?: number;
+}
+
+/** Cumplimiento de una categoría de criterios, sin contar «No sé o no aplica». */
+export interface Topic {
+  codigo: string;
+  nombre: string;
+  /** Porcentaje de «Sí», entero. */
+  porcentajeSi: number;
+  /** Reseñas que respondieron algo de la categoría. */
+  resenas: number;
+}
+
+/** Empresa con el resumen de sus reseñas publicadas (GET /companies). */
+export interface CompanySummary extends Company {
+  cantidadResenas: number;
   /** Promedio con un decimal; `null` sin reseñas. */
-  promedio?: number | null;
-  /** Tema con más «Sí», sin contar «No sé»; solo con 3 reseñas o más. */
-  temaPrincipal?: { nombre: string; porcentajeSi: number } | null;
-  /** Logo con permiso de la empresa. */
-  logoUrl?: string | null;
+  promedio: number | null;
+  /** Primera categoría de criterios, la misma para todas las empresas; `null` si no llega a 3 reseñas. */
+  temaPrincipal: Topic | null;
+  /** Logo con permiso de la empresa; por ahora siempre `null`. */
+  logoUrl: string | null;
 }
 
 export interface OfficeCity {
@@ -43,18 +60,50 @@ export interface Office {
   empresa?: { id: number; nombre: string };
 }
 
-/** Empresa con sus locales aprobados (GET /companies/:id). */
-export interface CompanyDetail extends Company {
-  locales: Office[];
+/** Local con la cantidad de reseñas publicadas. */
+export interface OfficeSummary extends Office {
+  cantidadResenas: number;
 }
 
-/** Filtros del directorio (GET /companies). */
-export interface CompaniesQuery {
+/** Empresa con sus locales aprobados y el resumen de sus reseñas (GET /companies/:id). */
+export interface CompanyDetail extends CompanySummary {
+  /** De 5 a 1 estrellas; vacía con menos de 3 reseñas. */
+  distribucion: { estrellas: number; cantidad: number }[];
+  /** Categorías con 3 reseñas o más; vacía con menos de 3 reseñas. */
+  temas: Topic[];
+  locales: OfficeSummary[];
+}
+
+/** Filtros del directorio, para el listado y sus conteos. */
+export interface CompanyFilters {
   q?: string;
-  ciudad?: number;
   rubro?: number;
+  grupo?: SectorGroup;
+  departamento?: number;
+  ciudad?: number;
+  /** `true`: solo con reseñas; `false`: solo sin reseñas; sin valor, todas. */
+  conResenas?: boolean;
+}
+
+export type CompanyOrder = 'nombre' | 'resenas' | 'calificacion';
+
+/** Consulta del directorio (GET /companies). */
+export interface CompaniesQuery extends CompanyFilters {
+  orden?: CompanyOrder;
   page?: number;
   pageSize?: number;
+}
+
+/** Conteos del directorio (GET /companies/facets). Cada uno aplica los demás filtros y no el propio. */
+export interface CompanyFacets {
+  /** Empresas con todos los filtros. */
+  total: number;
+  /** Reseñas de esas empresas; con departamento o ciudad, solo las de ese lugar. */
+  experiencias: number;
+  grupos: { total: number; opciones: { grupo: SectorGroup; cantidad: number }[] };
+  departamentos: { total: number; opciones: { id: number; nombre: string; cantidad: number }[] };
+  ciudades: { total: number; opciones: { id: number; nombre: string; idDepartamento: number; cantidad: number }[] };
+  resenas: { total: number; con: number; sin: number };
 }
 
 /** Rubro completo del catálogo (GET /sectors). */

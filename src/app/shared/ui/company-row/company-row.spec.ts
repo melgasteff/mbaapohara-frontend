@@ -3,14 +3,23 @@ import localeEsPy from '@angular/common/locales/es-PY';
 import { LOCALE_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { Company } from '../../../core/models/company';
+import { CompanySummary } from '../../../core/models/company';
 import { CompanyRow, companyRowState } from './company-row';
 
 registerLocaleData(localeEsPy);
 
-const company: Company = { id: 7, nombre: 'Empresa Ejemplo', rubro: { id: 1, codigoCiiu: 'G', nombre: 'Comercio' }, estado: 'aprobada' };
+const company: CompanySummary = {
+  id: 7,
+  nombre: 'Empresa Ejemplo',
+  rubro: { id: 1, codigoCiiu: 'G', nombre: 'Comercio', grupo: 'comercio' },
+  estado: 'aprobada',
+  cantidadResenas: 0,
+  promedio: null,
+  temaPrincipal: null,
+  logoUrl: null,
+};
 
-function render(change: Partial<Company>): HTMLElement {
+function render(change: Partial<CompanySummary>): HTMLElement {
   const fixture = TestBed.createComponent(CompanyRow);
   fixture.componentRef.setInput('company', { ...company, ...change });
   fixture.detectChanges();
@@ -22,13 +31,11 @@ describe('Fila de empresa', () => {
   beforeEach(() => TestBed.configureTestingModule({ providers: [provideRouter([]), { provide: LOCALE_ID, useValue: 'es-PY' }] }));
 
   it('elige el estado por la cantidad de reseñas', () => {
-    expect([undefined, 0, 1, 2, 3, 49, 50].map(companyRowState)).toEqual(['sin-dato', 'ninguna', 'pocas', 'pocas', 'con-temas', 'con-temas', 'muchas']);
+    expect([0, 1, 2, 3, 49, 50].map(companyRowState)).toEqual(['ninguna', 'pocas', 'pocas', 'con-temas', 'con-temas', 'muchas']);
   });
 
-  it('si la API no trae la cantidad, no afirma nada sobre las reseñas', () => {
-    const el = render({});
-    expect(el.querySelector('.side')).toBeNull();
-    expect(el.querySelector('h2 a')?.getAttribute('href')).toBe('/empresas/7');
+  it('toda la fila lleva al perfil', () => {
+    expect(render({}).querySelector('h2 a')?.getAttribute('href')).toBe('/empresas/7');
   });
 
   it('sin reseñas invita a contar la primera', () => {
@@ -45,7 +52,7 @@ describe('Fila de empresa', () => {
   });
 
   it('con 3 o más suma el tema principal', () => {
-    const el = render({ cantidadResenas: 9, promedio: 3.6, temaPrincipal: { nombre: 'Tema ficticio', porcentajeSi: 78 } });
+    const el = render({ cantidadResenas: 9, promedio: 3.6, temaPrincipal: { codigo: 'X', nombre: 'Tema ficticio', porcentajeSi: 78, resenas: 9 } });
     expect(text(el)).toContain('3,6');
     expect(text(el)).toContain('Tema ficticio');
     expect(text(el)).toContain('78 %');

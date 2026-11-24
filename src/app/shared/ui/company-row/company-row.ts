@@ -2,7 +2,7 @@ import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { LucideArrowRight } from '@lucide/angular';
-import { Company } from '../../../core/models/company';
+import { CompanySummary } from '../../../core/models/company';
 import { CompanySeal } from '../company-seal/company-seal';
 
 /** Reseñas desde las que se muestran los temas (indicadores visibles con 3 o más). */
@@ -10,11 +10,10 @@ export const MIN_REVIEWS_FOR_TOPICS = 3;
 /** TODO(decision): umbral de «Muy comentada»; 50 es el valor inicial del documento de rediseño. */
 export const MANY_REVIEWS = 50;
 
-export type CompanyRowState = 'sin-dato' | 'ninguna' | 'pocas' | 'con-temas' | 'muchas';
+export type CompanyRowState = 'ninguna' | 'pocas' | 'con-temas' | 'muchas';
 
-/** Qué se muestra a la derecha según la cantidad. Sin el dato no se afirma nada (tampoco «sin reseñas»). */
-export function companyRowState(count: number | undefined): CompanyRowState {
-  if (count === undefined) return 'sin-dato';
+/** Qué se muestra a la derecha según la cantidad de reseñas publicadas. */
+export function companyRowState(count: number): CompanyRowState {
   if (count === 0) return 'ninguna';
   if (count < MIN_REVIEWS_FOR_TOPICS) return 'pocas';
   return count >= MANY_REVIEWS ? 'muchas' : 'con-temas';
@@ -28,14 +27,13 @@ export function companyRowState(count: number | undefined): CompanyRowState {
   host: { '[class.is-many]': "state() === 'muchas'" },
   styleUrl: './company-row.css',
   template: `
-    <app-company-seal [name]="company().nombre" [ciiu]="company().rubro.codigoCiiu" [logoUrl]="company().logoUrl" />
+    <app-company-seal [name]="company().nombre" [group]="company().rubro.grupo" [logoUrl]="company().logoUrl" />
     <div class="info">
       @if (state() === 'muchas') { <p class="sobretitulo">Muy comentada</p> }
       <h2 class="name"><a [routerLink]="['/empresas', company().id]">{{ company().nombre }}</a></h2>
       @if (company().rubro.nombre; as rubro) { <p class="body-sm muted">{{ rubro }}</p> }
     </div>
     @switch (state()) {
-      @case ('sin-dato') {}
       @case ('ninguna') {
         <div class="side">
           <p class="body-sm muted">Nadie contó todavía cómo es trabajar acá.</p>
@@ -68,7 +66,7 @@ export function companyRowState(count: number | undefined): CompanyRowState {
   `,
 })
 export class CompanyRow {
-  readonly company = input.required<Company>();
+  readonly company = input.required<CompanySummary>();
 
   protected readonly count = computed(() => this.company().cantidadResenas);
   protected readonly state = computed(() => companyRowState(this.count()));

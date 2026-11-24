@@ -182,6 +182,30 @@ export interface PublicReviewsQuery {
   tipoContrato?: number;
   modalidad?: number;
   situacion?: WorkSituation;
+  orden?: PublicReviewOrder;
   page?: number;
   pageSize?: number;
+}
+
+export type PublicReviewOrder = 'recientes' | 'mejor' | 'peor';
+
+/** Filtros del perfil, para los conteos: los del listado, con la empresa obligatoria. */
+export type PublicReviewFilters = Omit<PublicReviewsQuery, 'page' | 'pageSize' | 'orden'> & { empresa: number };
+
+/** Conteos de un filtro. `total` es el de «todos»: las reseñas sin aplicar ese filtro. */
+export interface ReviewFacet<T> {
+  total: number;
+  opciones: (T & { cantidad: number })[];
+}
+
+/** Conteos por opción de los filtros del perfil (GET /reviews/facets). */
+export interface PublicReviewFacets {
+  /** Reseñas con todos los filtros. */
+  total: number;
+  local: ReviewFacet<{ id: number; nombre: string; ciudad: string }>;
+  /** Solo cargos aprobados: puede sumar menos que el total. */
+  cargo: ReviewFacet<CatalogItem>;
+  tipoContrato: ReviewFacet<CatalogItem>;
+  modalidad: ReviewFacet<CatalogItem>;
+  situacion: ReviewFacet<{ valor: WorkSituation }>;
 }

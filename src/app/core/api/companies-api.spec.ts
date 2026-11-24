@@ -32,6 +32,17 @@ describe('CompaniesApi', () => {
     req.flush({ data: [], total: 0, page: 2, pageSize: 20 });
   });
 
+  it('pide los conteos con los mismos filtros; «sin reseñas» viaja como false', () => {
+    runInInjectionContext(injector, () => api.facetsResource(signal({ grupo: 'comercio' as const, departamento: 5, conResenas: false })));
+    TestBed.tick();
+
+    const req = http.expectOne((r) => r.url.endsWith('/companies/facets'));
+    expect(req.request.params.get('grupo')).toBe('comercio');
+    expect(req.request.params.get('departamento')).toBe('5');
+    expect(req.request.params.get('conResenas')).toBe('false');
+    req.flush({});
+  });
+
   it('no pide el detalle mientras no hay id', () => {
     runInInjectionContext(injector, () => api.detailResource(signal(undefined)));
     TestBed.tick();

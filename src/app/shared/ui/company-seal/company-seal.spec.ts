@@ -18,8 +18,8 @@ describe('Sello de empresa', () => {
   it('el color sale del grupo de rubro', () => {
     const fixture = TestBed.createComponent(CompanySeal);
     fixture.componentRef.setInput('name', 'Transportadora Ejemplo');
-    for (const [ciiu, group] of [['G', 'comercio'], ['F', 'industria'], ['N', 'servicios'], ['I', 'gastronomia'], ['H', 'transporte'], [null, 'agro-otros']]) {
-      fixture.componentRef.setInput('ciiu', ciiu);
+    for (const group of ['comercio', 'industria', 'servicios', 'gastronomia', 'transporte', 'agro-otros']) {
+      fixture.componentRef.setInput('group', group);
       fixture.detectChanges();
       expect((fixture.nativeElement as HTMLElement).className).toBe(group);
     }

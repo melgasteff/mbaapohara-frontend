@@ -31,6 +31,16 @@ describe('PublicReviewsApi', () => {
     req.flush({ data: [], total: 0, page: 2, pageSize: 10 });
   });
 
+  it('pide los conteos de una empresa con sus filtros', () => {
+    runInInjectionContext(injector, () => TestBed.inject(PublicReviewsApi).facetsResource(signal({ empresa: 4, local: 7 })));
+    TestBed.tick();
+
+    const req = http.expectOne((r) => r.url.endsWith('/reviews/facets'));
+    expect(req.request.params.get('empresa')).toBe('4');
+    expect(req.request.params.get('local')).toBe('7');
+    req.flush({});
+  });
+
   it('sin consulta no pide nada', () => {
     runInInjectionContext(injector, () => TestBed.inject(PublicReviewsApi).listResource(signal(undefined)));
     TestBed.tick();
