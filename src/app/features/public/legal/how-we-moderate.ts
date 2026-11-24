@@ -1,5 +1,30 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TabItem, Tabs } from '../../../shared/ui/tabs/tabs';
+import { InfoPage } from '../info-page/info-page';
+
+type Stage = 'enviada' | 'automatica' | 'humana' | 'publicada' | 'cambio';
+
+const STAGES: Record<Stage, { titulo: string; texto: string; nota?: string }> = {
+  enviada: { titulo: 'Enviada', texto: 'Al tocar «Enviar», la reseña queda guardada. Todavía no la ve nadie más que vos.' },
+  automatica: {
+    titulo: 'Revisión automática',
+    texto:
+      'Primero, unas reglas buscan datos de contacto, palabras ofensivas y textos repetidos. Después, un modelo de lenguaje analiza el texto: solo recibe lo que escribiste, nunca tu correo, tu cuenta, la empresa ni el local.',
+    nota: 'Si el resultado es claro, se publica o te pedimos un cambio. Si hay dudas, si parece acusar de un delito a una persona o si el servicio falla, la lee una persona.',
+  },
+  humana: {
+    titulo: 'Revisión humana',
+    texto: 'Una persona del equipo lee la reseña y decide si se publica o si hay que corregir algo. El objetivo es resolverla en 48 horas.',
+    nota: 'Ve el contenido de la reseña y por qué quedó en revisión, nunca quién la escribió.',
+  },
+  publicada: { titulo: 'Publicada', texto: 'Aparece en el perfil de la empresa, con el mes de publicación y sin tu nombre.' },
+  cambio: {
+    titulo: 'Necesita un cambio',
+    texto: 'Te decimos qué corregir. Lo demás queda guardado y la volvés a enviar. Solo vos la ves.',
+    nota: 'Está en «Mis reseñas».',
+  },
+};
 
 /**
  * «Cómo moderamos» (tarea 1.9). Resume para el público la política de moderación del backend
@@ -7,83 +32,72 @@ import { RouterLink } from '@angular/router';
  */
 @Component({
   selector: 'app-how-we-moderate',
-  imports: [RouterLink],
+  imports: [RouterLink, InfoPage, Tabs],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrl: './legal.css',
+  styleUrl: './info-content.css',
+  styles: `
+    .stage { display: flex; flex-direction: column; gap: var(--space-2); padding: 24px 26px; border-radius: var(--radio-md); background: var(--blanco); font-size: 16px; line-height: 25px; }
+    .stage h3 { font-size: 21px; line-height: 28px; }
+  `,
   template: `
-    <article class="page legal" aria-labelledby="titulo">
-      <h1 id="titulo" class="h1">Cómo moderamos</h1>
-      <p class="meta body-sm"><span class="mb-tag">Borrador</span> Actualizada el 19 de noviembre de 2026</p>
+    <app-info-page page="moderacion">
+      <section id="recorrido" tabindex="-1" aria-labelledby="recorrido-titulo">
+        <h2 id="recorrido-titulo" class="info-h2">El recorrido de una reseña</h2>
+        <p>Tocá cada etapa para ver qué pasa en ella.</p>
+        <app-tabs look="etapas" label="Etapas" panelId="etapa" [tabs]="tabs" [(value)]="stage" />
+        <div class="stage" id="etapa" role="tabpanel" tabindex="0" [attr.aria-labelledby]="'etapa-' + stage()">
+          <h3>{{ detail().titulo }}</h3>
+          <p>{{ detail().texto }}</p>
+          @if (detail().nota; as note) { <p class="small">{{ note }}</p> }
+        </div>
+      </section>
 
-      <div class="callout">
-        <p class="body">
-          Mbaapohara existe para que cuentes cómo trata una empresa a quienes trabajan en ella.
-          <strong>La crítica a la empresa sobre hechos laborales siempre se publica</strong>, aunque sea dura.
-          Moderamos para proteger a las personas y tu anonimato, no para filtrar opiniones negativas.
+      <section id="revisamos" tabindex="-1" aria-labelledby="revisamos-titulo">
+        <h2 id="revisamos-titulo" class="info-h2">Qué revisamos y qué no</h2>
+        <p>La crítica a la empresa sobre hechos laborales siempre se publica, aunque sea dura. Moderamos para proteger a las personas y tu anonimato.</p>
+        <div class="cards cards--2">
+          <div class="card card--yes">
+            <h3>Revisamos que no haya</h3>
+            <ul>
+              <li>Teléfonos, correos, documentos o enlaces</li>
+              <li>Nombres, apodos o descripciones que apunten a una persona</li>
+              <li>Acusaciones de delitos contra una persona</li>
+              <li>Insultos, amenazas o discriminación</li>
+              <li>Publicidad o textos que no hablan del trabajo</li>
+            </ul>
+          </div>
+          <div class="card card--no">
+            <h3>Nunca hacemos esto</h3>
+            <ul>
+              <li>Retirar una reseña solo porque es negativa</li>
+              <li>Cambiar tu texto: si algo se corrige, te lo pedimos</li>
+              <li>Mostrar quién escribió, ni siquiera a la moderación</li>
+            </ul>
+          </div>
+        </div>
+        <p>Las reglas completas, con ejemplos, están en los <a routerLink="/terminos" fragment="reglas">términos de uso</a>.</p>
+      </section>
+
+      <section id="reportes" tabindex="-1" aria-labelledby="reportes-titulo">
+        <h2 id="reportes-titulo" class="info-h2">Si ves algo que no debería estar</h2>
+        <p>
+          Con tu cuenta podés tocar «Reportar» en una reseña publicada. Juntamos los reportes de cada reseña y decidimos si se mantiene o se retira
+          según las mismas reglas con las que se revisó. Mientras tanto sigue visible, para que nadie pueda bajar reseñas reportándolas muchas
+          veces.
         </p>
-      </div>
-
-      <h2 class="h2" id="reglas">Reglas de publicación</h2>
-      <p>Antes de enviar tu reseña aceptás estas reglas:</p>
-      <ol>
-        <li>Contá <strong>tu propia experiencia</strong> en esa empresa y ese local.</li>
-        <li>Hablá de <strong>hechos sobre la empresa</strong>: pagos, horarios, contratos, trato, seguridad.</li>
-        <li><strong>No nombres a nadie</strong>: ni nombres, ni apodos, ni descripciones que apunten a una sola persona.</li>
-        <li><strong>No incluyas datos de contacto</strong>: teléfonos, correos, números de documento ni enlaces.</li>
-        <li><strong>Sin insultos</strong>, discriminación ni amenazas.</li>
-        <li><strong>Sin publicidad</strong> ni textos que no hablen de tu experiencia de trabajo.</li>
-        <li>Una reseña por persona y local. Podés editarla; cada cambio vuelve a pasar por la moderación.</li>
-      </ol>
-
-      <h2 class="h2">Qué revisamos</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th scope="col">Revisamos</th><th scope="col">Por ejemplo</th><th scope="col">Sí se publica</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Datos de contacto</td><td>«Llamá al 0981…», un correo, una cédula, un enlace</td><td>Montos de salario, fechas, horarios</td></tr>
-            <tr><td>Personas identificables</td><td>«El gerente Juan Pérez», un apodo, «la cajera de la caja 3»</td><td>«Los encargados avisan tarde los horarios»</td></tr>
-            <tr><td>Acusaciones de delitos contra una persona</td><td>«La supervisora roba»</td><td>«Hay acoso y la empresa no hace nada»</td></tr>
-            <tr><td>Insultos, odio o discriminación</td><td>Insultos, también en jopara; desprecio por sexo, origen o religión</td><td>«Un desastre cómo pagan»</td></tr>
-            <tr><td>Publicidad</td><td>Ofertas, promociones, avisos de empleo</td><td>Recomendar o no trabajar ahí</td></tr>
-            <tr><td>Textos fuera de tema</td><td>Opiniones sobre la atención como cliente</td><td>Contexto breve sobre tu trabajo</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h2 class="h2">Cómo se decide</h2>
-      <ol>
-        <li><strong>Reglas automáticas</strong> buscan datos de contacto y palabras ofensivas.</li>
-        <li>Un <strong>modelo de lenguaje</strong> analiza el texto. Solo recibe el texto de la reseña: nunca tu correo,
-          tu cuenta ni la empresa.</li>
-        <li>Si el resultado es claro, se publica o se rechaza explicando qué corregir. Si hay dudas, si la reseña acusa a
-          una persona o si el servicio automático falla, <strong>la revisa una persona del equipo</strong>.</li>
-      </ol>
-
-      <h2 class="h2">Qué pasa con tu reseña</h2>
-      <ul>
-        <li><strong>Publicada:</strong> la ve cualquier persona, sin tu nombre.</li>
-        <li><strong>En revisión:</strong> una persona del equipo la revisa en un plazo de 48 horas, sin saber quién la escribió.
-          Mientras tanto solo la ves vos.</li>
-        <li><strong>Rechazada:</strong> solo la ves vos, con el motivo y qué corregir. Podés editarla y volver a enviarla.</li>
-      </ul>
-
-      <h2 class="h2">Después de publicar</h2>
-      <ul>
-        <li><strong>Reportes:</strong> si una reseña rompe estas reglas, cualquier cuenta puede reportarla. La reseña sigue visible
-          mientras la revisamos, para que nadie pueda bajar reseñas negativas reportándolas muchas veces.</li>
-        <li><strong>Empresas:</strong> no tienen cuenta. Pueden pedirnos que revisemos una reseña o que corrijamos sus datos con un
-          formulario, desde el perfil de la empresa. La evaluamos con estas mismas reglas:
-          <strong>una reseña nunca se retira por ser negativa</strong>. Respondemos por correo.</li>
-        <li>Si retiramos una reseña, quien la escribió ve el motivo y puede corregirla.</li>
-      </ul>
-
-      <nav class="see-also" aria-label="Más información">
-        <a class="mb-link" routerLink="/privacidad">Política de privacidad</a>
-        <a class="mb-link" routerLink="/terminos">Términos de uso</a>
-      </nav>
-    </article>
+        <p>Si sos de la empresa, no necesitás cuenta: mirá <a routerLink="/responsabilidad" fragment="pedido">cómo pedir una revisión</a>.</p>
+      </section>
+    </app-info-page>
   `,
 })
-export class HowWeModerate {}
+export class HowWeModerate {
+  protected readonly tabs: TabItem<Stage>[] = (Object.keys(STAGES) as Stage[]).map((valor, i) => ({
+    valor,
+    etiqueta: STAGES[valor].titulo,
+    urgente: valor === 'cambio',
+    // Al final del recorrido se llega a una de las dos últimas.
+    separador: i < 3 ? '→' : i === 3 ? 'o' : undefined,
+  }));
+  protected readonly stage = signal<Stage>('automatica');
+  protected readonly detail = computed(() => STAGES[this.stage()]);
+}

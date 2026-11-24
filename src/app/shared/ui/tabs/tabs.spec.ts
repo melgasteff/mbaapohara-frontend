@@ -44,4 +44,15 @@ describe('Pestañas', () => {
     expect(selected()).toBe('b');
     expect(tabs()[1].querySelector('.is-urgent')?.textContent).toBe('1');
   });
+
+  it('como etapas, numera los pasos y también se recorre hacia abajo', () => {
+    const { fixture, tabs, press, selected } = setup();
+    press('ArrowDown');
+    expect(selected()).toBe('a');
+    fixture.componentRef.setInput('look', 'etapas');
+    fixture.detectChanges();
+    expect(tabs().map((tab) => tab.querySelector('.step')?.textContent)).toEqual(['1', '2', '3']);
+    press('ArrowDown');
+    expect(selected()).toBe('b');
+  });
 });

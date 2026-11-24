@@ -1,0 +1,26 @@
+/* Contenido propio de las páginas informativas (la plantilla es info-page). */
+h2, h3, p, ul, ol, dl, dd { margin: 0; }
+/* El contenido proyectado no recibe los estilos de la plantilla: las secciones se repiten acá. */
+section { display: flex; flex-direction: column; gap: var(--space-4); margin-top: calc(-1 * var(--space-5)); padding-top: var(--space-5); /* aire al llegar por un ancla: el router no mira scroll-margin */ }
+section:focus { outline: none; }
+section > p { font-size: 17px; line-height: 27px; }
+a { text-underline-offset: 3px; }
+.cards { display: grid; gap: var(--space-4); }
+.card { display: flex; flex-direction: column; gap: 10px; padding: 22px; border-radius: var(--radio-md); background: var(--blanco); font-size: 15px; line-height: 22px; color: var(--noche-suave); }
+.card h3 { font-size: 18px; line-height: 24px; color: var(--noche); }
+.card--yes { border-top: 4px solid var(--azul-texto); }
+.card--no { border-top: 4px solid var(--naranja-texto); }
+.card--link { color: var(--noche-suave); text-decoration: none; }
+.card--link:hover { background: var(--azul-suave); }
+.card--link:focus-visible { outline: 2px solid var(--azul-texto); outline-offset: 2px; }
+.card--link strong { display: inline-flex; align-items: center; gap: 6px; color: var(--azul-texto); }
+.card ul { padding-left: 20px; font-size: 16px; line-height: 26px; color: var(--noche); }
+.rows { border-top: 1px solid var(--linea); }
+.rows > div { display: grid; gap: var(--space-1) var(--space-4); padding: 14px 0; border-bottom: 1px solid var(--linea); font-size: 16px; line-height: 25px; }
+.rows dt { font-weight: 700; }
+.small { font-size: 14px; line-height: 20px; color: var(--noche-suave); }
+@media (min-width: 760px) {
+  .cards--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cards--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .rows > div { grid-template-columns: 200px minmax(0, 1fr); }
+}

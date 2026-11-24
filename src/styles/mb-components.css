@@ -161,3 +161,7 @@ input:checked ~ .mb-radio { border: 7px solid var(--azul-texto); }
 
 /* Aviso de que algo salió bien */
 .mb-aviso { padding: var(--space-3) 14px; border-radius: var(--radio-sm); background: var(--azul-suave); color: var(--azul-texto); font-size: 15px; line-height: 22px; font-weight: 600; }
+
+/* Título de sección de las páginas informativas (plantilla y contenido) */
+.info-h2 { margin: 0; font-size: 26px; line-height: 32px; font-weight: 700; letter-spacing: -0.01em; }
+@media (min-width: 760px) { .info-h2 { font-size: 28px; line-height: 34px; } }
