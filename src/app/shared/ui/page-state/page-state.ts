@@ -16,10 +16,10 @@ export type PageStateKind = 'loading' | 'empty' | 'error';
     .state {
       display: flex; flex-direction: column; align-items: center; gap: var(--space-3);
       padding: var(--space-7) var(--space-4); text-align: center;
-      background: var(--surface-sunken); border-radius: var(--radius-lg); color: var(--ink-muted);
+      background: var(--blanco); border-radius: var(--radio-md); color: var(--noche-suave);
     }
     .state p { margin: 0; max-width: 45ch; }
-    .state strong { color: var(--ink); }
+    .state strong { color: var(--noche); }
   `,
   template: `
     @switch (kind()) {

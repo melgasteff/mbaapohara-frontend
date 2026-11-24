@@ -60,19 +60,19 @@ import { REPORT_CATEGORIES, REPORT_LABELS, ReportCategory } from '../../../../co
     }
   `,
   styles: `
-    :host { display: block; border-top: 1px solid var(--line); padding-top: var(--space-3); }
+    :host { display: block; border-top: 1px solid var(--linea); padding-top: var(--space-3); }
     .links { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); }
     .report { display: flex; flex-direction: column; gap: var(--space-3); }
     fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: var(--space-1); }
     legend { padding: 0; margin-bottom: var(--space-1); }
     .choice { display: flex; align-items: center; gap: var(--space-2); cursor: pointer; }
-    .choice input { accent-color: var(--yerba); margin: 0; }
+    .choice input { accent-color: var(--azul-texto); margin: 0; }
     .mb-field { width: 100%; }
-    .hint { margin: 0; color: var(--ink-muted); }
+    .hint { margin: 0; color: var(--noche-suave); }
     .buttons { display: flex; flex-wrap: wrap; gap: var(--space-2); }
     .ok, .error { display: flex; align-items: center; gap: var(--space-1); margin: 0; }
-    .ok { color: var(--success); }
-    .error { color: var(--danger); }
+    .ok { color: var(--azul-texto); }
+    .error { color: var(--naranja-texto); }
   `,
 })
 export class ReviewActions {

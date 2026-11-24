@@ -1,11 +1,11 @@
 .account { max-width: 640px; }
 .card {
   display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-5);
-  background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-lg);
+  background: var(--blanco); border: 1px solid var(--linea); border-radius: var(--radio-md);
 }
 .card h2, .card p { margin: 0; }
 dl { display: grid; gap: var(--space-1); margin: 0; }
-dt { color: var(--ink-muted); }
+dt { color: var(--noche-suave); }
 dt:not(:first-child) { margin-top: var(--space-2); }
 @media (min-width: 480px) {
   dl { grid-template-columns: auto 1fr; gap: var(--space-2) var(--space-4); }
@@ -16,9 +16,9 @@ dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
 .card .mb-btn { align-self: flex-start; }
 .card form { display: flex; flex-direction: column; gap: var(--space-3); }
 .card .mb-field { width: 100%; max-width: 360px; }
-.danger-zone { border-color: var(--danger); }
-.delete { color: var(--danger); border-color: var(--danger); }
+.danger-zone { border-color: var(--naranja-texto); }
+.delete { color: var(--naranja-texto); border-color: var(--naranja-texto); }
 .alert {
   display: flex; gap: var(--space-2); align-items: flex-start; margin: 0;
-  padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--danger-soft); color: var(--danger);
+  padding: var(--space-3) var(--space-4); border-radius: var(--radio-md); background: var(--naranja-suave); color: var(--naranja-texto);
 }

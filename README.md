@@ -6,7 +6,7 @@ empresas y locales de Paraguay, y cualquier persona las consulta, filtra y ve in
 Proyecto Final de Grado, Ingeniería en Informática, FCyT-UNCA.
 
 - **Stack:** Angular 22 (componentes standalone, sin zone.js), Reactive Forms, `@lucide/angular`. Sin librería
-  de componentes: estilos del manual de marca (`src/styles/mb-*.css`, [docs/marca/](docs/marca/README.md)).
+  de componentes: estilos de la marca (`src/styles/mb-*.css`).
 - **API:** [mbaapohara-backend](../mbaapohara-backend/README.md) (NestJS). En desarrollo se espera en
   `http://localhost:3000` (`src/environments/environment.development.ts`).
 
@@ -121,6 +121,6 @@ src/app/
     worker/   asistente de publicación
     admin/    administración
   mocks/      implementaciones simuladas, detrás de la misma interfaz que el servicio real
-public/       fuentes, logos y la forma de la reseña (archivos estáticos)
+public/       fuentes, logos, ilustraciones y la forma de la reseña (archivos estáticos)
 docs/         plan, decisiones, demo y manual de marca
 ```

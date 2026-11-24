@@ -4,11 +4,11 @@
 .item { display: flex; flex-direction: column; gap: var(--space-3); }
 .item__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-3); }
 .item__head h2 { margin: 0; display: flex; flex-direction: column; gap: var(--space-1); }
-.item__head small { color: var(--ink-muted); font-weight: 400; }
-.reason { margin: 0; color: var(--ink-muted); }
+.item__head small { color: var(--noche-suave); font-weight: 400; }
+.reason { margin: 0; color: var(--noche-suave); }
 .actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-.delete { color: var(--danger); border-color: var(--danger); }
+.delete { color: var(--naranja-texto); border-color: var(--naranja-texto); }
 .alert {
   display: flex; gap: var(--space-2); align-items: flex-start; margin: 0;
-  padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--danger-soft); color: var(--danger);
+  padding: var(--space-3) var(--space-4); border-radius: var(--radio-md); background: var(--naranja-suave); color: var(--naranja-texto);
 }

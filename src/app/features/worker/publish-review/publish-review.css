@@ -1,9 +1,9 @@
 .anon { display: flex; align-items: center; gap: var(--space-1); }
 
 .stepper { list-style: none; margin: var(--space-6) 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-2); }
-.stepper li { display: flex; flex-direction: column; gap: var(--space-1); padding-top: var(--space-2); border-top: 4px solid var(--line); color: var(--ink-muted); }
-.stepper li.is-done { border-top-color: var(--yerba-soft); }
-.stepper li.is-current { border-top-color: var(--yerba); color: var(--ink); }
+.stepper li { display: flex; flex-direction: column; gap: var(--space-1); padding-top: var(--space-2); border-top: 4px solid var(--linea); color: var(--noche-suave); }
+.stepper li.is-done { border-top-color: var(--azul-suave); }
+.stepper li.is-current { border-top-color: var(--azul-texto); color: var(--noche); }
 .stepper__num { font-weight: 700; }
 .stepper__name { font-size: 14px; line-height: 20px; }
 /* En móvil solo se ven las barras; el nombre del paso está en el título. */
@@ -11,15 +11,15 @@
 
 .step-title { margin: var(--space-5) 0 0; display: flex; flex-direction: column; gap: var(--space-1); }
 .step-title:focus { outline: none; }
-.step-count { color: var(--ink-muted); }
+.step-count { color: var(--noche-suave); }
 
-.summary { color: var(--danger); display: flex; align-items: center; gap: var(--space-1); }
+.summary { color: var(--naranja-texto); display: flex; align-items: center; gap: var(--space-1); }
 .actions { display: flex; gap: var(--space-3); flex-wrap: wrap; padding-top: var(--space-2); }
 
-.editing-place { margin: var(--space-4) 0 0; color: var(--ink-muted); }
+.editing-place { margin: var(--space-4) 0 0; color: var(--noche-suave); }
 .send-error {
   display: flex; flex-direction: column; gap: var(--space-2); max-width: 640px;
-  padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--danger-soft); color: var(--danger);
+  padding: var(--space-3) var(--space-4); border-radius: var(--radio-md); background: var(--naranja-suave); color: var(--naranja-texto);
 }
 .send-error p { display: flex; align-items: center; gap: var(--space-1); margin: 0; }
 .send-error ul { margin: 0; padding-left: var(--space-5); }

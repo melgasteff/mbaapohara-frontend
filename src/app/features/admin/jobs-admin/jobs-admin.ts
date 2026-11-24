@@ -80,7 +80,7 @@ import { Notice } from '../status';
     .toolbar { align-items: flex-end; }
     .proposed { display: flex; flex-direction: column; gap: var(--space-3); }
     h2 { margin: var(--space-2) 0 0; }
-    .hint { margin: 0; color: var(--ink-muted); }
+    .hint { margin: 0; color: var(--noche-suave); }
     .add { flex: 1; min-width: 220px; max-width: 420px; }
   `,
 })

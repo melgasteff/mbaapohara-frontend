@@ -23,14 +23,14 @@ import { PageState } from '../../../shared/ui/page-state/page-state';
   styles: `
     .form { display: flex; flex-direction: column; gap: var(--space-4); max-width: 560px; }
     .form .mb-field { width: 100%; }
-    .quote { margin: 0; padding: var(--space-3) var(--space-4); background: var(--surface-sunken); border-radius: var(--radius-md); }
+    .quote { margin: 0; padding: var(--space-3) var(--space-4); background: var(--blanco); border-radius: var(--radio-md); }
     .quote p { margin: 0; }
     .quote p + p { margin-top: var(--space-2); }
     .check { display: flex; gap: var(--space-2); align-items: flex-start; }
-    .check input { accent-color: var(--yerba); margin-top: 4px; }
-    .alert { display: flex; gap: var(--space-2); align-items: center; margin: 0; padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); }
-    .alert--error { background: var(--danger-soft); color: var(--danger); }
-    .alert--ok { background: var(--success-soft); color: var(--success); }
+    .check input { accent-color: var(--azul-texto); margin-top: 4px; }
+    .alert { display: flex; gap: var(--space-2); align-items: center; margin: 0; padding: var(--space-3) var(--space-4); border-radius: var(--radio-md); }
+    .alert--error { background: var(--naranja-suave); color: var(--naranja-texto); }
+    .alert--ok { background: var(--azul-suave); color: var(--azul-texto); }
   `,
 })
 export class CompanyRequestPage {

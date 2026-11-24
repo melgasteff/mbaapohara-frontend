@@ -26,16 +26,16 @@ type Editing = { kind: 'category'; id: number } | { kind: 'item'; id: number; re
   host: { class: 'admin-screen' },
   templateUrl: './criteria-admin.html',
   styles: `
-    .category { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4); background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-md); }
-    .category--off { background: var(--surface-sunken); }
+    .category { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4); background: var(--blanco); border: 1px solid var(--linea); border-radius: var(--radio-md); }
+    .category--off { background: var(--crema); }
     .category__head { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; justify-content: space-between; }
     .category__head h2 { margin: 0; }
-    .rows .row { background: var(--surface); }
-    .row--off .row__title { color: var(--ink-muted); }
-    .code { color: var(--ink-muted); }
+    .rows .row { background: var(--crema); }
+    .row--off .row__title { color: var(--noche-suave); }
+    .code { color: var(--noche-suave); }
     .meta { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
-    .hint { margin: 0; color: var(--ink-muted); }
-    .warning { display: flex; gap: var(--space-2); align-items: flex-start; margin: 0; padding: var(--space-3); border-radius: var(--radius-md); background: var(--warning-soft); color: var(--warning); }
+    .hint { margin: 0; color: var(--noche-suave); }
+    .warning { display: flex; gap: var(--space-2); align-items: flex-start; margin: 0; padding: var(--space-3); border-radius: var(--radio-md); background: var(--amarillo-suave); color: var(--noche); }
     .inline { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: flex-end; width: 100%; }
     .inline .grow { flex: 1; min-width: 220px; width: auto; }
     .inline .code-field { width: 160px; }

@@ -5,13 +5,13 @@
 .auth .mb-btn-primary { align-self: stretch; height: 48px; }
 .alert {
   display: flex; gap: var(--space-2); align-items: flex-start; margin: 0;
-  padding: var(--space-3) var(--space-4); border-radius: var(--radius-md);
-  background: var(--danger-soft); color: var(--danger);
+  padding: var(--space-3) var(--space-4); border-radius: var(--radio-md);
+  background: var(--naranja-suave); color: var(--naranja-texto);
 }
 .alert svg { flex: none; margin-top: 2px; }
 .rules { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-1); }
-.rules li { display: flex; align-items: center; gap: var(--space-2); color: var(--ink-muted); }
-.rules li.ok { color: var(--success); }
+.rules li { display: flex; align-items: center; gap: var(--space-2); color: var(--noche-suave); }
+.rules li.ok { color: var(--azul-texto); }
 .check { display: flex; gap: var(--space-3); align-items: flex-start; cursor: pointer; }
-.check input { accent-color: var(--yerba); width: 20px; height: 20px; margin: 2px 0 0; flex: none; }
+.check input { accent-color: var(--azul-texto); width: 20px; height: 20px; margin: 2px 0 0; flex: none; }
 .anon { display: flex; align-items: center; gap: var(--space-1); }

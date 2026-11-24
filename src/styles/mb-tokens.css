@@ -1,68 +1,35 @@
-/* Mbaapohara — tokens de la marca (copiados del manual de marca, tokens.css).
-   Única fuente de colores, espacios, radios, sombras y tipografía del frontend.
-   Cambio respecto del manual: las rutas de las fuentes apuntan a /marca/fonts/
-   (carpeta servida como estática; ver LEEME-MARCA.md). */
-:root, [data-theme="light"] {
-  --surface: #fbf8f3;
-  --surface-raised: #ffffff;
-  --surface-sunken: #f3eee6;
-  --line: #e3dcd0;
-  --line-strong: #8a8276;
-  --ink: #17302b;
-  --ink-muted: #56645f;
-  --yerba: #0e5c4f;
-  --yerba-hover: #0a4a40;
-  --on-yerba: #ffffff;
-  --yerba-soft: #e2efea;
-  --yerba-text: #0e5c4f;
-  --tierra: #e4643f;
-  --tierra-text: #b0431f;
-  --on-tierra: #1f0e07;
-  --tierra-soft: #fbe7df;
-  --sol: #b87400;
-  --sol-soft: #fbf0d6;
-  --focus: #b0431f;
-  --success: #1e6e42;
-  --success-soft: #e3f2e8;
-  --warning: #8a5a00;
-  --warning-soft: #fbf0d6;
-  --danger: #b3261e;
-  --danger-soft: #fbe4e1;
-  --shadow-sm: 0 1px 2px rgba(23,48,43,0.08);
-  --shadow-md: 0 6px 20px rgba(23,48,43,0.10);
-  --shadow-lg: 0 16px 40px rgba(23,48,43,0.16);
-}
-[data-theme="dark"] {
-  --surface: #0f1d1a;
-  --surface-raised: #172925;
-  --surface-sunken: #0a1613;
-  --line: #2a3f3a;
-  --line-strong: #6f8a83;
-  --ink: #ecf2ef;
-  --ink-muted: #a7b8b2;
-  --yerba: #4cc2a6;
-  --yerba-hover: #72d4bc;
-  --on-yerba: #08201b;
-  --yerba-soft: #173a33;
-  --yerba-text: #6fd3ba;
-  --tierra: #f28b66;
-  --tierra-text: #f7a584;
-  --on-tierra: #1f0e07;
-  --tierra-soft: #3b241b;
-  --sol: #f2b632;
-  --sol-soft: #3a2e12;
-  --focus: #f7a584;
-  --success: #6fd39b;
-  --success-soft: #16352a;
-  --warning: #f2c14e;
-  --warning-soft: #3a2e12;
-  --danger: #ff8f85;
-  --danger-soft: #3d1b18;
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
-  --shadow-md: 0 8px 24px rgba(0,0,0,0.5);
-  --shadow-lg: 0 16px 40px rgba(0,0,0,0.6);
-}
+/* Mbaapohara — tokens de la marca (rediseño del 23/11/2026, docs/marca/ADAPTACIONES.md).
+   Única fuente de colores, espacios, radios, sombras y tipografía del frontend. */
 :root {
+  /* Marca */
+  --azul: #0276F8;          /* bloques de marca e íconos; texto blanco solo desde 24 px, o 19 px en negrita */
+  --azul-texto: #0560D0;    /* botón primario, enlaces, selección, foco */
+  --azul-hover: #044DA8;    /* botón primario al pasar el cursor */
+  --azul-suave: #E6F0FE;    /* chip elegido, «Sí», fondos de barras */
+  --naranja: #F96B17;       /* solo «Escribí tu reseña» y acentos; el texto encima va en --noche */
+  --naranja-texto: #B04408; /* «A mejorar», «No», rechazos, borrar, errores */
+  --naranja-suave: #FEEBDD;
+  --amarillo: #FDCD06;      /* estrellas, líneas de franja, números destacados */
+  --amarillo-borde: #C99A00;/* contorno de las estrellas llenas */
+  --amarillo-suave: #FFF6CC;/* franjas editoriales, «En revisión», «En parte» */
+  /* Neutros */
+  --noche: #10274E;         /* texto, títulos, bordes de botones secundarios, pie */
+  --noche-suave: #4A5A76;   /* texto secundario */
+  --crema: #F2EEE6;         /* fondo de página */
+  --blanco: #FFFFFF;        /* reseñas, campos, paneles */
+  --linea: #DDD6C9;         /* separadores */
+  --linea-suave: #EEE9DF;   /* separadores internos de tarjetas */
+  --borde-control: #7A8499; /* campos, chips sin elegir, estrellas vacías (3,25:1 sobre crema) */
+  --neutro-suave: #E9E4DA;  /* «No sé», contadores neutros */
+  --pie-texto: #C7D0E0;     /* texto secundario sobre --noche */
+  /* Forma */
+  --radio-xs: 4px;          /* etiquetas y estados */
+  --radio-sm: 8px;          /* botones y campos */
+  --radio-md: 12px;         /* bloques y paneles */
+  --radio-resena: 12px 12px 12px 2px; /* esquina de diálogo: solo la reseña */
+  --radio-pildora: 999px;   /* chips y contadores */
+  --sombra-flotante: 0 12px 32px rgba(16, 39, 78, .18); /* solo menús y paneles desplegables */
+  /* Espacios */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -71,13 +38,12 @@
   --space-6: 32px;
   --space-7: 48px;
   --space-8: 64px;
-  --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 20px;
-  --radius-pill: 999px;
+  --ancho-pagina: 1280px;
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
 }
+/* Portada: solo en el inicio. Sobretítulo: reemplaza a las etiquetas tipo píldora encima de un título. */
+.portada { font-family: var(--font-sans); font-size: 56px; line-height: 60px; font-weight: 700; letter-spacing: -0.025em; }
+.sobretitulo { font-family: var(--font-sans); font-size: 13px; line-height: 18px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
 .display { font-family: var(--font-sans); font-size: 48px; line-height: 52px; font-weight: 700; letter-spacing: -0.02em; }
 .h1 { font-family: var(--font-sans); font-size: 32px; line-height: 38px; font-weight: 700; letter-spacing: -0.015em; }
 .h2 { font-family: var(--font-sans); font-size: 24px; line-height: 30px; font-weight: 700; letter-spacing: -0.01em; }

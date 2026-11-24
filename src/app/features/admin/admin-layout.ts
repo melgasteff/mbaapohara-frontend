@@ -8,13 +8,13 @@ import { ModerationAdminApi } from '../../core/api/moderation-admin-api';
   imports: [RouterOutlet, RouterLink, RouterLinkActive],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
-    .admin-nav { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--line); }
-    .admin-nav a { text-decoration: none; color: var(--ink); font-weight: 600; padding: var(--space-1) 0; }
-    .admin-nav a[aria-current='page'] { color: var(--yerba-text); box-shadow: inset 0 -2px 0 var(--yerba); }
-    .caption { color: var(--ink-muted); margin: 0; }
+    .admin-nav { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--linea); }
+    .admin-nav a { text-decoration: none; color: var(--noche); font-weight: 600; padding: var(--space-1) 0; }
+    .admin-nav a[aria-current='page'] { color: var(--azul-texto); box-shadow: inset 0 -2px 0 var(--azul-texto); }
+    .caption { color: var(--noche-suave); margin: 0; }
     .count {
       display: inline-block; min-width: 20px; padding: 0 var(--space-1); margin-left: var(--space-1);
-      border-radius: var(--radius-pill); background: var(--warning-soft); color: var(--warning);
+      border-radius: var(--radio-pildora); background: var(--amarillo-suave); color: var(--noche);
       font-size: 12px; line-height: 20px; text-align: center;
     }
   `,

@@ -79,13 +79,13 @@ import { ReviewForm } from '../review-form';
   styles: `
     .reminder {
       display: flex; gap: var(--space-2); align-items: flex-start; margin: 0; max-width: 560px;
-      padding: var(--space-3) var(--space-4); background: var(--yerba-soft); color: var(--ink);
-      border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-4); background: var(--azul-suave); color: var(--noche);
+      border-radius: var(--radio-md);
     }
-    .reminder svg { flex: none; color: var(--yerba-text); }
+    .reminder svg { flex: none; color: var(--azul-texto); }
     textarea.mb-input { min-height: 140px; }
     .check { display: flex; gap: var(--space-3); align-items: flex-start; cursor: pointer; font-weight: 400; }
-    .check input { accent-color: var(--yerba); width: 20px; height: 20px; margin: 2px 0 0; flex: none; }
+    .check input { accent-color: var(--azul-texto); width: 20px; height: 20px; margin: 2px 0 0; flex: none; }
   `,
 })
 export class StepRating {

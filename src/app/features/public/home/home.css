@@ -9,12 +9,12 @@
 .rights {
   display: grid; grid-template-columns: auto 1fr; gap: var(--space-3) var(--space-4); align-items: start;
   max-width: 720px; padding: var(--space-5);
-  background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-lg);
+  background: var(--blanco); border: 1px solid var(--linea); border-radius: var(--radio-md);
 }
-.rights > svg { color: var(--tierra-text); }
+.rights > svg { color: var(--naranja-texto); }
 .rights h2, .rights p { margin: 0; }
-.rights .mb-tag { grid-column: 2; justify-self: start; }
+.rights .sobretitulo { grid-column: 2; justify-self: start; }
 @media (min-width: 600px) {
   .rights { grid-template-columns: auto 1fr auto; align-items: center; }
-  .rights .mb-tag { grid-column: auto; }
+  .rights .sobretitulo { grid-column: auto; }
 }

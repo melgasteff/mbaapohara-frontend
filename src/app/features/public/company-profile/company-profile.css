@@ -7,8 +7,8 @@ section[aria-labelledby] > * + * { margin-top: var(--space-3); }
 .office {
   display: flex; gap: var(--space-3); align-items: flex-start;
   padding: var(--space-3) var(--space-4);
-  background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-md);
+  background: var(--blanco); border: 1px solid var(--linea); border-radius: var(--radio-md);
 }
-.office svg { flex: none; color: var(--yerba-text); }
+.office svg { flex: none; color: var(--azul-texto); }
 .office div { display: flex; flex-direction: column; }
-.office__ref { color: var(--ink-muted); }
+.office__ref { color: var(--noche-suave); }

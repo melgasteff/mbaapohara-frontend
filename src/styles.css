@@ -2,19 +2,19 @@
    salen siempre de src/styles/mb-tokens.css (cargado antes que este archivo). */
 *, *::before, *::after { box-sizing: border-box; }
 
-/* Contenedor de página: máximo 1200px, margen lateral space-4 en móvil y space-6 desde 1024px. */
+/* Contenedor de página: máximo 1280px, margen lateral space-4 en móvil y space-7 desde 1024px. */
 .page {
-  max-width: 1200px;
+  max-width: var(--ancho-pagina);
   margin: 0 auto;
   padding: var(--space-6) var(--space-4) var(--space-7);
 }
 @media (min-width: 1024px) {
-  .page { padding-left: var(--space-6); padding-right: var(--space-6); }
+  .page { padding-left: var(--space-7); padding-right: var(--space-7); }
 }
 .page > * + * { margin-top: var(--space-4); }
 .page h1, .page p { margin-bottom: 0; }
 .page h1 { margin-top: 0; }
-.page p { color: var(--ink-muted); max-width: 65ch; }
+.page p { color: var(--noche-suave); max-width: 65ch; }
 
 /* Solo para lectores de pantalla */
 .visually-hidden {

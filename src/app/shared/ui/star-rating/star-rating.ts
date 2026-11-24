@@ -12,9 +12,9 @@ let nextId = 0;
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [{ provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StarRating), multi: true }],
   styles: `
-    .stars { display: inline-flex; gap: var(--space-1); color: var(--sol); }
-    label { cursor: pointer; display: inline-flex; border-radius: var(--radius-sm); }
-    label:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+    .stars { display: inline-flex; gap: var(--space-1); }
+    label { cursor: pointer; display: inline-flex; border-radius: var(--radio-sm); }
+    label:has(input:focus-visible) { outline: 2px solid var(--azul-texto); outline-offset: 2px; }
     svg { width: 36px; height: 36px; }
     .summary { margin-left: var(--space-2); }
     .row { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2); }

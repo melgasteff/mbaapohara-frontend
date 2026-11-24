@@ -7,11 +7,11 @@ import { RouterLink } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     footer {
-      background: var(--surface-raised);
-      border-top: 1px solid var(--line);
+      background: var(--noche);
+      color: var(--blanco);
     }
     .inner {
-      max-width: 1200px;
+      max-width: var(--ancho-pagina);
       margin: 0 auto;
       padding: var(--space-5) var(--space-4);
       display: flex;
@@ -20,11 +20,12 @@ import { RouterLink } from '@angular/router';
       align-items: center;
     }
     p { margin: 0; }
-    .muted { color: var(--ink-muted); }
+    .muted { color: var(--pie-texto); }
     .links { margin-left: auto; display: flex; flex-wrap: wrap; gap: 0 var(--space-4); }
-    .mb-link { display: inline-flex; align-items: center; min-height: 44px; }
+    .mb-link { display: inline-flex; align-items: center; min-height: 44px; color: var(--blanco); }
+    .mb-link:focus-visible { outline-color: var(--blanco); }
     @media (min-width: 1024px) {
-      .inner { padding-left: var(--space-6); padding-right: var(--space-6); }
+      .inner { padding-left: var(--space-7); padding-right: var(--space-7); }
     }
   `,
   template: `

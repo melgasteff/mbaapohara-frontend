@@ -1,19 +1,31 @@
 # Adaptaciones del manual de marca para este proyecto
 
-El manual (`docs/marca/README.md` y `docs/marca/components/`) manda en lo visual y en la voz.
-Este archivo registra dónde el proyecto se aparta del manual o lo concreta, según las decisiones del PFG
-Si algo de este archivo choca con el manual, gana este archivo.
+Desde el 23/11/2026 la marca es la del rediseño: las láminas del diseño mandan en lo visual. El manual anterior
+(`docs/marca/README.md` y `docs/marca/components/`) solo sigue vigente en voz y tono. Este archivo registra dónde el
+proyecto se aparta de las láminas o las concreta, según las decisiones del PFG
+Si algo de este archivo choca con ellas, gana este archivo.
 
 ## Implementación
 - Componentes standalone de Angular con las clases `mb-` de `src/styles/mb-components.css`.
-  **Sin Angular Material.** Íconos: `@lucide/angular` (trazo de 2px, como pide el manual).
+  **Sin Angular Material.** Íconos: `@lucide/angular` (trazo de 2px).
 - Los tokens viven solo en `src/styles/mb-tokens.css`. En los componentes no se escriben colores, fuentes,
-  radios ni sombras a mano.
-- `.mb-field` trae un ancho fijo de 320px pensado para la vista previa. En los formularios de la aplicación
-  se usa a ancho completo, con un máximo razonable en escritorio.
-- Solo tema claro por ahora. Los tokens del tema oscuro quedan disponibles para más adelante.
-- Diseño primero para móvil a 360px. En móvil, el buscador del encabezado baja a una segunda fila y la
-  navegación pasa a un menú (como indica el README del Encabezado).
+  radios ni sombras a mano. Solo hay tema claro.
+- `.mb-field` trae un ancho fijo de 320px. En los formularios se usa a ancho completo, con un máximo razonable
+  en escritorio.
+- Diseño primero para móvil a 360px; contenedor de 1280px en escritorio.
+
+## Diferencias con las láminas
+- `--borde-control` es `#7A8499` y no `#8A94A8`, para llegar a 3:1 sobre crema. El texto tenue usa `--noche-suave`:
+  `#8A94A8` sobre blanco queda en 3,05:1 y el ejemplo del buscador del inicio (`#5B83C0`) en 3,33:1.
+- Tokens agregados: `--azul-hover` y `--pie-texto`.
+- Los radios de 10px de las láminas pasan a 8 o 12. Sello de empresa: 72, 48 y 36px.
+- Cuando el texto de una lámina choca con los datos o con la política de moderación, mandan los datos y la política:
+  5 reglas de contraseña, los contratos y modalidades del catálogo, las palabras de las estrellas del JSON, los
+  rechazos automáticos y el plazo de 48 horas.
+- Grupos de rubro por sección CIIU: Comercio (G), Industria y construcción (B a F), Gastronomía (I), Transporte (H),
+  Servicios y oficinas (J a R, T y U) y Agro y otros (A y S), que reemplaza a «Talleres y oficios».
+- Moderación: no se resalta el fragmento marcado, porque la API no lo devuelve.
+- Asistente: sin «¿No está la empresa? Proponela», porque ese flujo no existe.
 
 ## Voz
 - Voseo en toda la interfaz: «Buscá una empresa», «Escribí tu reseña», «Contá tu experiencia».
@@ -33,13 +45,14 @@ Si algo de este archivo choca con el manual, gana este archivo.
 - **Criterios de cumplimiento:** cada afirmación se responde con cuatro opciones (Sí / En parte / No /
   No sé o no aplica) que se ven como `.mb-chip`, pero se implementan como un grupo de radios
   (`role="radiogroup"`) para que funcionen con teclado.
-- Ninguna respuesta «No» y ninguna calificación baja usan `danger`. `danger` es solo para errores de formulario.
-- Los porcentajes de cumplimiento se muestran con número y palabra, en colores neutros o `yerba`.
+- Sin rojo en ningún lado. El «No», los rechazos, los errores y «Borrar» usan `--naranja-texto` (sobre
+  `--naranja-suave` en las etiquetas), siempre con palabra o ícono.
+- Los porcentajes de cumplimiento se muestran con número y palabra, en colores neutros o azul.
 
 ## Estados de moderación (etiquetas)
 - Publicada: `.mb-tag-success`.
 - En revisión: `.mb-tag-warning`, con el texto del manual: «Tu reseña está en revisión. Te avisamos en 48 horas.»
-- Rechazada: `.mb-tag-danger`, visible solo para quien la escribió, junto con el motivo.
+- Rechazada: `.mb-tag-naranja`, visible solo para quien la escribió, junto con el motivo.
 
 ## Datos de ejemplo
 - Las empresas y locales de la demo son reales: vienen de la semilla del backend (decisión del 19/11).

@@ -3,16 +3,16 @@
 .mb-field { width: 100%; max-width: 560px; }
 fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
 legend { padding: 0; }
-.legend { font-size: 14px; line-height: 20px; font-weight: 600; color: var(--ink); margin-bottom: var(--space-2); }
-.error { color: var(--danger); display: flex; align-items: center; gap: var(--space-1); }
+.legend { font-size: 14px; line-height: 20px; font-weight: 600; color: var(--noche); margin-bottom: var(--space-2); }
+.error { color: var(--naranja-texto); display: flex; align-items: center; gap: var(--space-1); }
 .options { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
 .option {
   display: flex; gap: var(--space-3); align-items: center; cursor: pointer;
   padding: var(--space-3) var(--space-4);
-  background: var(--surface-raised); border: 1.5px solid var(--line); border-radius: var(--radius-md);
+  background: var(--blanco); border: 1.5px solid var(--linea); border-radius: var(--radio-md);
 }
-.option:has(input:checked) { border-color: var(--yerba); background: var(--yerba-soft); }
-.option:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
-.option input { accent-color: var(--yerba); margin: 0; flex: none; }
+.option:has(input:checked) { border-color: var(--azul-texto); background: var(--azul-suave); }
+.option:has(input:focus-visible) { outline: 2px solid var(--azul-texto); outline-offset: 2px; }
+.option input { accent-color: var(--azul-texto); margin: 0; flex: none; }
 .option span { display: flex; flex-direction: column; }
-.option small { color: var(--ink-muted); }
+.option small { color: var(--noche-suave); }

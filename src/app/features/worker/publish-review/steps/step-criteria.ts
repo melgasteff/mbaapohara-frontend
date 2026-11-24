@@ -33,16 +33,16 @@ import { ReviewForm } from '../review-form';
     </ng-container>
   `,
   styles: `
-    .progress { margin: 0; color: var(--ink-muted); }
+    .progress { margin: 0; color: var(--noche-suave); }
     .category { display: flex; flex-direction: column; gap: var(--space-3); }
     .category .h3 { margin: 0; }
     .criteria { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
     .criterion {
       display: flex; flex-direction: column; gap: var(--space-3);
-      padding: var(--space-4); background: var(--surface-raised);
-      border: 1px solid var(--line); border-radius: var(--radius-md);
+      padding: var(--space-4); background: var(--blanco);
+      border: 1px solid var(--linea); border-radius: var(--radio-md);
     }
-    .criterion.has-error { border-color: var(--danger); }
+    .criterion.has-error { border-color: var(--naranja-texto); }
     .criterion p { margin: 0; }
   `,
 })

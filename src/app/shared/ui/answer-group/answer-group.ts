@@ -14,9 +14,9 @@ let nextId = 0;
   providers: [{ provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AnswerGroup), multi: true }],
   styles: `
     .options { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-    .mb-chip:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+    .mb-chip:has(input:focus-visible) { outline: 2px solid var(--azul-texto); outline-offset: 2px; }
     /* Mismo aspecto que .mb-chip[aria-pressed="true"] del manual, para un radio marcado. */
-    .mb-chip.is-checked { background: var(--yerba-soft); border-color: var(--yerba); color: var(--yerba-text); }
+    .mb-chip.is-checked { background: var(--azul-suave); border-color: var(--azul-texto); color: var(--azul-texto); }
   `,
   template: `
     <div class="options" role="radiogroup" [attr.aria-labelledby]="labelledBy()">

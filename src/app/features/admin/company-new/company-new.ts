@@ -84,7 +84,7 @@ import { apiErrorMessage } from '../api-error';
       </div>
     </form>
   `,
-  styles: `.error-text { color: var(--danger); display: flex; align-items: center; gap: var(--space-1); }`,
+  styles: `.error-text { color: var(--naranja-texto); display: flex; align-items: center; gap: var(--space-1); }`,
 })
 export class CompanyNew {
   private readonly api = inject(CompaniesAdminApi);

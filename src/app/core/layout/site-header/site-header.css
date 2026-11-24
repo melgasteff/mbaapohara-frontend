@@ -12,7 +12,6 @@
   min-height: 44px;
   margin-right: auto;
 }
-.site-header .mb-logo { height: 28px; }
 .site-header__search {
   order: 3;
   flex-basis: 100%;
@@ -23,6 +22,7 @@
   max-width: none;
   height: 44px;
 }
+.site-header__search .mb-search { background: var(--crema); border-color: transparent; }
 .site-header__search input { height: 100%; }
 .site-header__toggle { display: inline-flex; }
 .site-header__nav {
@@ -34,7 +34,7 @@
   gap: var(--space-1);
   margin-left: 0;
   padding-top: var(--space-2);
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--linea);
 }
 .site-header__nav.is-open { display: flex; }
 .site-header__nav a:not(.mb-btn) { display: flex; align-items: center; min-height: 44px; }
@@ -48,7 +48,6 @@
     padding: var(--space-3) var(--space-6);
   }
   .site-header__brand { margin-right: 0; }
-  .site-header .mb-logo { height: 32px; }
   .site-header__search { order: 0; flex: 1; flex-basis: auto; max-width: 420px; }
   .site-header__search .mb-search { height: 40px; }
   .site-header__toggle { display: none; }
@@ -69,9 +68,9 @@
 
 /* «Salir» es una acción (botón), pero se ve como los enlaces de la navegación. */
 .site-header__logout {
-  font: inherit; font-weight: 600; color: var(--ink); background: none; border: 0; padding: 0;
+  font: inherit; font-weight: 600; color: var(--noche); background: none; border: 0; padding: 0;
   cursor: pointer; text-align: left; min-height: 44px;
 }
-.site-header__logout:hover { color: var(--yerba-text); }
-.site-header__logout:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.site-header__logout:hover { color: var(--azul-texto); }
+.site-header__logout:focus-visible { outline: 2px solid var(--azul-texto); outline-offset: 2px; }
 @media (min-width: 768px) { .site-header__logout { min-height: 0; } }

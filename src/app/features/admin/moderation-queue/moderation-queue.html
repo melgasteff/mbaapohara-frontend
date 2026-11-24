@@ -32,7 +32,7 @@
                 <span>Enviada el {{ item.fechaEnvio | date: 'short' }}</span>
               </span>
             </div>
-            <span class="mb-tag" [class.mb-tag-danger]="item.horasEsperando >= targetHours" [class.mb-tag-warning]="item.horasEsperando < targetHours">
+            <span class="mb-tag" [class.mb-tag-urgente]="item.horasEsperando >= targetHours" [class.mb-tag-warning]="item.horasEsperando < targetHours">
               <svg lucideClock aria-hidden="true"></svg>{{ item.horasEsperando }} h esperando
             </span>
           </div>

@@ -28,7 +28,7 @@ import { draftMeta } from '../review-form';
       <p class="body-sm reason">Una persona del equipo la revisa sin saber quién la escribió. Podés ver cómo va en «Mis reseñas».</p>
     } @else {
       <p class="status">
-        <span class="mb-tag mb-tag-danger"><svg lucideCircleX aria-hidden="true"></svg>Rechazada</span>
+        <span class="mb-tag mb-tag-naranja"><svg lucideCircleX aria-hidden="true"></svg>Rechazada</span>
         <span class="body">{{ result().motivo }}</span>
       </p>
       <p class="body-sm reason">Solo vos ves esta reseña. Corregila y volvé a enviarla: lo que escribiste no se perdió.</p>
@@ -57,7 +57,7 @@ import { draftMeta } from '../review-form';
   styles: `
     :host { display: flex; flex-direction: column; gap: var(--space-4); max-width: 640px; }
     .status { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); margin: 0; }
-    .reason { margin: 0; color: var(--ink-muted); }
+    .reason { margin: 0; color: var(--noche-suave); }
     .actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
   `,
 })
