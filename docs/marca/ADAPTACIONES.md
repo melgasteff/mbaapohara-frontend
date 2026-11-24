@@ -39,7 +39,6 @@ Si algo de este archivo choca con ellas, gana este archivo.
   Entre 760 y 1099px van dos columnas, con la barra de progreso en lugar de la lista de pasos.
 - Asistente, vista previa: un cargo que no está en la lista se ve «Otro cargo», como en el perfil, y «No sé o no aplica» no se cuenta.
 - Asistente, resultado: sin «Escribir otra reseña». El rechazo muestra el único motivo que devuelve la API.
-- Pie: sin «Responsabilidad por las reseñas» hasta que exista su página (fase 6).
 - Sello: las iniciales saltan artículos, preposiciones y tipos de sociedad («Supermercado La Amistad» es «SA»), como
   pide el documento; la lámina 00 dice «LA». «Agro y otros» usa la ilustración 12 (herramientas).
 - Fila de empresa: «Muy comentada» desde 50 reseñas (TODO(decision) en el código). El tema principal es la primera
@@ -64,6 +63,13 @@ Si algo de este archivo choca con ellas, gana este archivo.
   tarjeta de reseña y, si está publicada, suma «Ver en el perfil».
 - Mi cuenta: sin «Reseñas escritas», que `/users/me` no devuelve. Se conservan la fecha de aceptación de los términos y el enlace
   a Mis reseñas. Las fechas van completas, porque solo las ve su dueño.
+- Páginas informativas: los textos siguen la política y lo que el sistema hace. El modelo sí rechaza solo cuando es claro, reportar
+  exige cuenta, el sistema no envía correos a las cuentas y el nombre no se pide. Los ejemplos evitan «el encargado del turno noche» y
+  «una persona de Recursos Humanos», que la política considera personas identificables, y «es una porquería», que no asegura un rechazo.
+- Términos: las 7 reglas de la política (la lámina trae 4), en `/terminos#reglas`, adonde apunta el asistente.
+- Privacidad: con quién compartimos, cuánto tiempo, protección, responsable y edad son secciones visibles con la estética de la lámina.
+- Índice: marca la sección de la URL, no la que se está leyendo. Las preguntas y los términos completos son `<details>` nativos.
+- 404: usa el encabezado sin buscador, para no mostrar dos.
 - Moderación: no se resalta el fragmento marcado, porque la API no lo devuelve.
 - Asistente: sin «¿No está la empresa? Proponela», porque ese flujo no existe.
 

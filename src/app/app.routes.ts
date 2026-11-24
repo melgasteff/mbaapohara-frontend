@@ -30,5 +30,11 @@ export const routes: Routes = [
     path: '',
     loadChildren: () => import('./features/public/public.routes').then((m) => m.PUBLIC_ROUTES),
   },
-  { path: '**', redirectTo: '' },
+  {
+    // Sin buscador en el encabezado: la página ya tiene uno.
+    path: '**',
+    title: 'Página no encontrada · Mbaapohara',
+    data: { encabezado: 'inicio' },
+    loadComponent: () => import('./features/public/not-found/not-found').then((m) => m.NotFound),
+  },
 ];
