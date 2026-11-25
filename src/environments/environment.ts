@@ -1,4 +1,4 @@
-// Producción. La URL definitiva se fija al elegir el servicio de despliegue (tarea 4.4).
+// Producción: la API en Render (tarea 4.4). Solo la dirección confirmada: a ella se envían las contraseñas.
 export const environment = {
-  apiUrl: '/api',
+  apiUrl: 'https://mbaapohara-api.onrender.com',
 };
