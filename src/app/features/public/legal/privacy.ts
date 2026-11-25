@@ -129,8 +129,13 @@ const FIELDS: { nombre: string; valor: string; ve: Viewer[]; oculto?: string }[]
               tu cuenta, la empresa ni el local.
             </dd>
           </div>
-          <!-- TODO(decision): alojamiento; se completa en la tarea 4.4. -->
-          <div><dt>Alojamiento</dt><dd>Todavía no está definido dónde se van a guardar los datos. Lo completamos antes de abrir el sitio al público.</dd></div>
+          <div>
+            <dt>Alojamiento</dt>
+            <dd>
+              Los datos se guardan fuera de Paraguay. La base está en Neon y la API en Render, en Virginia (Estados Unidos). Las páginas se publican
+              con Vercel. Son empresas que prestan ese servicio y pueden procesar datos técnicos de la conexión, como tu dirección IP.
+            </dd>
+          </div>
           <div><dt>Nadie más</dt><dd>No vendemos ni cedemos tus datos, tampoco a las empresas reseñadas.</dd></div>
         </dl>
       </section>
@@ -148,8 +153,13 @@ const FIELDS: { nombre: string; valor: string; ve: Viewer[]; oculto?: string }[]
               y nuestra respuesta.
             </dd>
           </div>
-          <!-- TODO(decision): copias de seguridad; se completa en la tarea 4.4. -->
-          <div><dt>Copias de seguridad</dt><dd>Todavía no están definidas. Lo completamos antes de abrir el sitio al público.</dd></div>
+          <div>
+            <dt>Copias de seguridad</dt>
+            <dd>
+              No hacemos copias propias: este es un proyecto académico y no podemos garantizar recuperar tus datos si se pierden. El servicio de la
+              base conserva por hasta 6 horas el historial de cambios, así que algo que borraste puede quedar ahí ese tiempo.
+            </dd>
+          </div>
         </dl>
       </section>
 
