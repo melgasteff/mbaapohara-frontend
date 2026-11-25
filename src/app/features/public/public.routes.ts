@@ -20,6 +20,11 @@ export const PUBLIC_ROUTES: Routes = [
     loadComponent: () => import('./company-profile/company-profile').then((m) => m.CompanyProfile),
   },
   {
+    path: 'panel',
+    title: 'Indicadores · Mbaapohara',
+    loadComponent: () => import('./panel/panel').then((m) => m.Panel),
+  },
+  {
     path: 'ingresar',
     title: 'Ingresar · Mbaapohara',
     data: { encabezado: 'ninguno' },

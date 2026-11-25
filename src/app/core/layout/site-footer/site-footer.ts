@@ -33,6 +33,7 @@ import { Logo } from '../../../shared/brand/logo/logo';
         <nav aria-labelledby="pie-plataforma">
           <h2 id="pie-plataforma">Plataforma</h2>
           <a routerLink="/empresas">Empresas</a>
+          <a routerLink="/panel">Indicadores</a>
           <a routerLink="/publicar">Escribí tu reseña</a>
           <a routerLink="/como-moderamos">Cómo moderamos</a>
         </nav>

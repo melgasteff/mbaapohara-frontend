@@ -1,0 +1,112 @@
+<section class="head" aria-labelledby="titulo">
+  <div class="mb-wrap">
+    <h1 id="titulo" class="mb-frase">
+      Mostrame cómo se cumplen los derechos en
+      <app-sentence-filter label="Rubro" [options]="groupOptions" [value]="grupo() ?? null" (valueChange)="selectGroup($event)" />
+      en
+      <span class="mb-frase-junto"><app-sentence-filter label="Lugar" [place]="true" [options]="placeOptions()" [value]="place()" (valueChange)="selectPlace($event)" />.</span>
+    </h1>
+    <p class="intro">
+      Lo que respondieron las personas en las reseñas publicadas. Es su experiencia, no una inspección: sirve para saber qué preguntar
+      antes de aceptar un trabajo.
+    </p>
+    @if (filtered()) { <button type="button" class="link" (click)="clearFilters()">Ver todo el país y todos los rubros</button> }
+  </div>
+</section>
+
+<div class="mb-wrap body">
+  @if (insightsResource.error()) {
+    <app-page-state kind="error" title="No pudimos cargar los indicadores" message="Revisá tu conexión y volvé a intentar." (retry)="insightsResource.reload()" />
+  } @else if (insights(); as data) {
+    <dl class="stats" aria-live="polite">
+      <div class="stat"><dt>Reseñas publicadas</dt><dd>{{ data.resenas | number }}</dd></div>
+      <div class="stat"><dt>Empresas con reseñas</dt><dd>{{ data.empresas | number }}</dd></div>
+      <div class="stat">
+        <dt>Calificación general</dt>
+        @if (data.promedio !== null) {
+          <dd>{{ data.promedio | number: '1.1-1' }}<span class="stat__unit"> de 5</span></dd>
+        } @else {
+          <dd class="stat__none">—<span class="stat__note">desde {{ data.minimo }} reseñas</span></dd>
+        }
+      </div>
+    </dl>
+
+    @if (data.resenas === 0) {
+      <app-page-state
+        kind="empty"
+        illustration="20-resena"
+        title="Todavía no hay reseñas publicadas con estos filtros"
+        message="Abajo están los derechos que se preguntan en cada reseña. Si trabajaste en algún lugar, tu experiencia puede ser la primera."
+      />
+    }
+
+    <section class="categories" aria-labelledby="temas">
+      <div class="categories__head">
+        <h2 id="temas" class="sobretitulo">Cómo se cumplen los derechos</h2>
+        <ul class="legend" aria-label="Colores de las barras">
+          @for (answer of answers; track answer.clave) {
+            <li><span class="swatch" [attr.data-answer]="answer.clave" aria-hidden="true"></span>{{ answer.nombre }}</li>
+          }
+        </ul>
+      </div>
+      <p class="note">
+        El porcentaje es la parte de «Sí» entre Sí, En parte y No. «No sé o no aplica» se cuenta aparte. Cada valor aparece desde
+        {{ data.minimo }} reseñas que lo respondieron, para que una sola opinión no parezca la regla.
+      </p>
+
+      @for (category of data.categorias; track category.codigo) {
+        <article class="category">
+          <div class="row row--category">
+            <h3 class="row__name">{{ category.nombre }}</h3>
+            @if (category.indicador; as value) {
+              <strong class="row__value">{{ value.porcentajeSi }} %<span class="visually-hidden"> de «Sí»</span></strong>
+              <span class="track" role="img" [attr.aria-label]="label(category.nombre, value)">
+                @for (part of segments(value); track part.clave) {
+                  @if (part.cantidad) {
+                    <span class="part" [attr.data-answer]="part.clave" [style.width.%]="part.porcentaje" [title]="part.nombre + ': ' + part.cantidad"></span>
+                  }
+                }
+              </span>
+              <span class="row__counts" aria-hidden="true">{{ text(value) }}</span>
+            } @else {
+              <span class="row__none">Faltan reseñas: aparece desde {{ data.minimo }}</span>
+            }
+          </div>
+
+          <details class="criteria">
+            <summary>{{ category.criterios.length === 1 ? 'Ver el criterio' : 'Ver los ' + category.criterios.length + ' criterios' }}</summary>
+            <ul>
+              @for (criterion of category.criterios; track criterion.codigo) {
+                <li class="row">
+                  <span class="row__name">{{ criterion.texto }}</span>
+                  @if (criterion.indicador; as value) {
+                    <strong class="row__value">{{ value.porcentajeSi }} %<span class="visually-hidden"> de «Sí»</span></strong>
+                    <span class="track track--thin" role="img" [attr.aria-label]="label(criterion.texto, value)">
+                      @for (part of segments(value); track part.clave) {
+                        @if (part.cantidad) {
+                          <span class="part" [attr.data-answer]="part.clave" [style.width.%]="part.porcentaje" [title]="part.nombre + ': ' + part.cantidad"></span>
+                        }
+                      }
+                    </span>
+                    <span class="row__counts" aria-hidden="true">{{ text(value) }}</span>
+                  } @else {
+                    <span class="row__none">Faltan reseñas</span>
+                  }
+                </li>
+              }
+            </ul>
+          </details>
+        </article>
+      } @empty {
+        <p class="note">Todavía no hay criterios activos.</p>
+      }
+    </section>
+
+    <p class="more">
+      ¿Querés ver una empresa en particular? <a routerLink="/empresas" [queryParams]="{ grupo: grupo() ?? null }">Buscala en el directorio</a>: su perfil
+      muestra estos mismos temas.
+    </p>
+  } @else {
+    <app-page-state kind="loading" message="Cargando los indicadores…" />
+  }
+</div>

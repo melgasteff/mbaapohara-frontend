@@ -1,0 +1,66 @@
+.head { border-bottom: 1px solid var(--linea); }
+.head .mb-wrap { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-4); padding-top: var(--space-6); padding-bottom: var(--space-5); }
+.intro { margin: 0; max-width: 62ch; font-size: 17px; line-height: 26px; color: var(--noche-suave); }
+.link {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0; border: 0; background: none; cursor: pointer;
+  color: var(--azul-texto); font: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 4px;
+}
+.link:focus-visible, .more a:focus-visible, .criteria summary:focus-visible { outline: 2px solid var(--azul-texto); outline-offset: 2px; }
+
+.body { display: grid; gap: var(--space-6); padding-top: var(--space-6); padding-bottom: var(--space-8); }
+
+.stats { display: grid; gap: var(--space-3); margin: 0; }
+.stat { display: flex; flex-direction: column; gap: var(--space-1); padding: var(--space-4) var(--space-5); background: var(--blanco); border-radius: var(--radio-md); }
+.stat dt { font-size: 14px; line-height: 20px; color: var(--noche-suave); }
+.stat dd { margin: 0; font-size: 36px; line-height: 44px; font-weight: 700; letter-spacing: -0.02em; color: var(--noche); }
+.stat__unit, .stat__note { font-size: 17px; font-weight: 600; letter-spacing: 0; color: var(--noche-suave); }
+.stat__none { display: flex; align-items: baseline; gap: var(--space-2); }
+.stat__note { font-size: 14px; line-height: 20px; font-weight: 400; }
+@media (min-width: 760px) { .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+.categories { display: flex; flex-direction: column; gap: var(--space-4); }
+.categories__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.categories__head h2 { margin: 0; color: var(--noche); }
+.note { margin: 0; max-width: 72ch; font-size: 15px; line-height: 22px; color: var(--noche-suave); }
+
+.legend { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); margin: 0; padding: 0; list-style: none; font-size: 14px; line-height: 20px; color: var(--noche); }
+.legend li { display: inline-flex; align-items: center; gap: var(--space-2); }
+.swatch { width: 12px; height: 12px; border-radius: 50%; }
+
+/* Colores validados: azul, amarillo profundo y naranja profundo. El texto nunca va en color. */
+[data-answer='si'] { background: var(--azul); }
+[data-answer='enParte'] { background: var(--amarillo-borde); }
+[data-answer='no'] { background: var(--naranja-texto); }
+
+.category { display: flex; flex-direction: column; padding: var(--space-5); background: var(--blanco); border-radius: var(--radio-md); }
+
+.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-2) var(--space-4); align-items: baseline; }
+.row__name { margin: 0; font-size: 16px; line-height: 24px; font-weight: 600; color: var(--noche); }
+.row--category .row__name { font-size: 19px; line-height: 26px; font-weight: 700; }
+.row__value { font-size: 19px; line-height: 26px; font-weight: 700; color: var(--noche); font-variant-numeric: tabular-nums; }
+.row__counts, .row__none { font-size: 14px; line-height: 20px; color: var(--noche-suave); }
+.row__counts { grid-column: 1 / -1; }
+.row__none { text-align: right; }
+
+/* Barra segmentada: partes separadas por 2 px del fondo y extremos redondeados (sin línea de base). */
+.track { grid-column: 1 / -1; display: flex; gap: 2px; height: 12px; }
+.track--thin { height: 8px; }
+.part { min-width: 4px; border-radius: 2px; }
+.part:first-child { border-top-left-radius: 999px; border-bottom-left-radius: 999px; }
+.part:last-child { border-top-right-radius: 999px; border-bottom-right-radius: 999px; }
+
+.criteria { margin-top: var(--space-4); border-top: 1px solid var(--linea-suave); }
+.criteria summary {
+  display: flex; align-items: center; min-height: 44px; padding-top: var(--space-2); cursor: pointer;
+  color: var(--azul-texto); font-weight: 600; text-decoration: underline; text-underline-offset: 4px;
+}
+.criteria ul { display: flex; flex-direction: column; gap: var(--space-4); margin: var(--space-3) 0 0; padding: 0; list-style: none; }
+.criteria .row { padding-top: var(--space-4); border-top: 1px solid var(--linea-suave); }
+.criteria .row:first-child { padding-top: 0; border-top: 0; }
+
+.more { margin: 0; font-size: 16px; line-height: 24px; color: var(--noche-suave); }
+.more a { color: var(--azul-texto); font-weight: 600; text-underline-offset: 4px; }
+
+@media (forced-colors: active) {
+  .part, .swatch { forced-color-adjust: none; border: 1px solid CanvasText; }
+}

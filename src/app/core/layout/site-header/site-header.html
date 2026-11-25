@@ -32,6 +32,7 @@
           }
           <nav aria-label="Principal">
             <a routerLink="/empresas" routerLinkActive ariaCurrentWhenActive="page" (click)="closeMenu()">Empresas</a>
+            <a routerLink="/panel" routerLinkActive ariaCurrentWhenActive="page" (click)="closeMenu()">Indicadores</a>
             @if (session.isAuthenticated()) {
               @if (session.isAdmin()) { <a routerLink="/admin" (click)="closeMenu()">Administración</a> }
               <a routerLink="/mis-resenas" routerLinkActive ariaCurrentWhenActive="page" (click)="closeMenu()">Mis reseñas</a>
