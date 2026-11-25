@@ -1,10 +1,17 @@
 import { HttpClient, HttpContext, httpResource } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable, switchMap, tap } from 'rxjs';
+import { catchError, Observable, switchMap, tap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { KEEP_SESSION_ON_401 } from '../auth/auth.interceptor';
 import { SessionService } from '../auth/session.service';
 import { Account, Credentials, RegisterRequest, TokenResponse } from '../models/account';
+
+/** La cuenta se creó, pero el ingreso que sigue falló (por ejemplo, 429 por el límite de intentos). */
+export class AccountCreatedError extends Error {
+  constructor(override readonly cause: unknown) {
+    super('La cuenta se creó, pero no se pudo iniciar la sesión');
+  }
+}
 
 /** Autenticación (POST /auth/login, POST /auth/register, GET /users/me). */
 @Injectable({ providedIn: 'root' })
@@ -42,10 +49,14 @@ export class AuthApi {
       .pipe(tap(() => this.session.end()));
   }
 
-  /** Crea la cuenta e inicia la sesión. */
+  /** Crea la cuenta e inicia la sesión. Si solo falla el ingreso, avisa con AccountCreatedError: la cuenta ya existe. */
   register(request: RegisterRequest): Observable<Account> {
-    return this.http
-      .post<Account>(`${this.url}/auth/register`, request)
-      .pipe(switchMap(() => this.signIn({ email: request.email, password: request.password })));
+    return this.http.post<Account>(`${this.url}/auth/register`, request).pipe(
+      switchMap(() =>
+        this.signIn({ email: request.email, password: request.password }).pipe(
+          catchError((error: unknown) => throwError(() => new AccountCreatedError(error))),
+        ),
+      ),
+    );
   }
 }

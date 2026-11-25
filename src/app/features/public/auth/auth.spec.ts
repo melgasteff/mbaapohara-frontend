@@ -4,7 +4,7 @@ import { Type } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { NEVER, of, throwError } from 'rxjs';
-import { AuthApi } from '../../../core/api/auth-api';
+import { AccountCreatedError, AuthApi } from '../../../core/api/auth-api';
 import { SignIn } from './sign-in/sign-in';
 import { SignUp } from './sign-up/sign-up';
 
@@ -112,5 +112,33 @@ describe('Ingresar y crear cuenta', () => {
     await submit();
     expect(register).toHaveBeenCalledWith({ email: 'persona@ejemplo.com', password: 'abcDEF1!', aceptaTerminos: true });
     expect(navigate).toHaveBeenCalledWith('/');
+  });
+
+  async function fillSignUp(): Promise<void> {
+    fill('email', 'persona@ejemplo.com');
+    fill('password', 'abcDEF1!');
+    check('mayorDeEdad');
+    check('aceptaTerminos');
+    await submit();
+  }
+
+  it('registro: si la cuenta se creó y el ingreso da 429, lo dice y lleva a ingresar', async () => {
+    register.mockReturnValue(throwError(() => new AccountCreatedError(new HttpErrorResponse({ status: 429 }))));
+    open(SignUp, '/publicar');
+    await fillSignUp();
+    const alert = el().querySelector('[role="alert"]')!;
+    expect(alert.textContent).toContain('Tu cuenta se creó, pero hubo muchos intentos de ingreso.');
+    expect(alert.textContent).not.toContain('Hiciste muchos intentos');
+    expect(alert.querySelector('a')?.getAttribute('href')).toBe('/ingresar?volver=%2Fpublicar');
+    expect(navigate).not.toHaveBeenCalled();
+  });
+
+  it('registro: si la creación falla, muestra el error sin el enlace', async () => {
+    register.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 409 })));
+    open(SignUp);
+    await fillSignUp();
+    const alert = el().querySelector('[role="alert"]')!;
+    expect(alert.textContent).toContain('Ya hay una cuenta con ese correo.');
+    expect(alert.querySelector('a')).toBeNull();
   });
 });

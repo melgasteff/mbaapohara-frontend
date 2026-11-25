@@ -3,7 +3,8 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { LucideCircle, LucideCircleAlert, LucideCircleCheck, LucideEyeOff } from '@lucide/angular';
-import { AuthApi } from '../../../../core/api/auth-api';
+import { HttpErrorResponse } from '@angular/common/http';
+import { AccountCreatedError, AuthApi } from '../../../../core/api/auth-api';
 import { safeReturnUrl } from '../../../../core/auth/guards';
 import { Logo } from '../../../../shared/brand/logo/logo';
 import { focusFirstInvalid } from '../../../../shared/focus-first-invalid';
@@ -56,6 +57,8 @@ export class SignUp {
   });
   protected readonly sending = signal(false);
   protected readonly error = signal<string | null>(null);
+  /** La cuenta se creó y falló solo el ingreso: no hay que volver a registrarse. */
+  protected readonly created = signal(false);
   protected readonly submitted = signal(false);
 
   private readonly password = toSignal(this.form.controls.password.valueChanges, { initialValue: '' });
@@ -83,6 +86,7 @@ export class SignUp {
     if (this.sending()) return;
     this.submitted.set(true);
     this.error.set(null);
+    this.created.set(false);
     if (this.form.invalid) {
       focusFirstInvalid(this.host, this.injector);
       return;
@@ -92,7 +96,17 @@ export class SignUp {
     this.auth.register({ email, password, aceptaTerminos: true }).subscribe({
       next: () => this.router.navigateByUrl(safeReturnUrl(this.volver())),
       error: (error: unknown) => {
-        this.error.set(authErrorMessage(error, 'registro'));
+        if (error instanceof AccountCreatedError) {
+          const limited = error.cause instanceof HttpErrorResponse && error.cause.status === 429;
+          this.created.set(true);
+          this.error.set(
+            limited
+              ? 'Tu cuenta se creó, pero hubo muchos intentos de ingreso. Esperá un minuto e ingresá con tu correo y contraseña.'
+              : 'Tu cuenta se creó, pero no pudimos iniciar la sesión. Ingresá con tu correo y contraseña.',
+          );
+        } else {
+          this.error.set(authErrorMessage(error, 'registro'));
+        }
         this.sending.set(false);
       },
     });

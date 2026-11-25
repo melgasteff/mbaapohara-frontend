@@ -9,7 +9,15 @@
       </div>
 
       @if (error(); as message) {
-        <p class="alert mb-entra" role="alert"><svg lucideCircleAlert [size]="20" aria-hidden="true"></svg>{{ message }}</p>
+        <p class="alert mb-entra" role="alert">
+          <svg lucideCircleAlert [size]="20" aria-hidden="true"></svg>
+          <span>
+            {{ message }}
+            @if (created()) {
+              <a routerLink="/ingresar" [queryParams]="volver() ? { volver: volver() } : {}">Ir a ingresar</a>
+            }
+          </span>
+        </p>
       }
 
       <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
